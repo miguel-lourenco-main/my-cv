@@ -12,12 +12,12 @@ variables:
   NODE_ENV: production
 
 before_script:
-  - npm ci
+  - pnpm ci
 
 build:
   stage: build
   script:
-    - npm run build
+    - pnpm run build
   artifacts:
     paths:
       - out/
