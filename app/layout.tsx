@@ -5,24 +5,23 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Your Portfolio | Full Stack Developer',
-  description: 'Portfolio and CV of [Your Name] - Full Stack Developer specializing in modern web technologies',
-  keywords: 'portfolio, developer, full stack, web development, react, nextjs',
-  authors: [{ name: 'Your Name' }],
-  creator: 'Your Name',
+  title: 'Miguel de Sousa Lourenço | Full Stack Developer',
+  description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer specializing in modern web technologies',
+  keywords: 'portfolio, developer, full stack, web development, react, nextjs, miguel lourenço',
+  authors: [{ name: 'Miguel de Sousa Lourenço' }],
+  creator: 'Miguel de Sousa Lourenço',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://yoursite.com',
-    title: 'Your Portfolio | Full Stack Developer',
-    description: 'Portfolio and CV of [Your Name] - Full Stack Developer',
-    siteName: 'Your Portfolio',
+    url: 'https://miguel-lourenco-main.gitlab.io/web-curriculum/',
+    title: 'Miguel de Sousa Lourenço | Full Stack Developer',
+    description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer',
+    siteName: 'Miguel Lourenço Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Your Portfolio | Full Stack Developer',
-    description: 'Portfolio and CV of [Your Name] - Full Stack Developer',
-    creator: '@yourusername',
+    title: 'Miguel de Sousa Lourenço | Full Stack Developer',
+    description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer',
   },
   robots: {
     index: true,
