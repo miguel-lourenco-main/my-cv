@@ -1,8 +1,11 @@
 image: node:18
 
 cache:
+  key:
+    files:
+      - pnpm-lock.yaml
   paths:
-    - node_modules/
+    - .pnpm-store
 
 stages:
   - build
@@ -10,9 +13,13 @@ stages:
 
 variables:
   NODE_ENV: production
+  PNPM_CACHE_FOLDER: .pnpm-store
 
 before_script:
-  - pnpm ci
+  - corepack enable
+  - corepack prepare pnpm@latest --activate
+  - pnpm config set store-dir .pnpm-store
+  - pnpm install --frozen-lockfile
 
 build:
   stage: build
