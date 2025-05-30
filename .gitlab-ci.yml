@@ -36,7 +36,6 @@ build:
 pages:
   stage: deploy
   script:
-    - mkdir public
     - cp -r out/* public/
   artifacts:
     paths:
@@ -48,7 +47,6 @@ pages:
 pages:staging:
   stage: deploy
   script:
-    - mkdir public
     - cp -r out/* public/
   artifacts:
     paths:
