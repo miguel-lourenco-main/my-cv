@@ -40,8 +40,14 @@ pages:
   artifacts:
     paths:
       - public
+    expire_in: never
   only:
     - main
+  # Ensure public access
+  environment:
+    name: production
+    url: $CI_PAGES_URL
+    
 
 # Optional: Deploy to staging for merge requests
 pages:staging:

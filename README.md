@@ -24,7 +24,6 @@ A modern, responsive single-page portfolio and CV website built with Next.js, Ty
 ├── public/                # Static assets
 ├── next.config.js         # Next.js configuration
 ├── tailwind.config.js     # Tailwind CSS configuration
-└── setup-remotes.sh       # Git remote setup script
 ```
 
 ## 🛠️ Setup Instructions
@@ -35,28 +34,6 @@ A modern, responsive single-page portfolio and CV website built with Next.js, Ty
 npm install
 ```
 
-### 2. Set Up Git Remotes
-
-First, create repositories on both GitHub and GitLab with the same name (e.g., `portfolio`).
-
-Then run the setup script:
-
-```bash
-./setup-remotes.sh git@github.com:username/portfolio.git git@gitlab.com:username/portfolio.git
-```
-
-Or set up manually:
-
-```bash
-# Add multiple remotes
-git remote add github git@github.com:username/portfolio.git
-git remote add gitlab git@gitlab.com:username/portfolio.git
-
-# Set up origin to push to both
-git remote add origin git@github.com:username/portfolio.git
-git remote set-url --add --push origin git@github.com:username/portfolio.git
-git remote set-url --add --push origin git@gitlab.com:username/portfolio.git
-```
 
 ### 3. Configure Domains
 
@@ -152,7 +129,7 @@ npm start
 After deployment, your sites will be available at:
 
 - **GitHub Pages**: `https://username.github.io/repository-name`
-- **GitLab Pages**: `https://username.gitlab.io/repository-name`
+- **GitLab Pages**: ` https://miguel-lourenco-main.gitlab.io/my-cv`
 
 With custom domains:
 - **GitHub**: `https://your-domain.com`
@@ -212,9 +189,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 1. **Install dependencies**: `npm install`
 2. **Customize content**: Update your information in `app/page.tsx` and `app/layout.tsx`
-3. **Create repositories**: Set up on both GitHub and GitLab
-4. **Setup remotes**: Run `./setup-remotes.sh` with your repository URLs
-5. **Deploy**: `git push origin main`
+3. **Create repositories**: Set up on both GitHub and GitLab5. **Deploy**: `git push origin main`
 6. **Add projects**: Replace placeholder content as you build projects
 
 Your single-page portfolio will be live on both platforms! 🎉
