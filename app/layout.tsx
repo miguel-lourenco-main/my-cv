@@ -5,6 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://miguel-lourenco-main.gitlab.io/my-cv/'),
   title: 'Miguel de Sousa Lourenço | Full Stack Developer',
   description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer specializing in modern web technologies',
   keywords: 'portfolio, developer, full stack, web development, react, nextjs, miguel lourenço',
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://miguel-lourenco-main.gitlab.io/web-curriculum/',
+    url: 'https://miguel-lourenco-main.gitlab.io/my-cv/',
     title: 'Miguel de Sousa Lourenço | Full Stack Developer',
     description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer',
     siteName: 'Miguel Lourenço Portfolio',
