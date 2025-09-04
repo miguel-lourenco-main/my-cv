@@ -2,7 +2,7 @@ import ThemeToggle from './ThemeToggle'
 
 export default function Navigation() {
   return (
-    <nav className="fixed top-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-b border-slate-200/20">
+    <nav className="fixed top-0 w-full backdrop-blur-md z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
