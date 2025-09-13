@@ -59,7 +59,7 @@ export default function ShootingStars({
   trailColor = "#FFFFFF",
   starWidth = 140,
   starHeight = 2,
-  minTravelPx = 2000,
+  minTravelPx = 700,
   className,
 }: ShootingStarsProps) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
