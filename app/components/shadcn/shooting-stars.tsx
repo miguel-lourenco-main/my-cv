@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/app/lib/utils";
+import { useTheme } from "@/app/lib/theme-provider";
 
 export type ShootingStarsProps = {
   minSpeed?: number; // px per second for cruise phase
@@ -62,9 +63,13 @@ export default function ShootingStars({
   minTravelPx = 700,
   className,
 }: ShootingStarsProps) {
+  const { theme } = useTheme();
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [shooting, setShooting] = useState<ShootingInstance | null>(null);
+
+  // Determine if we're in dark mode
+  const isDarkMode = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   useEffect(() => {
     const element = wrapperRef.current;
@@ -263,10 +268,28 @@ export default function ShootingStars({
 
   const isTrailPhase = (s: ShootingInstance) => s.phase === "accelerating" || s.phase === "explosive";
   const getWidthForPhase = (s: ShootingInstance) => (isTrailPhase(s) ? starWidth : Math.max(starHeight * 2, 6));
-  const getBackgroundForPhase = (s: ShootingInstance) =>
-    isTrailPhase(s)
-      ? `linear-gradient(90deg, transparent 0%, ${trailColor} 60%, ${starColor} 100%)`
-      : `${starColor}`;
+  
+  // Theme-aware colors: darker colors in light mode, lighter colors in dark mode
+  const getThemeAwareColors = () => {
+    if (isDarkMode) {
+      return {
+        starColor: starColor, // Keep original purple in dark mode
+        trailColor: trailColor // Keep original white in dark mode
+      };
+    } else {
+      return {
+        starColor: "#4A0080", // Darker purple for light mode
+        trailColor: "#000000" // Black trail for light mode
+      };
+    }
+  };
+  
+  const getBackgroundForPhase = (s: ShootingInstance) => {
+    const colors = getThemeAwareColors();
+    return isTrailPhase(s)
+      ? `linear-gradient(90deg, transparent 0%, ${colors.trailColor} 60%, ${colors.starColor} 100%)`
+      : colors.starColor;
+  };
 
   return (
     <div ref={wrapperRef} className={cn("pointer-events-none relative h-full w-full overflow-hidden", className)}>
@@ -287,7 +310,9 @@ export default function ShootingStars({
               width: `${getWidthForPhase(shooting)}px`,
               height: `${starHeight}px`,
               background: getBackgroundForPhase(shooting),
-              filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9))",
+              filter: isDarkMode 
+                ? "drop-shadow(0 0 6px rgba(255,255,255,0.9))" 
+                : "drop-shadow(0 0 6px rgba(0,0,0,0.9))",
               borderRadius: `${starHeight}px`,
               transform: `rotate(${shooting.angleRad}rad)`,
               opacity: getOpacityForPhase(shooting),
