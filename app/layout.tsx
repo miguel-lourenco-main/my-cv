@@ -7,23 +7,23 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://miguel-lourenco-main.gitlab.io/my-cv/'),
-  title: 'Miguel de Sousa Lourenço | Full Stack Developer',
-  description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer specializing in modern web technologies',
+  title: 'Miguel Lourenço | Full Stack Developer',
+  description: 'Portfolio and CV of Miguel Lourenço - Full Stack Developer specializing in modern web technologies',
   keywords: 'portfolio, developer, full stack, web development, react, nextjs, miguel lourenço',
-  authors: [{ name: 'Miguel de Sousa Lourenço' }],
-  creator: 'Miguel de Sousa Lourenço',
+  authors: [{ name: 'Miguel Lourenço' }],
+  creator: 'Miguel Lourenço',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://miguel-lourenco-main.gitlab.io/my-cv/',
-    title: 'Miguel de Sousa Lourenço | Full Stack Developer',
-    description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer',
+    title: 'Miguel Lourenço | Full Stack Developer',
+    description: 'Portfolio and CV of Miguel Lourenço - Full Stack Developer',
     siteName: 'Miguel Lourenço Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Miguel de Sousa Lourenço | Full Stack Developer',
-    description: 'Portfolio and CV of Miguel de Sousa Lourenço - Full Stack Developer',
+    title: 'Miguel Lourenço | Full Stack Developer',
+    description: 'Portfolio and CV of Miguel Lourenço - Full Stack Developer',
   },
   robots: {
     index: true,

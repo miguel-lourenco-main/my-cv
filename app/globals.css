@@ -53,4 +53,9 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Force custom cursor on all interactive elements */
+* {
+  cursor: none !important;
 } 

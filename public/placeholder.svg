@@ -1,0 +1,9 @@
+<svg width="400" height="300" viewBox="0 0 400 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet">
+  <rect x="0" y="0" width="400" height="300" style="fill:#f1f5f9;"/>
+  <g transform="matrix(1,0,0,1,100,50)">
+    <rect x="0" y="0" width="200" height="160" rx="8" ry="8" fill="#e2e8f0"/>
+    <path d="M70,60 C70,54.5 74.5,50 80,50 C85.5,50 90,54.5 90,60 C90,65.5 85.5,70 80,70 C74.5,70 70,65.5 70,60 Z" fill="#94a3b8"/>
+    <path d="M30,150 L80,90 L100,110 L140,70 L170,150 Z" fill="#94a3b8"/>
+  </g>
+  <text x="50%" y="85%" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#64748b">Product Image</text>
+</svg>

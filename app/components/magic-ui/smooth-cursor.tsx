@@ -155,12 +155,29 @@ export function SmoothCursor({
       }
     };
 
+    // Hide cursor globally
     document.body.style.cursor = "none";
+    document.documentElement.style.cursor = "none";
+    
+    // Force cursor none on all elements
+    const style = document.createElement('style');
+    style.setAttribute('data-custom-cursor', 'true');
+    style.textContent = '* { cursor: none !important; }';
+    document.head.appendChild(style);
+    
     window.addEventListener("mousemove", smoothMouseMove, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", smoothMouseMove);
       document.body.style.cursor = "auto";
+      document.documentElement.style.cursor = "auto";
+      
+      // Remove the injected style
+      const injectedStyle = document.querySelector('style[data-custom-cursor]');
+      if (injectedStyle) {
+        injectedStyle.remove();
+      }
+      
       if (moveTimeoutRef.current) {
         clearTimeout(moveTimeoutRef.current);
       }
