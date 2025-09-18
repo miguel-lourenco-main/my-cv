@@ -1,3 +1,6 @@
+import EmailButton from './EmailButton'
+import GitlabButton from './GitlabButton'
+import LinkedInButton from './LinkedInButton'
 import ThemeToggle from './ThemeToggle'
 
 export default function Navigation() {
@@ -11,15 +14,9 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <a href="#about" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  About
-                </a>
-                <a href="#projects" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Projects
-                </a>
-                <a href="#contact" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Contact
-                </a>
+                <GitlabButton width={20} height={20} className='p-0'/>
+                <LinkedInButton width={20} height={20} className='p-0'/>
+                <EmailButton width={20} height={20} className='p-0'/>
               </div>
             </div>
             <ThemeToggle />

@@ -21,15 +21,6 @@ export default function Hero() {
             </p>
           </div>
         </div>
-        {/* Social Links in Hero */}
-        <div className="flex flex-col items-center px-6 py-4">
-          <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">Get in touch</h2>
-          <div className="flex justify-center space-x-6">
-            <GitlabButton />
-            <LinkedInButton />
-            <EmailButton />
-          </div>
-        </div>
       </div>
     </section>
   )
