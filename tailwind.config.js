@@ -10,6 +10,7 @@ module.exports = {
     extend: {
       maxWidth: {
         '8xl': '90rem', // 1440px (adjust to what you need)
+        '9xl': '100rem', // 1600px (adjust to what you need)
       },
       colors: {
         border: 'hsl(var(--border) / <alpha-value>)',
