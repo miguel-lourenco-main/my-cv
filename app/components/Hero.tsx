@@ -1,11 +1,8 @@
 import Image from "next/image";
-import GitlabButton from "./GitlabButton";
-import LinkedInButton from "./LinkedInButton";
-import EmailButton from "./EmailButton";
 
 export default function Hero() {
   return (
-    <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+    <section className="pt-48 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col max-w-7xl mx-auto gap-y-12">
         <div className="flex justify-center w-full space-x-12">
           <Image src="/placeholder.svg" alt="Miguel Lourenço" width={400} height={100} className="rounded-full" />

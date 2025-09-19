@@ -50,7 +50,7 @@ export default function Projects() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Example project card - replace with your actual projects */}
           {projects.map((project) => (
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.open('https://personal1625516.gitlab.io/ui-components', '_blank')}>
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.open(project.url, '_blank')}>
               <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                 <Image src={project.image} alt={project.title} width={500} height={500} />
               </div>
