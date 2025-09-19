@@ -17,7 +17,7 @@ export default function GitlabButton({
         target="_blank"
         rel="noopener noreferrer"
     >
-        <Image src="/gitlab-logo-500.svg" alt="GitLab" width={width} height={height} />
+        <Image src="logos/gitlab-logo-500.svg" alt="GitLab" width={width} height={height} />
     </a>
   );
 }

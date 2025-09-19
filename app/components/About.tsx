@@ -3,10 +3,12 @@ export default function About() {
     {
       title: "Languages",
       items: ["TypeScript/JavaScript", "C# (.NET for Visual Studio extensions)", "HTML/CSS"],
+      iconURLs: ["/logos/typescript.svg", "/logos/javaScript.png", "/logos/c_sharp.svg", "/logos/html-5.png", "/logos/css.png"],
     },
     {
       title: "Frontend",
       items: ["React", "Next.js (App Router)", "Tailwind CSS", "shadcn/ui", "Figma", "Vercel v0"],
+      iconURLs: ["/logos/react.svg", "/logos/nextjs.svg", "/logos/tailwind_css.svg", "/logos/shadcn.png", "/logos/figma.svg", "/logos/vercel.svg"],
     },
     {
       title: "Backend",
@@ -17,20 +19,21 @@ export default function About() {
         "File processin",
         "RAG/LLM integration",
       ],
+      iconURLs: ["/logos/nodejs.svg", "/logos/nextjs.svg", "/logos/rest.png", "/logos/file_processing.svg", "/logos/llm.png"],
     },
     {
       title: "DevOps",
-      items: ["GitLab", "CI/CD pipelines", "GitLab Pages", "Environment/config management"],
-    },
-    {
-      title: "Testing",
-      items: ["End‑to‑end/UI test automation integrated into CI with Playwright"],
+      items: ["GitLab", "CI/CD pipelines", "GitLab Pages", "Environment/config management", "Unit test automation integrated into CI with Playwright"],
+      iconURLs: ["/logos/gitlab-logo-500.svg", "/logos/ci_cd.svg", "/logos/environment_config.svg", "/logos/playwright.svg"],
     },
     {
       title: "Tooling",
       items: ["Git", "Linux", "Bash", "Pragmatic use of open‑source and AI tooling"],
+      iconURLs: ["/logos/git.svg", "/logos/linux.svg", "/logos/bash.svg"], // add to the ai tooling icon, a set that is made up of 3 ai tools that I regularly use, "/logos/ai_tools.svg"
     },
   ];
+
+  //add to the ai tooling icon, a set that is made up of 3 ai tools that I regularly use
 
   return (
     <section id="about" className="py-20">

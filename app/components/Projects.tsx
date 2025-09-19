@@ -7,28 +7,28 @@ const projects = [
     title: 'UI Components Playground',
     description: 'A playground for you to explore and play with custom UI components.',
     url: 'https://ui-components-5218c2.gitlab.io/',
-    image: '/ui_components_preview.png',
+    image: '/projects/ui_components_preview.png',
     technologies: ['React', 'Tailwind CSS', 'TypeScript'],
   },
   {
     title: 'Sonora',
     description: 'A storytelling app for children, that uses LLMs to generate narration voices and in the future, the stories themselves.',
     url: 'https://sonora-d09e63.gitlab.io/',
-    image: '/sonora_preview.png',
+    image: '/projects/sonora_preview.png',
     technologies: ['React', 'Tailwind CSS', 'TypeScript'],
   },
   {
     title: 'Agentic Hub',
     description: 'A hub for agentic systems, that allows users to invest, hire and create agents.',
     url: 'https://agentichub-64abdc.gitlab.io',
-    image: '/agentic_hub_preview.png',
+    image: '/projects/agentic_hub_preview.png',
     technologies: ['React', 'Tailwind CSS', 'TypeScript'],
   },
   {
     title: 'Cash Register',
     description: 'A very simple cash register app that allows you to add and remove items from a cart.',
     url: 'https://cash-register-a85839.gitlab.io/',
-    image: '/cash_register_preview.png',
+    image: '/projects/cash_register_preview.png',
     technologies: ['React', 'Tailwind CSS', 'TypeScript'],
   },
 ]
@@ -50,7 +50,7 @@ export default function Projects() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Example project card - replace with your actual projects */}
           {projects.map((project) => (
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.open(project.url, '_blank')}>
+            <div key={project.title} className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.open(project.url, '_blank')}>
               <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                 <Image src={project.image} alt={project.title} width={500} height={500} />
               </div>
