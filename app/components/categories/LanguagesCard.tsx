@@ -22,8 +22,8 @@ export default function LanguagesCard() {
           src={src}
           alt=""
           aria-hidden="true"
-          width={56}
-          height={56}
+          width={42}
+          height={42}
           className="opacity-90"
           loading="lazy"
           decoding="async"

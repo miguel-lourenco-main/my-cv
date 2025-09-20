@@ -15,10 +15,10 @@ export default function DevOpsCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <img key={src + idx} src={src} alt="" aria-hidden="true" width={60} height={60} className="opacity-90" loading="lazy" decoding="async" />
+        <img key={src + idx} src={src} alt="" aria-hidden="true" width={idx === 0 ? 42 : 56} height={idx === 0 ? 42 : 56} className="opacity-90" loading="lazy" decoding="async" />
       ))}
-      <CiCdIcon className="h-16 w-16 text-slate-900 dark:text-white" />
-      <EnvConfigIcon className="h-16 w-16 text-slate-900 dark:text-white" />
+      <CiCdIcon className="size-12 text-slate-900 dark:text-white" />
+      <EnvConfigIcon className="size-14 text-slate-900 dark:text-white" />
     </CategoryCard>
   );
 }

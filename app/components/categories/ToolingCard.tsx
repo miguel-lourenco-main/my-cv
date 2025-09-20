@@ -15,9 +15,9 @@ export default function ToolingCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <img key={src + idx} src={src} alt="" aria-hidden="true" width={56} height={56} className="opacity-90" loading="lazy" decoding="async" />
+        <img key={src + idx} src={src} alt="" aria-hidden="true" width={42} height={42} className="opacity-90" loading="lazy" decoding="async" />
       ))}
-      <VercelLogo className="h-14 w-14 text-slate-900 dark:text-white [&_*]:fill-current" />
+      <VercelLogo className="size-24 text-slate-900 dark:text-white [&_*]:fill-current" />
     </CategoryCard>
   );
 }
