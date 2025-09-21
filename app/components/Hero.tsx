@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <section className="pt-48 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col max-w-7xl mx-auto gap-y-12">
-        <div className="flex justify-center w-full space-x-12">
+        <div className="flex flex-col lg:flex-row justify-center items-center w-full space-y-12 lg:space-y-0 lg:space-x-12">
           <Image src="/placeholder.svg" alt="Miguel Lourenço" width={400} height={100} className="rounded-full" />
           <div className="flex flex-col items-center text-center gap-y-6">
             <h1 className="text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white mb-6">
