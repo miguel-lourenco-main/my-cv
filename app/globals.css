@@ -118,3 +118,12 @@ html {
     animation: none !important;
   }
 }
+
+/* Phone scroll-based card effects */
+.phone-active .mt-6 {
+  transform: scale(1.1) !important;
+}
+
+.phone-active [data-icon-item="true"] {
+  transform: translateY(calc(var(--dist-ratio, 0) * 8px)) !important;
+}

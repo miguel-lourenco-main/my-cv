@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useIsPhone } from "../../lib/use-mobile-detection";
 
 type CategoryCardProps = {
   title: string;
@@ -10,6 +11,57 @@ type CategoryCardProps = {
 
 export default function CategoryCard({ title, items, children }: CategoryCardProps) {
   const iconsContainerRef = useRef<HTMLDivElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const isPhone = useIsPhone();
+
+  // Intersection observer for scroll-based triggering on phones
+  useEffect(() => {
+    if (!isPhone || !titleRef.current) return;
+
+    const titleElement = titleRef.current;
+    const cardElement = titleElement.closest('[data-category-card="true"]');
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const rect = entry.boundingClientRect;
+          const viewportHeight = window.innerHeight;
+          const middleOfViewport = viewportHeight / 2;
+          
+          // Check if title is crossing the middle of the viewport
+          const isCrossingMiddle = rect.top <= middleOfViewport && rect.bottom >= middleOfViewport;
+          
+          if (isCrossingMiddle) {
+            // Deactivate all other cards first
+            const allCards = document.querySelectorAll('[data-category-card="true"]');
+            allCards.forEach((card) => {
+              if (card !== cardElement) {
+                card.classList.remove('phone-active');
+              }
+            });
+            
+            setIsActive(true);
+            cardElement?.classList.add('phone-active');
+          } else if (entry.intersectionRatio === 0) {
+            // Title has left the viewport completely
+            setIsActive(false);
+            cardElement?.classList.remove('phone-active');
+          }
+        });
+      },
+      {
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        rootMargin: '-10% 0px -10% 0px'
+      }
+    );
+
+    observer.observe(titleElement);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isPhone]);
 
   useEffect(() => {
     const container = iconsContainerRef.current;
@@ -56,17 +108,38 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
   }, [children]);
 
   return (
-    <div className="group flex flex-col gap-y-8 items-center justify-center h-full p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out overflow-hidden">
+    <div 
+      data-category-card="true"
+      className={`group flex flex-col gap-y-8 items-center justify-center h-full p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md transition-shadow duration-300 ease-in-out overflow-hidden ${
+        isPhone ? '' : 'hover:shadow-lg'
+      }`}
+    >
       <div className="flex flex-col items-center text-center">
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{title}</h3>
+        <h3 
+          ref={titleRef}
+          className="text-xl font-semibold text-slate-900 dark:text-white mb-2"
+        >
+          {title}
+        </h3>
         <p className="text-slate-600 dark:text-slate-300">{items.join(', ')}</p>
       </div>
-      <div ref={iconsContainerRef} className="mt-6 flex flex-wrap items-center justify-center gap-6 group-hover:scale-110 transition-transform duration-300 ease-in-out">
+      <div 
+        ref={iconsContainerRef} 
+        className={`mt-6 flex flex-wrap items-center justify-center gap-6 transition-transform duration-300 ease-in-out ${
+          isPhone 
+            ? 'phone-active:scale-110' 
+            : 'group-hover:scale-110'
+        }`}
+      >
         {React.Children.map(children, (child, idx) => (
           <div
             key={idx}
             data-icon-item="true"
-            className="transform transition-transform duration-300 ease-in-out group-hover:translate-y-[calc(var(--dist-ratio,0)*8px)]"
+            className={`transform transition-transform duration-300 ease-in-out ${
+              isPhone 
+                ? 'phone-active:translate-y-[calc(var(--dist-ratio,0)*8px)]' 
+                : 'group-hover:translate-y-[calc(var(--dist-ratio,0)*8px)]'
+            }`}
           >
             {child}
           </div>
