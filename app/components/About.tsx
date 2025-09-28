@@ -22,10 +22,23 @@ export default function About() {
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Technical Capabilities</h2>
           <p className="text-slate-600 dark:text-slate-300 mt-3">These are the technologies I'm most comfortable with.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:hidden block">
           {categories.map((c) => (
             <div key={c.key}>{c.component}</div>
           ))}
+        </div>
+        <div className="lg:block hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
+            <div><LanguagesCard /></div>
+            <div><FrontendCard /></div>
+            <div><BackendCard /></div>
+          </div>
+
+          {/* Row 2: 2 centered cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:max-w-5xl mx-auto">
+            <div><DevOpsCard /></div>
+            <div><ToolingCard /></div>
+          </div>
         </div>
       </div>
     </section>

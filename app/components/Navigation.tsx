@@ -26,7 +26,7 @@ export default function Navigation() {
 
   return (
     <nav className="fixed top-0 w-full z-50">
-      <div className={`${isScrolled ? 'w-full' : 'max-w-8xl mx-auto'} duration-1000 animate-all ease-in-out px-4 sm:px-6 lg:px-8`}>
+      <div className={`w-full mx-auto ${isScrolled ? 'max-w-[100vw]' : 'max-w-[1100px]'} transition-[max-width] duration-300 ease-in-out px-4 sm:px-6 lg:px-8`}>
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
             <h1 className="text-xl font-bold text-slate-800 dark:text-white">Miguel Lourenço</h1>

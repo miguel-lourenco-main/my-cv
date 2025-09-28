@@ -36,7 +36,7 @@ const projects = [
 export default function Projects() {
   return (
     <section id="projects" className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl xl:max-w-7xl 3xl:max-w-10xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
             Projects
@@ -47,12 +47,12 @@ export default function Projects() {
         </div>
         
         {/* Projects will be added here as you create them */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-16">
           {/* Example project card - replace with your actual projects */}
           {projects.map((project) => (
             <div key={project.title} className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.open(project.url, '_blank')}>
-              <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                <Image src={project.image} alt={project.title} width={500} height={500} />
+              <div className="h-72 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <img src={project.image} alt={project.title} className="size-full object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{project.title}</h3>
