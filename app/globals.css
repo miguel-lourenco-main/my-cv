@@ -55,11 +55,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Force custom cursor on all interactive elements */
-* {
-  cursor: none !important;
-} 
-
 /* 3D perspective and halo animations */
 .perspective-900 {
   perspective: 900px;
@@ -116,5 +111,54 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .icon-halo__icon {
     animation: none !important;
+  }
+}
+
+/* Optimized rocket cursor animations that sync with browser refresh rate */
+.rocket-thruster-1 {
+  animation: thruster1 0.33s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.rocket-thruster-2 {
+  animation: thruster2 0.27s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.rocket-thruster-3 {
+  animation: thruster3 0.39s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+@keyframes thruster1 {
+  0%, 100% { 
+    transform: scaleY(1); 
+    opacity: 0.6; 
+  }
+  50% { 
+    transform: scaleY(1.67); 
+    opacity: 1; 
+  }
+}
+
+@keyframes thruster2 {
+  0%, 100% { 
+    transform: scaleY(1); 
+    opacity: 0.6; 
+  }
+  50% { 
+    transform: scaleY(1.58); 
+    opacity: 1; 
+  }
+}
+
+@keyframes thruster3 {
+  0%, 100% { 
+    transform: scaleY(1); 
+    opacity: 0.6; 
+  }
+  50% { 
+    transform: scaleY(1.67); 
+    opacity: 1; 
   }
 }

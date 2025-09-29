@@ -14,7 +14,7 @@ export default function Hero() {
               </span>
             </h1>
             <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-              I’m an engineer who loves building systems—especially websites. I enjoy the whole lifecycle, from designing architecture and choosing tools, to shaping UX flows and crafting UI. I’m looking for a role where I can do exactly that.
+              I’m an engineer who loves building systems. I enjoy the whole lifecycle, from designing the architecture of the repository, to shaping UX flows and crafting UI's and implementing core backend features. I’m looking for a role where I can do exactly that.
             </p>
           </div>
         </div>
