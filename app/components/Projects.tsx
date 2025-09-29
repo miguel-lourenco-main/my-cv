@@ -1,81 +1,43 @@
 'use client'
 
-import Image from 'next/image'
-import { CardBody, CardContainer, CardItem } from './shadcn/3d-card'
-import Link from 'next/link'
-
-const projects = [
-  {
-    title: 'UI Components Playground',
-    description: 'A playground for you to explore and play with custom UI components.',
-    url: 'https://ui-components-5218c2.gitlab.io/',
-    image: '/projects/ui_components_preview.png',
-    technologies: ['React', 'Tailwind CSS', 'TypeScript'],
-  },
-  {
-    title: 'Sonora',
-    description: 'A storytelling app for children, that uses LLMs to generate narration voices and in the future, the stories themselves.',
-    url: 'https://sonora-d09e63.gitlab.io/',
-    image: '/projects/sonora_preview.png',
-    technologies: ['React', 'Tailwind CSS', 'TypeScript'],
-  },
-  {
-    title: 'Agentic Hub',
-    description: 'A hub for agentic systems, that allows users to invest, hire and create agents.',
-    url: 'https://agentichub-64abdc.gitlab.io',
-    image: '/projects/agentic_hub_preview.png',
-    technologies: ['React', 'Tailwind CSS', 'TypeScript'],
-  },
-  {
-    title: 'Cash Register',
-    description: 'A very simple cash register app that allows you to add and remove items from a cart.',
-    url: 'https://cash-register-a85839.gitlab.io/',
-    image: '/projects/cash_register_preview.png',
-    technologies: ['React', 'Tailwind CSS', 'TypeScript'],
-  },
-]
+import React, { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { ProjectGrid } from './projects/ProjectGrid'
+import { projects as projectsData } from './projects/projects.data'
+import type { Project } from './projects/projects.types'
+import { ProjectExpandedCard } from './projects/ProjectExpandedCard'
+import { Reveal, RevealStagger } from './Reveal'
 
 export default function Projects() {
+  const [activeProject, setActiveProject] = useState<Project | null>(null)
+
   return (
     <section id="projects" className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+      <div className="max-w-3xl xl:max-w-7xl 3xl:max-w-10xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealStagger className="text-center mb-16" delay={0.05} interval={0.06}>
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
             Projects
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
             Here are some of the projects I've worked on. Each project represents a learning journey and showcases different skills.
           </p>
-        </div>
-        
-        {/* Projects will be added here as you create them */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Example project card - replace with your actual projects */}
-          {projects.map((project) => (
-            <Link key={project.title} href={project.url} target="_blank">
-              <CardContainer containerClassName="size-full" className='size-full'>
-                <CardBody className="size-full bg-foreground dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" >
-                  <CardItem translateZ={30}>
-                    <Image src={project.image} alt={project.title} width={500} height={500} className="size-fit" />
-                  </CardItem>
-                  <CardItem translateZ={30} className="px-6 pt-6">
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{project.title}</h3>
-                    <p className="text-slate-600 dark:text-slate-300 mb-4">
-                      {project.description}
-                    </p>
-                  </CardItem>
-                  <CardItem translateZ={30} className="p-6">
-                    <div className="flex space-x-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                        {project.technologies.join(', ')}
-                      </span>
-                    </div>
-                  </CardItem>
-                </CardBody>
-              </CardContainer>
-            </Link>
-          ))}
-        </div>
+        </RevealStagger>
+
+        <Reveal type="fade">
+          <ProjectGrid
+            projects={projectsData}
+            onCardClick={(project) => setActiveProject(project)}
+          />
+        </Reveal>
+
+        <AnimatePresence>
+          {activeProject ? (
+            <ProjectExpandedCard
+              project={activeProject}
+              onClose={() => setActiveProject(null)}
+            />
+          ) : null}
+        </AnimatePresence>
       </div>
     </section>
   )

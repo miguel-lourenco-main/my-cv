@@ -37,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} antialiased`}>
-        <ThemeProvider defaultTheme="system" storageKey="theme">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className={`${inter.className} antialiased bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`}>
+        <ThemeProvider attribute="class" defaultTheme="system" storageKey="theme">
           {children}
         </ThemeProvider>
       </body>

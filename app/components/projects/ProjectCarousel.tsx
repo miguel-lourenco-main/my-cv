@@ -1,0 +1,166 @@
+"use client";
+
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { useTheme } from "../../lib/theme-provider";
+
+export function ProjectCarousel({ images }: { images: string[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const { theme, systemTheme } = useTheme();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const resolvedTheme = (theme === "system" ? systemTheme : theme) ?? "light";
+
+  const filteredImages = useMemo(() => {
+    const isDark = resolvedTheme === "dark";
+    const suffix = isDark ? "_D.png" : "_L.png";
+    const candidates = images.filter((src) => src.endsWith(suffix));
+    return candidates.length > 0 ? candidates : images;
+  }, [images, resolvedTheme]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi]);
+
+  return (
+    <div className="w-full">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {filteredImages.map((src, idx) => (
+            <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>
+              <img
+                src={src}
+                alt={`Slide ${idx + 1}`}
+                className="w-full h-60 md:h-72 lg:h-80 object-cover cursor-zoom-in"
+                onClick={() => {
+                  setLightboxIndex(idx);
+                  setLightboxOpen(true);
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center justify-between mt-3">
+        <div className="flex gap-2">
+          {filteredImages.map((_, idx) => (
+            <button
+              key={`dot-${idx}`}
+              className={`h-2 w-2 rounded-full ${selectedIndex === idx ? "bg-slate-900 dark:bg-slate-100" : "bg-slate-300 dark:bg-slate-700"}`}
+              aria-label={`Go to slide ${idx + 1}`}
+              onClick={() => emblaApi?.scrollTo(idx)}
+            />
+          ))}
+        </div>
+        <div className="flex gap-2 text-background">
+          <button
+            className="px-3 py-1 text-sm rounded-md bg-foreground hover:bg-muted-foreground"
+            onClick={() => emblaApi?.scrollPrev()}
+          >
+            Prev
+          </button>
+          <button
+            className="px-3 py-1 text-sm rounded-md bg-foreground hover:bg-muted-foreground"
+            onClick={() => emblaApi?.scrollNext()}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      {lightboxOpen && (
+        <Lightbox
+          images={filteredImages}
+          index={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+          onPrev={() => setLightboxIndex((i) => (i - 1 + filteredImages.length) % filteredImages.length)}
+          onNext={() => setLightboxIndex((i) => (i + 1) % filteredImages.length)}
+        />
+      )}
+    </div>
+  );
+}
+
+function Lightbox({
+  images,
+  index,
+  onClose,
+  onPrev,
+  onNext,
+}: {
+  images: string[];
+  index: number;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  const [current, setCurrent] = useState(index);
+
+  useEffect(() => setCurrent(index), [index]);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "ArrowRight") onNext();
+    }
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose, onPrev, onNext]);
+
+  const handleBackdrop = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose();
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4" onClick={handleBackdrop}>
+      <button
+        aria-label="Close"
+        className="absolute top-4 right-4 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
+        onClick={onClose}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <button
+        aria-label="Previous image"
+        className="absolute left-4 md:left-6 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
+        onClick={(e) => { e.stopPropagation(); onPrev(); }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+      <button
+        aria-label="Next image"
+        className="absolute right-4 md:right-6 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
+        onClick={(e) => { e.stopPropagation(); onNext(); }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+
+      <div className="max-h-[90vh] max-w-[95vw] md:max-w-[90vw]">
+        <img src={images[current]} alt="Expanded" className="object-contain w-full h-full" />
+      </div>
+    </div>
+  );
+}
+
+

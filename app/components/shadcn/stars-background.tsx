@@ -6,7 +6,7 @@ import { useTheme } from "@/app/lib/theme-provider";
 
 export type StarsBackgroundProps = {
   starDensity?: number; // stars per pixel area
-  allStarsTwinkle?: boolean;
+  allStarsTwinkle?: boolean; // if false, stars are static
   twinkleProbability?: number; // when allStarsTwinkle is false
   minTwinkleSpeed?: number; // seconds
   maxTwinkleSpeed?: number; // seconds
@@ -23,6 +23,7 @@ type StarDefinition = {
   twinkleDelaySec: number;
   glowDurationSec: number;
   glowDelaySec: number;
+  brightness: number; // 0..1 for static brightness
 };
 
 function randomBetween(min: number, max: number) {
@@ -31,7 +32,7 @@ function randomBetween(min: number, max: number) {
 
 export default function StarsBackground({
   starDensity = 0.00015,
-  allStarsTwinkle = true,
+  allStarsTwinkle = false,
   twinkleProbability = 0.7,
   minTwinkleSpeed = 0.5,
   maxTwinkleSpeed = 1,
@@ -68,10 +69,11 @@ export default function StarsBackground({
     const created: StarDefinition[] = [];
     for (let i = 0; i < targetCount; i++) {
       const willTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
-      const twinkleDurationSec = randomBetween(minTwinkleSpeed, maxTwinkleSpeed);
-      const twinkleDelaySec = Math.random() * 2;
-      const glowDurationSec = randomBetween(0.6, 1.2);
-      const glowDelaySec = Math.random() * 1.5;
+      const twinkleDurationSec = willTwinkle ? randomBetween(minTwinkleSpeed, maxTwinkleSpeed) : 0;
+      const twinkleDelaySec = willTwinkle ? Math.random() * 2 : 0;
+      const glowDurationSec = willTwinkle ? randomBetween(0.6, 1.2) : 0;
+      const glowDelaySec = willTwinkle ? Math.random() * 1.5 : 0;
+      const brightness = Math.random() * 0.6 + 0.35; // 0.35..0.95
       created.push({
         id: i,
         xPercent: Math.random() * 100,
@@ -82,6 +84,7 @@ export default function StarsBackground({
         twinkleDelaySec,
         glowDurationSec,
         glowDelaySec,
+        brightness,
       });
     }
     setStars(created);
@@ -97,7 +100,7 @@ export default function StarsBackground({
           const twinkleAnimation = star.willTwinkle
             ? `${star.twinkleDurationSec}s twinkle ease-in-out ${star.twinkleDelaySec}s infinite alternate`
             : "none";
-          const glowAnimation = `${star.glowDurationSec}s glowPulse ease-in-out ${star.glowDelaySec}s infinite alternate`;
+          const glowAnimation = star.willTwinkle ? `${star.glowDurationSec}s glowPulse ease-in-out ${star.glowDelaySec}s infinite alternate` : "none";
 
           // Theme-aware colors: darker colors in light mode, lighter colors in dark mode
           const starColor = isDarkMode ? "255,255,255" : "0,0,0";
@@ -120,27 +123,13 @@ export default function StarsBackground({
                 background: backgroundGradient,
                 boxShadow: boxShadow,
                 animation: `${glowAnimation}${twinkleAnimation === "none" ? "" : ", " + twinkleAnimation}`,
+                opacity: star.brightness,
               }}
             />
           );
         })}
       </div>
-      <style jsx global>{`
-        @keyframes twinkle {
-          0% { opacity: 0.6; }
-          100% { opacity: 1; }
-        }
-        @keyframes glowPulse {
-          0% {
-            box-shadow: 0 0 3px ${isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'}, 0 0 6px ${isDarkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'};
-            transform: scale(1);
-          }
-          100% {
-            box-shadow: 0 0 6px ${isDarkMode ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)'}, 0 0 12px ${isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'};
-            transform: scale(1.2);
-          }
-        }
-      `}</style>
+      {/* No global animations when stars are static; twinkle/glow keyframes are omitted to reduce work */}
     </div>
   );
 }

@@ -11,6 +11,10 @@ module.exports = {
       maxWidth: {
         '8xl': '90rem', // 1440px (adjust to what you need)
         '9xl': '100rem', // 1600px (adjust to what you need)
+        '10xl': '110rem'
+      },
+      screens:{
+        '3xl': '1750px'
       },
       colors: {
         border: 'hsl(var(--border) / <alpha-value>)',

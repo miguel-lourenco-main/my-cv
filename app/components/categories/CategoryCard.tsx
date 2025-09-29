@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useIsPhone } from "../../lib/use-mobile-detection";
+import { RevealStagger } from "../Reveal";
+import { Reveal } from "../Reveal";
+import { useIsPhone } from "@/app/lib/use-mobile-detection";
 
 type CategoryCardProps = {
   title: string;
@@ -108,13 +110,12 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
   }, [children]);
 
   return (
-    <div 
-      data-category-card="true"
+    <Reveal type="fade" 
       className={`group flex flex-col gap-y-8 items-center justify-center h-full p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md transition-shadow duration-300 ease-in-out overflow-hidden ${
         isPhone ? '' : 'hover:shadow-lg'
       }`}
     >
-      <div className="flex flex-col items-center text-center">
+      <RevealStagger className="flex flex-col items-center text-center" delay={0.05} interval={0.06}>
         <h3 
           ref={titleRef}
           className="text-xl font-semibold text-slate-900 dark:text-white mb-2"
@@ -122,29 +123,19 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
           {title}
         </h3>
         <p className="text-slate-600 dark:text-slate-300">{items.join(', ')}</p>
-      </div>
-      <div 
-        ref={iconsContainerRef} 
-        className={`mt-6 flex flex-wrap items-center justify-center gap-6 transition-transform duration-300 ease-in-out ${
-          isPhone 
-            ? 'phone-active:scale-110' 
-            : 'group-hover:scale-110'
-        }`}
-      >
+      </RevealStagger>
+      <div ref={iconsContainerRef} className="mt-6 flex flex-wrap items-center justify-center gap-6 group-hover:scale-110 transition-transform duration-300 ease-in-out">
         {React.Children.map(children, (child, idx) => (
-          <div
-            key={idx}
-            data-icon-item="true"
-            className={`transform transition-transform duration-300 ease-in-out ${
-              isPhone 
-                ? 'phone-active:translate-y-[calc(var(--dist-ratio,0)*8px)]' 
-                : 'group-hover:translate-y-[calc(var(--dist-ratio,0)*8px)]'
-            }`}
-          >
-            {child}
-          </div>
+          <Reveal key={idx} type="slide" direction="up" delay={0.1 + idx * 0.06}>
+            <div
+              data-icon-item="true"
+              className="transform transition-transform duration-300 ease-in-out group-hover:translate-y-[calc(var(--dist-ratio,0)*8px)]"
+            >
+              {child}
+            </div>
+          </Reveal>
         ))}
       </div>
-    </div>
+    </Reveal>
   );
 }
