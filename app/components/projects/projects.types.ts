@@ -3,6 +3,21 @@ export type ProjectTechnology = {
   icon: string; // path to public asset, e.g. '/logos/react.svg'
 };
 
+export type ProjectDetails = {
+  subtitle?: string;
+  overview?: string;
+  coreConcept?: {
+    summary?: string;
+    bullets?: string[];
+  };
+  features?: string[];
+  technical?: {
+    frontendStack?: string[];
+    projectStructure?: string[];
+    deployment?: string[];
+  };
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -11,6 +26,6 @@ export type Project = {
   websiteUrl: string;
   gitlabUrl: string;
   technologies: ProjectTechnology[];
-  experience: string;
+  details?: ProjectDetails;
 };
 

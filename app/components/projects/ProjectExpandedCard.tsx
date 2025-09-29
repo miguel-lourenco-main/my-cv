@@ -61,6 +61,11 @@ export function ProjectExpandedCard({
                   <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
                     {project.title}
                   </h3>
+                  {project.details?.subtitle ? (
+                    <p className="text-neutral-700 dark:text-neutral-300 font-medium">
+                      {project.details.subtitle}
+                    </p>
+                  ) : null}
                   <p className="text-neutral-600 dark:text-neutral-400">
                     {project.description}
                   </p>
@@ -108,14 +113,84 @@ export function ProjectExpandedCard({
                 ))}
               </div>
 
-              <div>
-                <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">
-                  Experience
-                </h4>
-                <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                  {project.experience}
-                </p>
-              </div>
+              {project.details ? (
+                <div className="space-y-6">
+                  {project.details.overview ? (
+                    <section>
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Overview</h4>
+                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                        {project.details.overview}
+                      </p>
+                    </section>
+                  ) : null}
+
+                  {project.details.coreConcept ? (
+                    <section>
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Core Concept</h4>
+                      {project.details.coreConcept.summary ? (
+                        <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed mb-2">
+                          {project.details.coreConcept.summary}
+                        </p>
+                      ) : null}
+                      {project.details.coreConcept.bullets?.length ? (
+                        <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
+                          {project.details.coreConcept.bullets.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </section>
+                  ) : null}
+
+                  {project.details.features?.length ? (
+                    <section>
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Key Features</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
+                        {project.details.features.map((feature) => (
+                          <li key={feature}>{feature}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : null}
+
+                  {project.details.technical && (
+                    <section className="space-y-4">
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100">Technical Architecture</h4>
+                      {project.details.technical.frontendStack?.length ? (
+                        <div>
+                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">Frontend Stack</h5>
+                          <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
+                            {project.details.technical.frontendStack.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {project.details.technical.projectStructure?.length ? (
+                        <div>
+                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">Project Structure</h5>
+                          <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
+                            {project.details.technical.projectStructure.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {project.details.technical.deployment?.length ? (
+                        <div>
+                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">Deployment</h5>
+                          <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
+                            {project.details.technical.deployment.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </section>
+                  )}
+                </div>
+              ) : null}
+
             </div>
           </motion.div>
         </div>

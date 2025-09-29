@@ -18,8 +18,7 @@ export const projects: Project[] = [
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
     ],
-    experience:
-      "Built a component lab and refined design tokens, motion, and accessibility.",
+    
   },
   {
     id: "sonora",
@@ -37,14 +36,13 @@ export const projects: Project[] = [
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
     ],
-    experience:
-      "Worked on voice pipeline integration and kid-friendly UX with parental controls.",
+    
   },
   {
     id: "agentic-hub",
     title: "Agentic Hub",
     description:
-      "A hub to invest, hire, and create agentic systems.",
+      "Decentralized AI agent service marketplace — a 'Fiverr for AI agents'.",
     images: [
       "/projects/agentic_hub_preview.png",
       "/placeholder.svg",
@@ -56,8 +54,47 @@ export const projects: Project[] = [
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
     ],
-    experience:
-      "Designed modular agent architecture and marketplace interactions.",
+    details: {
+      subtitle: "AI Agent Service Marketplace",
+      overview:
+        "Agentic Hub is a decentralized AI agent service marketplace built as a modern web application that functions as a 'Fiverr for AI agents.' It's designed to be a platform where specialized AI agents can offer services to both human users and other AI agents, creating a digital economy ecosystem.",
+      coreConcept: {
+        summary: "The platform serves as an integration hub for AI agents.",
+        bullets: [
+          "AI agents act as service providers offering specialized capabilities like content generation, customer support, analytics, development assistance, and research",
+          "Agents can hire other agents for complex workflows requiring multiple specialized skills",
+          "Human users can hire agents for various tasks through embedded UIs",
+          "Blockchain integration with Solana for payments and verifiability",
+        ],
+      },
+      features: [
+        "Agent Marketplace: Browse and discover AI agents across categories (Development, Analytics, Content, Customer Support, Research)",
+        "Embedded Agent UIs: Each agent provides its own embeddable interface that gets integrated into the marketplace",
+        "Agent-to-Agent Communication: Agents can discover and hire other agents via standardized APIs",
+        "Trust & Verification: Cryptographic proofs and immutable logs ensure task completion verification",
+        "Investment Opportunities: Users can invest in popular agents through a tokenized system",
+        "Review System: Rating and review system for agent quality assessment",
+      ],
+      technical: {
+        frontendStack: [
+          "Next.js 14 with App Router",
+          "React 18 with TypeScript",
+          "Tailwind CSS for styling",
+          "Framer Motion for animations",
+          "Radix UI components via shadcn/ui",
+          "Zustand for state management",
+        ],
+        projectStructure: [
+          "Turbo for build orchestration",
+          "pnpm for package management",
+          "Shared UI components in packages/ui",
+          "ESLint/Prettier configuration packages",
+          "TypeScript configuration packages",
+        ],
+        deployment: ["Gitlab Pages"],
+      },
+    },
+    
   },
   {
     id: "cash-register",
@@ -75,8 +112,7 @@ export const projects: Project[] = [
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
     ],
-    experience:
-      "Explored state management patterns and receipt printing edge cases.",
+    
   },
 ];
 
