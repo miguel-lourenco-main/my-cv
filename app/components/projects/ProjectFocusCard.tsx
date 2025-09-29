@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
+import { useTheme } from "../../lib/theme-provider";
 
 export function ProjectFocusCard({
   project,
@@ -17,6 +18,15 @@ export function ProjectFocusCard({
   setHovered: React.Dispatch<React.SetStateAction<number | null>>;
   onClick: (project: Project) => void;
 }) {
+  const { theme, systemTheme } = useTheme();
+  const resolvedTheme = (theme === "system" ? systemTheme : theme) ?? "light";
+
+  const coverImage = useMemo(() => {
+    const isDark = resolvedTheme === "dark";
+    const suffix = isDark ? "_D.png" : "_L.png";
+    const themed = project.images.find((src) => src.endsWith(suffix));
+    return themed ?? project.images[0];
+  }, [project.images, resolvedTheme]);
   return (
     <div
       onMouseEnter={() => setHovered(index)}
@@ -28,7 +38,7 @@ export function ProjectFocusCard({
       onClick={() => onClick(project)}
     >
       <img
-        src={project.images[0]}
+        src={coverImage}
         alt={project.title}
         className="object-cover absolute inset-0 w-full h-full"
       />

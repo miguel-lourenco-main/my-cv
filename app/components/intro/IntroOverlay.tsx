@@ -16,8 +16,8 @@ type IntroOverlayProps = {
 export default function IntroOverlay({
   show,
   onDone,
-  starsDelayMs = 450,
-  afterStarsDelayMs = 1600,
+  starsDelayMs = 300,
+  afterStarsDelayMs = 1200,
 }: IntroOverlayProps) {
   const [showStars, setShowStars] = useState(false);
   const cancelledRef = useRef(false);
@@ -75,7 +75,7 @@ export default function IntroOverlay({
           {/* Centered identity */}
           <div className="relative h-full w-full flex items-center justify-center">
             <motion.div
-              className="flex flex-col items-center gap-y-6"
+              className="flex flex-col items-center gap-y-24"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -83,8 +83,8 @@ export default function IntroOverlay({
               {/* Landscape, larger avatar ~5x previous visible footprint */}
               <ProfileAvatar
                 layoutId="intro-avatar"
-                width={900}
-                height={540}
+                width={500}
+                height={300}
                 alt="Miguel Lourenço"
                 imageClassName="rounded-xl object-cover"
               />

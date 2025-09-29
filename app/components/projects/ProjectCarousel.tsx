@@ -1,11 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import { useTheme } from "../../lib/theme-provider";
 
 export function ProjectCarousel({ images }: { images: string[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { theme, systemTheme } = useTheme();
+
+  const resolvedTheme = (theme === "system" ? systemTheme : theme) ?? "light";
+
+  const filteredImages = useMemo(() => {
+    const isDark = resolvedTheme === "dark";
+    const suffix = isDark ? "_D.png" : "_L.png";
+    const candidates = images.filter((src) => src.endsWith(suffix));
+    return candidates.length > 0 ? candidates : images;
+  }, [images, resolvedTheme]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -21,7 +32,7 @@ export function ProjectCarousel({ images }: { images: string[] }) {
     <div className="w-full">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {images.map((src, idx) => (
+          {filteredImages.map((src, idx) => (
             <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>
               <img
                 src={src}
@@ -34,7 +45,7 @@ export function ProjectCarousel({ images }: { images: string[] }) {
       </div>
       <div className="flex items-center justify-between mt-3">
         <div className="flex gap-2">
-          {images.map((_, idx) => (
+          {filteredImages.map((_, idx) => (
             <button
               key={`dot-${idx}`}
               className={`h-2 w-2 rounded-full ${selectedIndex === idx ? "bg-slate-900 dark:bg-slate-100" : "bg-slate-300 dark:bg-slate-700"}`}
