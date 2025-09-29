@@ -79,7 +79,7 @@ export function ProjectExpandedCard({
                   >
                     Visit <GlobeIcon className="size-5" />
                   </Link>
-                  <GitlabButton width={20} height={20} className='bg-orange-100 rounded-full p-2 hover:bg-orange-200'/>
+                  <GitlabButton href={project.gitlabUrl} width={20} height={20} className='bg-orange-100 rounded-full p-2 hover:bg-orange-200'/>
                 </div>
             </div>
 

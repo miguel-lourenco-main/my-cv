@@ -234,7 +234,7 @@ export const projects: Project[] = [
       "/projects_images/cash-register/order_info_D.png",
     ],
     websiteUrl: "https://cash-register-a85839.gitlab.io/",
-    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/cash-register",
+    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/cash_register",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
