@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { Project } from "./projects.types";
 import { ProjectFocusCard } from "./ProjectFocusCard";
+import { Reveal } from "../Reveal";
 
 export function ProjectGrid({
   projects,
@@ -16,14 +17,15 @@ export function ProjectGrid({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
       {projects.map((project, index) => (
-        <ProjectFocusCard
-          key={project.id}
-          project={project}
-          index={index}
-          hovered={hovered}
-          setHovered={setHovered}
-          onClick={onCardClick}
-        />
+        <Reveal key={project.id} type="slide" direction="up" delay={index * 0.06}>
+          <ProjectFocusCard
+            project={project}
+            index={index}
+            hovered={hovered}
+            setHovered={setHovered}
+            onClick={onCardClick}
+          />
+        </Reveal>
       ))}
     </div>
   );

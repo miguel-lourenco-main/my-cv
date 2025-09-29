@@ -1,12 +1,17 @@
+"use client";
+
 import Image from "next/image";
+import { Reveal, RevealStagger } from "./Reveal";
 
 export default function Hero() {
   return (
     <section className="pt-48 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col max-w-7xl mx-auto gap-y-12">
-        <div className="flex justify-center w-full space-x-12">
-          <Image src="/placeholder.svg" alt="Miguel Lourenço" width={400} height={100} className="rounded-full" />
-          <div className="flex flex-col items-center text-center gap-y-6">
+        <div className="flex justify-center w-full space-x-12 items-center">
+          <Reveal type="zoom" duration={0.7}>
+            <Image src="/placeholder.svg" alt="Miguel Lourenço" width={400} height={100} className="rounded-full" />
+          </Reveal>
+          <RevealStagger className="flex flex-col items-center text-center gap-y-6" delay={0.1} interval={0.08}>
             <h1 className="text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white mb-6">
               Hi, I'm{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
@@ -16,7 +21,7 @@ export default function Hero() {
             <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
               I’m an engineer who loves building systems. I enjoy the whole lifecycle, from designing the architecture of the repository, to shaping UX flows and crafting UI's and implementing core backend features. I’m looking for a role where I can do exactly that.
             </p>
-          </div>
+          </RevealStagger>
         </div>
       </div>
     </section>

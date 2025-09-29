@@ -3,12 +3,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/app/lib/utils";
 import { useTheme } from "@/app/lib/theme-provider";
+import StarsBackground from "./stars-background";
 
 export type ShootingStarsProps = {
   minSpeed?: number; // px per second for cruise phase
   maxSpeed?: number; // px per second for cruise phase
   minDelay?: number; // ms between spawns
   maxDelay?: number; // ms between spawns
+  initialDelayMs?: number; // ms before the first star spawns
   starColor?: string;
   trailColor?: string;
   starWidth?: number; // px trail length
@@ -52,10 +54,11 @@ function pickOffscreenPoint(width: number, height: number, margin: number) {
 }
 
 export default function ShootingStars({
-  minSpeed = 600,
-  maxSpeed = 1200,
-  minDelay = 1000,
-  maxDelay = 2000,
+  minSpeed = 500,
+  maxSpeed = 900,
+  minDelay = 2500,
+  maxDelay = 5000,
+  initialDelayMs = 0,
   starColor = "#9E00FF",
   trailColor = "#FFFFFF",
   starWidth = 140,
@@ -181,7 +184,7 @@ export default function ShootingStars({
       });
     };
 
-    const initialDelay = Math.floor(randomBetween(800, 2200));
+    const initialDelay = Math.max(0, Math.floor(initialDelayMs));
     timeoutId = window.setTimeout(() => {
       if (cancelled) return;
       triggerShootingStar();
@@ -191,7 +194,7 @@ export default function ShootingStars({
       cancelled = true;
       if (timeoutId) window.clearTimeout(timeoutId);
     };
-  }, [containerSize.width, containerSize.height, minDelay, maxDelay, minSpeed, maxSpeed, minTravelPx]);
+  }, [containerSize.width, containerSize.height, minDelay, maxDelay, minSpeed, maxSpeed, minTravelPx, initialDelayMs]);
 
   const handleTransitionEnd = useCallback(() => {
     setShooting((prev) => {
@@ -292,7 +295,8 @@ export default function ShootingStars({
   };
 
   return (
-    <div ref={wrapperRef} className={cn("pointer-events-none relative h-full w-full overflow-hidden", className)}>
+    <div ref={wrapperRef} className={cn("pointer-events-none relative h-full w-full overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800", className)}>
+      <StarsBackground className="absolute inset-0 z-0" />
       {shooting && (
         <div
           key={shooting.id}

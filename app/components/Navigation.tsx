@@ -1,22 +1,34 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import EmailButton from './EmailButton'
 import GitlabButton from './GitlabButton'
 import LinkedInButton from './LinkedInButton'
 import ThemeToggle from './ThemeToggle'
 
 export default function Navigation() {
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false) // threshold state
+  const [visualScrolled, setVisualScrolled] = useState(false) // drives base max-width
+  const [animClass, setAnimClass] = useState<string>('') // nav-anim-expand/collapse
+  const isAnimatingRef = useRef(false)
+  const mountedRef = useRef(false)
 
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
       const scrollY = window.scrollY
-      // Change width when scrolled more than 100px (you can adjust this value)
-      setIsScrolled(scrollY > 100)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          // Only update state when threshold crossing actually changes the value
+          const next = scrollY > 100
+          setIsScrolled(prev => (prev !== next ? next : prev))
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     
     // Cleanup event listener on component unmount
     return () => {
@@ -24,10 +36,33 @@ export default function Navigation() {
     }
   }, [])
 
+  // Drive CSS animation without snapping the base width
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      setVisualScrolled(isScrolled)
+      return
+    }
+    if (isAnimatingRef.current) return
+    if (isScrolled !== visualScrolled) {
+      isAnimatingRef.current = true
+      setAnimClass(isScrolled ? 'nav-anim-expand' : 'nav-anim-collapse')
+    }
+  }, [isScrolled, visualScrolled])
+
   return (
     <nav className="fixed top-0 w-full z-50">
-      <div className={`w-full mx-auto ${isScrolled ? 'max-w-[100vw]' : 'max-w-[1100px]'} transition-[max-width] duration-300 ease-in-out px-4 sm:px-6 lg:px-8`}>
-        <div className="flex justify-between items-center h-16">
+      <div
+        className={`w-full mx-auto ${visualScrolled ? 'max-w-[100vw]' : 'max-w-[1100px]'} ${animClass} px-4 sm:px-6 lg:px-8`}
+        onAnimationEnd={() => {
+          if (isAnimatingRef.current) {
+            setVisualScrolled(isScrolled)
+            setAnimClass('')
+            isAnimatingRef.current = false
+          }
+        }}
+      >
+        <div className={`flex justify-between items-center h-16`}>
           <div className="flex-shrink-0">
             <h1 className="text-xl font-bold text-slate-800 dark:text-white">Miguel Lourenço</h1>
           </div>

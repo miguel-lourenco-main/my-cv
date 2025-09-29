@@ -114,6 +114,10 @@ html {
   }
 }
 
+* {
+  cursor: none !important;
+}
+
 /* Optimized rocket cursor animations that sync with browser refresh rate */
 .rocket-thruster-1 {
   animation: thruster1 0.33s ease-in-out infinite;
@@ -161,4 +165,42 @@ html {
     transform: scaleY(1.67); 
     opacity: 1; 
   }
+}
+
+/* Navigation width animations */
+@keyframes nav-expand {
+  from { max-width: 1100px; }
+  to { max-width: 100vw; }
+}
+
+@keyframes nav-collapse {
+  from { max-width: 100vw; }
+  to { max-width: 1100px; }
+}
+
+.nav-anim-expand {
+  animation: nav-expand 300ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.nav-anim-collapse {
+  animation: nav-collapse 300ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Transform-only scale animations for smooth GPU-driven nav transitions */
+@keyframes nav-scale-in {
+  from { transform: scale(0.985); }
+  to { transform: scale(1); }
+}
+
+@keyframes nav-scale-out {
+  from { transform: scale(1); }
+  to { transform: scale(0.985); }
+}
+
+.nav-scale-in {
+  animation: nav-scale-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nav-scale-out {
+  animation: nav-scale-out 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
