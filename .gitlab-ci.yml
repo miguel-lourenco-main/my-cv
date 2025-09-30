@@ -23,6 +23,8 @@ before_script:
 
 build:
   stage: build
+  variables:
+    BASE_PATH: "/my-cv"
   script:
     - pnpm run build
   artifacts:
