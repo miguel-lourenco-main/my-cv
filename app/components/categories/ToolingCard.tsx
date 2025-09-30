@@ -8,9 +8,9 @@ export default function ToolingCard() {
   const title = "Tooling";
   const items = ["Git", "Linux", "Bash", "Pragmatic use of open‑source and AI tooling"];
   const iconURLs = [
-    "/logos/git.svg",
-    "/logos/Tux.svg",
-    "/logos/bash.svg",
+    "logos/git.svg",
+    "logos/Tux.svg",
+    "logos/bash.svg",
   ];
   return (
     <CategoryCard title={title} items={items}>

@@ -7,11 +7,11 @@ export default function LanguagesCard() {
   const title = "Languages";
   const items = ["TypeScript/JavaScript", "C# (.NET for Visual Studio extensions)", "HTML/CSS"];
   const iconURLs = [
-    "/logos/typescript.svg",
-    "/logos/javaScript.png",
-    "/logos/c_sharp.svg",
-    "/logos/html-5.png",
-    "/logos/css.png",
+    "logos/typescript.svg",
+    "logos/javaScript.png",
+    "logos/c_sharp.svg",
+    "logos/html-5.png",
+    "logos/css.png",
   ];
   
   return (

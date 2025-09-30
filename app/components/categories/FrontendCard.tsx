@@ -8,10 +8,10 @@ export default function FrontendCard() {
   const title = "Frontend";
   const items = ["React", "Next.js (App Router)", "Tailwind CSS", "shadcn/ui", "Figma", "Vercel v0"];
   const iconURLs = [
-    "/logos/react.svg",
-    "/logos/tailwind_css.svg",
-    "/logos/shadcn.png",
-    "/logos/figma.svg",
+    "logos/react.svg",
+    "logos/tailwind_css.svg",
+    "logos/shadcn.png",
+    "logos/figma.svg",
   ];
   
   return (
