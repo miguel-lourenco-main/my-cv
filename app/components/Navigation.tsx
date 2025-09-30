@@ -69,9 +69,9 @@ export default function Navigation() {
           <div className="flex items-center space-x-4">
             <div className="hidden md:block">
               <div className="mr-4 flex items-baseline space-x-6">
-                <GitlabButton width={20} height={20} className='p-0'/>
+                <GitlabButton width={22} height={22} className='p-0'/>
                 <LinkedInButton width={20} height={20} className='p-0'/>
-                <EmailButton width={20} height={20} className='p-0'/>
+                <EmailButton width={22} height={22} className='p-0'/>
               </div>
             </div>
             <ThemeToggle />

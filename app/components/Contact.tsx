@@ -15,9 +15,9 @@ export default function Contact() {
           </p>
           {/* Social Links */}
           <div className="flex justify-center space-x-6">
-            <GitlabButton width={42} height={42} />
+            <GitlabButton width={46} height={46} />
             <LinkedInButton width={42} height={42} />
-            <EmailButton width={42} height={42} />
+            <EmailButton width={52} height={52} />
           </div>
         </div>
       </div>
