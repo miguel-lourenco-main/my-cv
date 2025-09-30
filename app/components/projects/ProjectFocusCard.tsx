@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
@@ -18,15 +18,24 @@ export function ProjectFocusCard({
   setHovered: React.Dispatch<React.SetStateAction<number | null>>;
   onClick: (project: Project) => void;
 }) {
-  const { theme, systemTheme } = useTheme();
-  const resolvedTheme = (theme === "system" ? systemTheme : theme) ?? "light";
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const coverImage = useMemo(() => {
+    // During SSR or before mount, always use light theme to prevent hydration mismatch
+    if (!mounted) {
+      return project.images.find((src) => src.endsWith("_L.png")) ?? project.images[0];
+    }
+    
     const isDark = resolvedTheme === "dark";
     const suffix = isDark ? "_D.png" : "_L.png";
     const themed = project.images.find((src) => src.endsWith(suffix));
     return themed ?? project.images[0];
-  }, [project.images, resolvedTheme]);
+  }, [project.images, resolvedTheme, mounted]);
   return (
     <div
       onMouseEnter={() => setHovered(index)}

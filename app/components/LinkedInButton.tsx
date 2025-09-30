@@ -12,7 +12,7 @@ export default function LinkedInButton({
   return (
     <a
         href="https://www.linkedin.com/in/miguel-louren%C3%A7o-395335355/"
-        className={cn("flex items-center rounded-md px-4 py-2 space-x-2 text-slate-800 font-bold dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors", className)}
+        className={cn("flex items-center rounded-md px-4 py-2 space-x-2 text-slate-800 font-bold dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-195 transition-colors", className)}
         target="_blank"
         rel="noopener noreferrer"
     >

@@ -7,18 +7,27 @@ import { useTheme } from "../../lib/theme-provider";
 export function ProjectCarousel({ images }: { images: string[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const { theme, systemTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
-  const resolvedTheme = (theme === "system" ? systemTheme : theme) ?? "light";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filteredImages = useMemo(() => {
+    // During SSR or before mount, always use light theme to prevent hydration mismatch
+    if (!mounted) {
+      const lightImages = images.filter((src) => src.endsWith("_L.png"));
+      return lightImages.length > 0 ? lightImages : images;
+    }
+    
     const isDark = resolvedTheme === "dark";
     const suffix = isDark ? "_D.png" : "_L.png";
     const candidates = images.filter((src) => src.endsWith(suffix));
     return candidates.length > 0 ? candidates : images;
-  }, [images, resolvedTheme]);
+  }, [images, resolvedTheme, mounted]);
 
   useEffect(() => {
     if (!emblaApi) return;
