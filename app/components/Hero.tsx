@@ -27,7 +27,7 @@ export default function Hero({ showShared = true }: { showShared?: boolean }) {
             </p>
             <Button size="lg" className="gap-x-2" onClick={() => {
               const link = document.createElement('a');
-              link.href = "/cv.pdf";
+              link.href = "cv.pdf";
               link.download = "Miguel_Lourenco_CV.pdf";
               link.target = "_self";
               link.style.display = "none";
