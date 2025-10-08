@@ -23,6 +23,7 @@
     "qss": "^3.0.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-scroll-parallax": "^3.5.0",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {

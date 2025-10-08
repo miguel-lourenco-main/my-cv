@@ -19,7 +19,7 @@ export default function Projects() {
             Projects
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-            Here are some of the projects I've worked on. Each project represents a learning journey and showcases different skills.
+            Here are some of the projects I've worked on.
           </p>
         </RevealStagger>
 

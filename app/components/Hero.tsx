@@ -22,7 +22,7 @@ export default function Hero({ showShared = true }: { showShared?: boolean }) {
           )}
           <div className="flex flex-col items-center text-center gap-y-6"> 
             {showShared && <NameBadge layoutId="intro-name" />}
-            <RevealStagger delay={2.1} interval={0.04}>
+            <RevealStagger delay={2} interval={0.04}>
               <div className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
                 <p>
                   I’m an engineer who thrives on building systems and has hands-on experience across all aspects of the development process, from architecting repositories and shaping user experrience flows to building intuitive UIs and implementing core backend features.

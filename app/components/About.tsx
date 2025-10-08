@@ -19,30 +19,28 @@ export default function About() {
   return (
     <section id="about" className="py-20">
       <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
-        <RevealStagger className="text-center mb-20" delay={2} interval={0.06}>
+        <RevealStagger className="text-center mb-20" delay={2.2} interval={0.06}>
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Technical Skills</h2>
         </RevealStagger>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:hidden block">
-          <RevealStagger delay={1} interval={0.06}>
+          <RevealStagger delay={2.4} interval={0.06}>
             {categories.map((c) => (
               <div key={c.key}>{c.component}</div>
             ))}
           </RevealStagger>
         </div>
         <div className="lg:block hidden">
-          <RevealStagger delay={1.8} interval={0.06}>
+          <RevealStagger delay={2.4} interval={0.06}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
-              <div><LanguagesCard /></div>
-              <div><FrontendCard /></div>
-              <div><BackendCard /></div>
+              <LanguagesCard />
+              <FrontendCard />
+              <BackendCard />
             </div>
           </RevealStagger>
 
-          <RevealStagger delay={1} interval={0.06}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
-              <div><DevOpsCard /></div>
-              <div><ToolingCard /></div>
-            </div>
+          <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12" delay={0.1} interval={0.06}>
+            <DevOpsCard />
+            <ToolingCard />
           </RevealStagger>
         </div>
       </div>

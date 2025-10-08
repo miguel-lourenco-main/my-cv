@@ -295,7 +295,7 @@ export default function ShootingStars({
   };
 
   return (
-    <div ref={wrapperRef} className={cn("pointer-events-none relative h-full w-full overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800", className)}>
+    <div ref={wrapperRef} className={cn("pointer-events-none relative size-full overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800", className)}>
       <StarsBackground className="absolute inset-0 z-0" />
       {shooting && (
         <div

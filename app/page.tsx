@@ -11,6 +11,8 @@ import { SmoothCursor } from './components/magic-ui/smooth-cursor'
 import IntroOverlay from './components/intro/IntroOverlay'
 import React, { useEffect, useMemo, useState } from 'react'
 import { LayoutGroup } from 'motion/react'
+import { Parallax } from 'react-scroll-parallax'
+import ParallaxRoot from './components/parallax/ParallaxRoot'
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -31,24 +33,29 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background h-fit overflow-hidden">
       <SmoothCursor />
       <LayoutGroup id="root-shared">
-        {/* Keep main stars on page; intro overlay will render its own background stars */}
-        <ShootingStars className="absolute inset-0 z-0" initialDelayMs={showIntro ? 1400 : 0} />
 
-        {/* Intro overlay handles initial reveal and shared-element start */}
+        {/* Intro overlay handles initial reveal and stays screen-space (no parallax) */}
         <IntroOverlay show={showIntro} onDone={handleIntroDone} />
 
-        {/* Main content; identity renders only after intro to enable shared transition */}
-        <div className={"relative z-10 transition-opacity duration-300 " + (showIntro ? "opacity-0 pointer-events-none" : "opacity-100") }>
-          <Navigation />
-          <Hero showShared={!showIntro} />
-          <About />
-          <Projects />
-          <Contact />
-          <Footer />
-        </div>
+        <ParallaxRoot>
+          {/* Background parallax layer: absolute fill under content, behind via -z-10 */}
+          <Parallax className="absolute inset-0 z-0 size-full pointer-events-none" speed={reducedMotion ? 0 : -500}>
+            <ShootingStars className='size-full' initialDelayMs={showIntro ? 1400 : 0} />
+          </Parallax>
+
+          {/* Foreground content defines layout height; no parallax wrapper */}
+          <div className={"relative z-10 transition-opacity duration-300 " + (showIntro ? "opacity-0 pointer-events-none" : "opacity-100") }>
+            <Navigation />
+            <Hero showShared={!showIntro} />
+            <About />
+            <Projects />
+            <Contact />
+            <Footer />
+          </div>
+        </ParallaxRoot>
       </LayoutGroup>
     </div>
   )
