@@ -42,7 +42,7 @@ export default function Home() {
 
         <ParallaxRoot>
           {/* Background parallax layer: motion-based smoothing, absolute and non-intrusive */}
-          <ScrollParallaxLayer className="absolute inset-0 z-0 pointer-events-none" fromY={-180} toY={180}>
+          <ScrollParallaxLayer className="absolute inset-0 z-0 pointer-events-none h-[120%]" fromY={180} toY={-180} bleed={180}>
             <ShootingStars className='size-full' initialDelayMs={showIntro ? 1400 : 0} />
           </ScrollParallaxLayer>
 

@@ -10,6 +10,12 @@ type ScrollParallaxLayerProps = {
   /** Translate from (px) when page is at top to (px) when page is at bottom */
   fromY?: number;
   toY?: number;
+  /**
+   * Extra vertical bleed (in px) to extend the layer beyond its parent on both
+   * top and bottom. Useful when using large parallax offsets so content never
+   * reveals edges during transforms. Example: set to max(|fromY|, |toY|).
+   */
+  bleed?: number;
   /** Smoothing spring config */
   stiffness?: number;
   damping?: number;
@@ -23,6 +29,7 @@ export default function ScrollParallaxLayer({
   className,
   fromY = -180,
   toY = 180,
+  bleed = 0,
   stiffness = 120,
   damping = 26,
   mass = 0.4,
@@ -53,7 +60,15 @@ export default function ScrollParallaxLayer({
   const y = useSpring(yRaw, { stiffness, damping, mass });
 
   return (
-    <motion.div className={cn(className)} style={{ y, willChange: "transform" }}>
+    <motion.div
+      className={cn(className)}
+      style={{
+        y,
+        willChange: "transform",
+        // Expand vertically to compensate for parallax translation so edges don't show
+        top: bleed > 0 ? -bleed : undefined,
+      }}
+    >
       {children}
     </motion.div>
   );

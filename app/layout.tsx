@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { ThemeProvider } from './lib/theme-provider'
 
@@ -39,6 +40,30 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.className} antialiased bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`} suppressHydrationWarning>
+        <Script id="disable-scroll-restoration" strategy="beforeInteractive">{`
+          (function(){
+            try {
+              if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+              }
+            } catch (_) {}
+
+            var docEl = document.documentElement;
+            var previous = docEl.style.scrollBehavior;
+            docEl.style.scrollBehavior = 'auto';
+            window.scrollTo(0, 0);
+            docEl.style.scrollBehavior = previous;
+
+            window.addEventListener('pageshow', function(event) {
+              if (event.persisted) {
+                var previousPersisted = docEl.style.scrollBehavior;
+                docEl.style.scrollBehavior = 'auto';
+                window.scrollTo(0, 0);
+                docEl.style.scrollBehavior = previousPersisted;
+              }
+            });
+          })();
+        `}</Script>
         <ThemeProvider attribute="class" defaultTheme="system" storageKey="theme">
           {children}
         </ThemeProvider>

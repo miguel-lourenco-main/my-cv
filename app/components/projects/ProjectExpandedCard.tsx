@@ -9,6 +9,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { GlobeIcon } from "lucide-react";
 import Link from "next/link";
 import GitlabButton from "../GitlabButton";
+import BaseButton from "../Button";
 
 export function ProjectExpandedCard({
   project,
@@ -57,61 +58,57 @@ export function ProjectExpandedCard({
             exit={{ opacity: 0, y: 10 }}
           >
             <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
-                    {project.title}
-                  </h3>
-                  {project.details?.subtitle ? (
-                    <p className="text-neutral-700 dark:text-neutral-300 font-medium">
-                      {project.details.subtitle}
-                    </p>
-                  ) : null}
-                  <p className="text-neutral-600 dark:text-neutral-400">
-                    {project.description}
+              <div>
+                <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
+                  {project.title}
+                </h3>
+                {project.details?.subtitle ? (
+                  <p className="text-neutral-700 dark:text-neutral-300 font-medium">
+                    {project.details.subtitle}
                   </p>
-                </div>
-                <div className="flex gap-2">
-                  <Link
-                    href={project.websiteUrl}
-                    target="_blank"
-                    className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white"
-                    rel="noreferrer"
-                  >
-                    Visit <GlobeIcon className="size-5" />
-                  </Link>
-                  <GitlabButton href={project.gitlabUrl} width={20} height={20} className='bg-orange-100 rounded-full p-2 hover:bg-orange-200'/>
-                </div>
+                ) : null}
+                <p className="text-neutral-600 dark:text-neutral-400">
+                  {project.description}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <BaseButton href={project.websiteUrl} className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white" theme="green">
+                  Visit <GlobeIcon className="size-5" />
+                </BaseButton>
+                <GitlabButton href={project.gitlabUrl} width={20} height={20} className='bg-orange-100 rounded-full p-2 hover:bg-orange-200'/>
+              </div>
             </div>
 
             <ProjectCarousel images={project.images} />
 
+            <div className="flex items-center gap-3 flex-wrap">
+              {project.technologies.map((tech) => (
+                <Tooltip.Provider delayDuration={150} key={tech.name}>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <div className="h-8 w-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                        <img
+                          src={tech.icon}
+                          alt={tech.name}
+                          className="h-6 w-6"
+                        />
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        sideOffset={6}
+                        className="rounded bg-black text-white px-2 py-1 text-xs shadow"
+                      >
+                        {tech.name}
+                        <Tooltip.Arrow className="fill-black" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              ))}
+            </div>
+
             <div className="flex flex-col gap-6 overflow-auto">
-              <div className="flex items-center gap-3 flex-wrap">
-                {project.technologies.map((tech) => (
-                  <Tooltip.Provider delayDuration={150} key={tech.name}>
-                    <Tooltip.Root>
-                      <Tooltip.Trigger asChild>
-                        <div className="h-8 w-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                          <img
-                            src={tech.icon}
-                            alt={tech.name}
-                            className="h-6 w-6"
-                          />
-                        </div>
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        <Tooltip.Content
-                          sideOffset={6}
-                          className="rounded bg-black text-white px-2 py-1 text-xs shadow"
-                        >
-                          {tech.name}
-                          <Tooltip.Arrow className="fill-black" />
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip.Root>
-                  </Tooltip.Provider>
-                ))}
-              </div>
 
               {project.details ? (
                 <div className="space-y-6">

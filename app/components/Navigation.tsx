@@ -70,7 +70,7 @@ export default function Navigation() {
             <div className="hidden md:block">
               <div className="mr-4 flex items-baseline space-x-6">
                 <GitlabButton width={22} height={22} className='p-0'/>
-                <LinkedInButton width={20} height={20} className='p-0'/>
+                <LinkedInButton width={20} height={20} className='p-0 text-[#2867b2] hover:text-[#0a66c2]'/>
                 <EmailButton width={22} height={22} className='p-0'/>
               </div>
             </div>
