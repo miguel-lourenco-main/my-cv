@@ -53,7 +53,7 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 w-full z-50">
       <div
-        className={`w-full mx-auto ${visualScrolled ? 'max-w-[100vw]' : 'max-w-[1100px]'} ${animClass} px-4 sm:px-6 lg:px-8`}
+        className={`w-full mx-auto ${visualScrolled ? 'max-w-[100vw]' : 'max-w-[1100px]'} ${animClass}`}
         onAnimationEnd={() => {
           if (isAnimatingRef.current) {
             setVisualScrolled(isScrolled)

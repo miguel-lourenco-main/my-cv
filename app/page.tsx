@@ -47,13 +47,12 @@ export default function Home() {
           </ScrollParallaxLayer>
 
           {/* Foreground content defines layout height; no parallax wrapper */}
-          <div className={"relative z-10 transition-opacity duration-300 " + (showIntro ? "opacity-0 pointer-events-none" : "opacity-100") }>
+          <div className={"flex flex-col gap-y-48 xl:gap-y-64 pb-12 pt-48 xl:pt-64 2xl:pt-72 px-4 sm:px-6 lg:px-8 relative z-10 transition-opacity duration-300 " + (showIntro ? "opacity-0 pointer-events-none" : "opacity-100") }>
             <Navigation />
             <Hero showShared={!showIntro} />
             <About />
             <Projects />
             <Contact />
-            <Footer />
           </div>
         </ParallaxRoot>
       </LayoutGroup>

@@ -6,7 +6,7 @@ import { useOutsideClick } from "../../lib/hooks/use-outside-click";
 import type { Project } from "./projects.types";
 import { ProjectCarousel } from "./ProjectCarousel";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { GlobeIcon } from "lucide-react";
+import { GlobeIcon, X } from "lucide-react";
 import Link from "next/link";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
@@ -52,11 +52,19 @@ export function ProjectExpandedCard({
           <motion.div
             ref={ref}
             layoutId={`card-${project.title}-${id}`}
-            className="w-full max-w-[900px] h-full md:h-fit md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden shadow-lg z-50"
+            className="relative w-full max-w-[900px] h-full md:h-fit md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
           >
+            {/* X button for screens smaller than xl */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 xl:hidden flex items-center justify-center size-7 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Close"
+            >
+              <X className="size-4 text-gray-600 dark:text-gray-400" />
+            </button>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
