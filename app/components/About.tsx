@@ -38,7 +38,7 @@ export default function About() {
             </div>
           </RevealStagger>
 
-          <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12" delay={0.1} interval={0.06}>
+          <RevealStagger className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:max-w-5xl mx-auto" delay={0.1} interval={0.06}>
             <DevOpsCard />
             <ToolingCard />
           </RevealStagger>

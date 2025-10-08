@@ -11,8 +11,8 @@ import { SmoothCursor } from './components/magic-ui/smooth-cursor'
 import IntroOverlay from './components/intro/IntroOverlay'
 import React, { useEffect, useMemo, useState } from 'react'
 import { LayoutGroup } from 'motion/react'
-import { Parallax } from 'react-scroll-parallax'
 import ParallaxRoot from './components/parallax/ParallaxRoot'
+import ScrollParallaxLayer from './components/parallax/ScrollParallaxLayer'
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -41,10 +41,10 @@ export default function Home() {
         <IntroOverlay show={showIntro} onDone={handleIntroDone} />
 
         <ParallaxRoot>
-          {/* Background parallax layer: absolute fill under content, behind via -z-10 */}
-          <Parallax className="absolute inset-0 z-0 size-full pointer-events-none" speed={reducedMotion ? 0 : -500}>
+          {/* Background parallax layer: motion-based smoothing, absolute and non-intrusive */}
+          <ScrollParallaxLayer className="absolute inset-0 z-0 pointer-events-none" fromY={-180} toY={180}>
             <ShootingStars className='size-full' initialDelayMs={showIntro ? 1400 : 0} />
-          </Parallax>
+          </ScrollParallaxLayer>
 
           {/* Foreground content defines layout height; no parallax wrapper */}
           <div className={"relative z-10 transition-opacity duration-300 " + (showIntro ? "opacity-0 pointer-events-none" : "opacity-100") }>
