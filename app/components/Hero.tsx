@@ -20,27 +20,36 @@ export default function Hero({ showShared = true }: { showShared?: boolean }) {
               imageClassName="rounded-xl object-cover"
             />
           )}
-          <RevealStagger className="flex flex-col items-center text-center gap-y-6" delay={0.1} interval={0.08}>
+          <div className="flex flex-col items-center text-center gap-y-6"> 
             {showShared && <NameBadge layoutId="intro-name" />}
-            <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-              I’m an engineer who loves building systems. I enjoy the whole lifecycle, from designing the architecture of the repository, to shaping UX flows and crafting UI's and implementing core backend features. I’m looking for a role where I can do exactly that.
-            </p>
-            <Button size="lg" className="gap-x-2" onClick={() => {
-              const link = document.createElement('a');
-              link.href = "cv.pdf";
-              link.download = "Miguel_Lourenco_CV.pdf";
-              link.target = "_self";
-              link.style.display = "none";
-              document.body.appendChild(link);
-              link.click();
-              setTimeout(() => {
-                document.body.removeChild(link);
-              }, 100);
-            }}>
-              <span className="font-semibold text-lg">Download CV</span>
-              <CloudDownloadIcon className="size-6"/>
-            </Button>
-          </RevealStagger>
+            <RevealStagger delay={2.1} interval={0.04}>
+              <div className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+                <p>
+                  I’m an engineer who thrives on building systems and has hands-on experience across all aspects of the development process, from architecting repositories and shaping user experrience flows to building intuitive UIs and implementing core backend features.
+                </p>
+                <p className="mt-8">
+                  I enjoy working across the stack and collaborating with teams, and <span className="font-bold">I'm now looking for a role where I can continue to grow as an engineer.</span>
+                </p>
+              </div>
+            </RevealStagger>
+            <RevealStagger delay={2.1} interval={0.04}>
+              <Button size="lg" className="gap-x-2" onClick={() => {
+                const link = document.createElement('a');
+                link.href = "cv.pdf";
+                link.download = "Miguel_Lourenco_CV.pdf";
+                link.target = "_self";
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => {
+                  document.body.removeChild(link);
+                }, 100);
+              }}>
+                <span className="font-semibold text-lg">Download CV</span>
+                <CloudDownloadIcon className="size-6"/>
+              </Button>
+            </RevealStagger>
+          </div>
         </div>
       </div>
     </section>
