@@ -40,7 +40,7 @@ i18n:translate:
       fi
     # 2) Install Cursor CLI
     - curl https://cursor.com/install -fsS | bash
-    - export PATH="$HOME/.cursor/bin:$PATH"
+    - export PATH="$HOME/.local/bin:$HOME/.cursor/bin:$PATH"
     # 3) Configure Git identity
     - git config user.name "Cursor Agent"
     - git config user.email "cursoragent@cursor.com"
@@ -58,6 +58,10 @@ i18n:translate:
       fi
     # 5) Ask Cursor to fill only missing keys based on i18n-missing.json
     - |
+      # Support GitLab "File"-type variables: if CURSOR_API_KEY points to a file, read its contents
+      if [ -n "$CURSOR_API_KEY" ] && [ -f "$CURSOR_API_KEY" ]; then
+        export CURSOR_API_KEY="$(cat "$CURSOR_API_KEY")"
+      fi
       if [ -z "$CURSOR_API_KEY" ]; then
         echo "CURSOR_API_KEY is not set. Failing."; exit 1; fi
       cursor-agent -p "You are operating in a GitLab CI runner with git available.
