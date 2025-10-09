@@ -26,7 +26,7 @@ before_script:
 i18n:translate:
   stage: test
   variables:
-    MODEL: gpt-5
+    MODEL: auto
     BRANCH_PREFIX: "translate"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\//'
@@ -44,6 +44,12 @@ i18n:translate:
     # 3) Configure Git identity
     - git config user.name "Cursor Agent"
     - git config user.email "cursoragent@cursor.com"
+    # 3a) If a bot token is provided, set authenticated remote for pushes
+    - |
+      if [ -n "$BOT_GITLAB_TOKEN" ]; then
+        git remote set-url origin "https://oauth2:${BOT_GITLAB_TOKEN}@gitlab.com/${CI_PROJECT_PATH}.git";
+        echo "Configured authenticated remote for bot pushes.";
+      fi
     # 4) Prepare persistent translate branch
     - export TRANSLATE_BRANCH="${BRANCH_PREFIX}/${CI_COMMIT_REF_NAME}"
     - |
@@ -64,6 +70,7 @@ i18n:translate:
       fi
       if [ -z "$CURSOR_API_KEY" ]; then
         echo "CURSOR_API_KEY is not set. Failing."; exit 1; fi
+      #Executing agent command
       cursor-agent -p "You are operating in a GitLab CI runner with git available.
 
       # Context:
@@ -81,17 +88,24 @@ i18n:translate:
       1) For each locale listed in i18n-missing.json, open the corresponding JSON files and insert only the keys that are missing (create files if absent), preserving JSON structure and formatting.
       2) Do not overwrite or alter any existing translations or keys.
       3) Validate JSON formatting. Keep ordering stable where possible.
-      4) Stage and commit changes to the currently checked-out translate branch with a concise commit message like: 'chore(i18n): add missing <locale> keys'.
-      5) Push the translate branch to origin.
-      6) Post or update a single note on the Merge Request (if MR IID is available) via GitLab API briefly explaining what was updated and include a compare link to quickly create an MR from the translate branch back into the source branch.
-      7) If there are no changes to make, do nothing.
+      4) Stage and commit changes to the currently checked-out translate branch with a concise commit message like: 'chore(i18n): add missing <locale> keys'. Do NOT push or call any remote APIs; leave pushing to the shell script that runs after you finish.
+      5) If there are no changes to make, do nothing.
 
       # GitLab API:
       - Use ${GITLAB_TOKEN} (Personal Access Token with api scope) if needed to call: POST ${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes
       - Compare link to include in the note: ${CI_PROJECT_URL}/-/compare/${CI_COMMIT_REF_NAME}...${TRANSLATE_BRANCH}
       " --force --model "$MODEL" --output-format=text
-    # 6) Ensure branch is pushed (if not already by agent) and print summary
+    # 6) Guard: ensure only public/locales/ changed compared to source branch, then push
     - |
+      BASE_REF="origin/${CI_COMMIT_REF_NAME}"
+      git fetch origin "${CI_COMMIT_REF_NAME}:${CI_COMMIT_REF_NAME}" || true
+      CHANGED=$(git diff --name-only "$BASE_REF"...HEAD || true)
+      echo "$CHANGED" | sed 's/^/changed: /'
+      if echo "$CHANGED" | grep -v '^public/locales/' | grep -q .; then
+        echo "Aborting: changes outside public/locales/ detected.";
+        git reset --hard "$BASE_REF";
+        exit 3;
+      fi
       git push -u origin "$TRANSLATE_BRANCH" || true
       echo "Compare changes: ${CI_PROJECT_URL}/-/compare/${CI_COMMIT_REF_NAME}...${TRANSLATE_BRANCH}"
   dependencies: []
