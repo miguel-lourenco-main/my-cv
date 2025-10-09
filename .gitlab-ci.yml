@@ -8,8 +8,8 @@ cache:
     - .pnpm-store
 
 stages:
-  - build
   - test
+  - build
   - deploy
 
 variables:
@@ -21,6 +21,78 @@ before_script:
   - corepack prepare pnpm@latest --activate
   - pnpm config set store-dir .pnpm-store
   - pnpm install --frozen-lockfile
+
+# Detect and generate missing i18n translations using Cursor
+i18n:translate:
+  stage: test
+  variables:
+    MODEL: gpt-5
+    BRANCH_PREFIX: "translate"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\//'
+  script:
+    # 1) Detect missing keys vs EN
+    - node scripts/check-missing-i18n.js
+    - |
+      if [ ! -f i18n-missing.json ]; then
+        echo "No missing translation keys detected. Skipping generation.";
+        exit 0;
+      fi
+    # 2) Install Cursor CLI
+    - curl https://cursor.com/install -fsS | bash
+    - export PATH="$HOME/.cursor/bin:$PATH"
+    # 3) Configure Git identity
+    - git config user.name "Cursor Agent"
+    - git config user.email "cursoragent@cursor.com"
+    # 4) Prepare persistent translate branch
+    - export TRANSLATE_BRANCH="${BRANCH_PREFIX}/${CI_COMMIT_REF_NAME}"
+    - |
+      if git show-ref --verify --quiet "refs/heads/$TRANSLATE_BRANCH"; then
+        echo "Translate branch exists: $TRANSLATE_BRANCH";
+        git checkout "$TRANSLATE_BRANCH";
+        git merge --no-edit "origin/${CI_COMMIT_REF_NAME}" || true;
+      else
+        echo "Creating translate branch: $TRANSLATE_BRANCH";
+        git fetch origin "${CI_COMMIT_REF_NAME}:${CI_COMMIT_REF_NAME}" || true;
+        git checkout -B "$TRANSLATE_BRANCH" "origin/${CI_COMMIT_REF_NAME}" || git checkout -B "$TRANSLATE_BRANCH";
+      fi
+    # 5) Ask Cursor to fill only missing keys based on i18n-missing.json
+    - |
+      if [ -z "$CURSOR_API_KEY" ]; then
+        echo "CURSOR_API_KEY is not set. Failing."; exit 1; fi
+      cursor-agent -p "You are operating in a GitLab CI runner with git available.
+
+      # Context:
+      - Project URL: ${CI_PROJECT_URL}
+      - Project Path: ${CI_PROJECT_PATH}
+      - MR IID: ${CI_MERGE_REQUEST_IID}
+      - Source Branch: ${CI_COMMIT_REF_NAME}
+      - Translate Branch: ${TRANSLATE_BRANCH}
+      - Missing Keys Report: i18n-missing.json
+
+      # Goal:
+      - Read i18n-missing.json and add only the missing keys for each non-English locale under public/locales. Use the English values in public/locales/en as the source of truth and translate them to the target locale language. Never modify existing keys/values.
+
+      # Requirements:
+      1) For each locale listed in i18n-missing.json, open the corresponding JSON files and insert only the keys that are missing (create files if absent), preserving JSON structure and formatting.
+      2) Do not overwrite or alter any existing translations or keys.
+      3) Validate JSON formatting. Keep ordering stable where possible.
+      4) Stage and commit changes to the currently checked-out translate branch with a concise commit message like: 'chore(i18n): add missing <locale> keys'.
+      5) Push the translate branch to origin.
+      6) Post or update a single note on the Merge Request (if MR IID is available) via GitLab API briefly explaining what was updated and include a compare link to quickly create an MR from the translate branch back into the source branch.
+      7) If there are no changes to make, do nothing.
+
+      # GitLab API:
+      - Use ${GITLAB_TOKEN} (Personal Access Token with api scope) if needed to call: POST ${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes
+      - Compare link to include in the note: ${CI_PROJECT_URL}/-/compare/${CI_COMMIT_REF_NAME}...${TRANSLATE_BRANCH}
+      " --force --model "$MODEL" --output-format=text
+    # 6) Ensure branch is pushed (if not already by agent) and print summary
+    - |
+      git push -u origin "$TRANSLATE_BRANCH" || true
+      echo "Compare changes: ${CI_PROJECT_URL}/-/compare/${CI_COMMIT_REF_NAME}...${TRANSLATE_BRANCH}"
+  only:
+    - merge_requests
+  dependencies: []
 
 build:
   stage: build

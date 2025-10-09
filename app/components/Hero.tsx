@@ -9,7 +9,7 @@ import { useI18n } from "../lib/i18n";
 
 export default function Hero({ showShared = true }: { showShared?: boolean }) {
   const { locale, t } = useI18n();
-  const cvPath = locale === 'pt' ? 'cv_pt.pdf' : 'cv_en.pdf';
+  const cvPath = locale === 'pt' ? '/cv_pt.pdf' : '/cv_en.pdf';
   const th = t('hero');
   return (
     <section id="hero" className="flex flex-col max-w-7xl mx-auto gap-y-12">
