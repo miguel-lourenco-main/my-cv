@@ -70,7 +70,7 @@ i18n:translate:
       fi
       if [ -z "$CURSOR_API_KEY" ]; then
         echo "CURSOR_API_KEY is not set. Failing."; exit 1; fi
-      #Executing agent command
+      # Executing agent command
       cursor-agent -p "You are operating in a GitLab CI runner with git available.
 
       # Context:
