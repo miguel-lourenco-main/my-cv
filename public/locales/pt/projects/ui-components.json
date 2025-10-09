@@ -1,0 +1,48 @@
+{
+  "title": "Playground de Componentes UI",
+  "description": "Biblioteca de componentes e playground para navegar, testar e copiar UI React em vários temas.",
+  "subtitle": "Biblioteca de Componentes React & Playground",
+  "overview": "Uma biblioteca moderna e um playground para componentes React reutilizáveis em vários temas. Descobre componentes, ajusta props em tempo real e copia código pronto para produção.",
+  "coreConcept": {
+    "summary": "Um hub de integração para componentes UI com temas.",
+    "bullets": [
+      "Um conjunto de componentes, 6+ temas (Minimal, Modern, Gradient, Rounded, Dark, Neon)",
+      "Props em tempo real com pré‑visualização imediata e saída de código",
+      "Snippets copiáveis prontos para produção",
+      "Comportamento consistente claro/escuro"
+    ]
+  },
+  "features": [
+    "Componentes selecionados: Button, Card, Input, Slider, Switch, Textarea, Toggle",
+    "Vários temas com paletas consistentes",
+    "Exemplos interativos e pré‑visualização em tempo real",
+    "Edição de props com segurança de tipos e geração de código",
+    "Interface mobile‑friendly com paineis redimensionáveis",
+    "Galeria de temas para comparação lado a lado"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 14 com App Router",
+      "React 18 com TypeScript",
+      "Tailwind CSS com safelist alargada para geração dinâmica de classes",
+      "Framer Motion para animações",
+      "Componentes Radix UI via shadcn/ui",
+      "Monaco Editor para edição de código e syntax highlighting"
+    ],
+    "projectStructure": [
+      "Carregamento dinâmico de componentes: descoberta e registo em runtime",
+      "Demos de uso baseadas em exemplos",
+      "Integração de temas: componentes adaptam‑se ao tema selecionado",
+      "Testes de componentes para props e comportamento",
+      "Performance: imports dinâmicos e code splitting",
+      "Design responsive mobile‑first",
+      "Gestão de temas via variáveis CSS",
+      "Registo de componentes para descoberta e metadados"
+    ],
+    "deployment": [
+      "GitLab Pages",
+      "Export estático com funcionalidades dinâmicas quando necessário",
+      "Bundle otimizado via code splitting e lazy loading"
+    ]
+  }
+}

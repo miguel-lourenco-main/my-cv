@@ -18,7 +18,7 @@ type ProfileAvatarProps = {
 export default function ProfileAvatar({
   className,
   layoutId = "intro-avatar",
-  src = "placeholder.svg",
+  src = "/placeholder.svg",
   size = 160,
   width,
   height,

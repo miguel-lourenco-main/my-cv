@@ -1,0 +1,49 @@
+{
+  "title": "Sonora",
+  "description": "Audiolivros interativos com narração por IA e histórias ramificadas.",
+  "subtitle": "Plataforma de Audiolivros Interativos com IA",
+  "overview": "Plataforma de audiolivros com narração por IA e histórias com escolhas. Escolhe uma voz, explora vários caminhos e gera áudio em tempo real.",
+  "coreConcept": {
+    "summary": "Audiolivros interativos com narração por IA.",
+    "bullets": [
+      "Histórias ramificadas com vários finais",
+      "Vozes de IA via ElevenLabs e OpenAI",
+      "Áudio em tempo real com marcação de palavras e legendas",
+      "Criação e gestão de vozes personalizadas",
+      "Fallback com áudio pré‑gravado",
+      "Leitor responsivo com cronologia, replay e escolhas"
+    ]
+  },
+  "features": [
+    "Biblioteca: 10+ histórias interativas (por ex., The Enchanted Forest, The Midnight Library, Project Hail Mary)",
+    "Vozes: criar e pré‑visualizar vozes personalizadas; TTS de alta qualidade",
+    "Navegação ramificada com escolhas do utilizador",
+    "Leitor: cronologia, replay, avanço automático",
+    "Performance: fallback pré‑gravado e deteção inteligente de fonte",
+    "Design: otimizado para mobile com temas claro/escuro"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 (App Router, geração estática)",
+      "React 19 com TypeScript",
+      "Tailwind CSS",
+      "Framer Motion (efeitos de card 3D)",
+      "Radix UI via shadcn/ui",
+      "Componentes de card 3D personalizados"
+    ],
+    "projectStructure": [
+      "Motor de história baseado em Node (escolhas, temporização)",
+      "Pipeline de áudio para TTS e legendas",
+      "Gestão de vozes (CRUD)",
+      "Leitor avançado (cronologia, replay, escolhas)",
+      "Dados de história type‑safe",
+      "Integrações: ElevenLabs + OpenAI",
+      "Geração estática com lazy loading e code splitting"
+    ],
+    "deployment": [
+      "Site estático com funcionalidades dinâmicas",
+      "Assets de áudio organizados com metadados",
+      "Configuração segura de ambiente e builds otimizados"
+    ]
+  }
+}

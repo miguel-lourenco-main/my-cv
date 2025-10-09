@@ -3,14 +3,16 @@
 import React from "react";
 import CategoryCard from "./CategoryCard";
 import VercelLogo from "@/public/logos/vercel.svg";
+import { useI18n } from "../../lib/i18n";
 
 export default function ToolingCard() {
-  const title = "Tooling";
+  const { t } = useI18n();
+  const title = t('categories')('tooling');
   const items = ["Git", "Linux", "Bash", "Pragmatic use of open‑source and AI tooling"];
   const iconURLs = [
-    "logos/git.svg",
-    "logos/Tux.svg",
-    "logos/bash.svg",
+    "/logos/git.svg",
+    "/logos/Tux.svg",
+    "/logos/bash.svg",
   ];
   return (
     <CategoryCard title={title} items={items}>

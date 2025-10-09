@@ -4,8 +4,11 @@ import BackendCard from "./categories/BackendCard";
 import DevOpsCard from "./categories/DevOpsCard";
 import ToolingCard from "./categories/ToolingCard";
 import { RevealStagger } from "./Reveal";
+import { useI18n } from "../lib/i18n";
 
 export default function About() {
+  const { t } = useI18n();
+  const ta = t('about');
   const categories = [
     { key: "languages", component: <LanguagesCard /> },
     { key: "frontend", component: <FrontendCard /> },
@@ -19,7 +22,7 @@ export default function About() {
   return (
     <section id="technical-skills" className="max-w-9xl mx-auto">
       <RevealStagger className="text-center mb-20" delay={2.2} interval={0.06}>
-        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Technical Skills</h2>
+        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">{ta('title')}</h2>
       </RevealStagger>
       <RevealStagger delay={2.4} interval={0.06}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:hidden block">

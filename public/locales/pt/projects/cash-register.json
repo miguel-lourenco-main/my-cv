@@ -1,0 +1,43 @@
+{
+  "title": "Cash Register",
+  "description": "POS mobile‑first para restaurantes e bares.",
+  "subtitle": "Sistema Moderno de Ponto de Venda",
+  "overview": "Um POS web que simplifica os pedidos com uma interface otimizada para toque e ecrãs pequenos.",
+  "coreConcept": {
+    "summary": "Fluxo POS completo do menu ao histórico.",
+    "bullets": [
+      "Explora menus categorizados (bebidas e comida)",
+      "Constrói pedidos com carrinho em tempo real",
+      "Guarda pedidos com histórico completo",
+      "Carrinho flutuante para navegação rápida no mobile"
+    ]
+  },
+  "features": [
+    "Catálogo: bebidas e comida com preços e ícones",
+    "Pedidos: adicionar com um toque, quantidades, totais, feedback fluido",
+    "Mobile: carrinho flutuante, scroll suave, badges",
+    "Pedidos: histórico, timestamps, detalhe, atualizações em tempo real"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 com App Router e export estático",
+      "React 19 com TypeScript",
+      "Tailwind CSS",
+      "Radix UI via shadcn/ui",
+      "Lucide React para ícones",
+      "Sonner para toasts"
+    ],
+    "projectStructure": [
+      "Backend Supabase com PostgreSQL, schema tipado e RLS",
+      "Subscrições em tempo real",
+      "Componentes client/server por responsabilidade",
+      "Operações de BD type‑safe com tipos gerados",
+      "UI modular em /components/ui e lógica em /lib",
+      "Componentes chave: CashRegister, FloatingCartButton, OrderList, OrderDetails"
+    ],
+    "deployment": [
+      "Frontend no GitLab Pages",
+      "Backend gerido no Supabase"
+    ]
+  }
+}

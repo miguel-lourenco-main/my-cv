@@ -7,9 +7,9 @@ import type { Project } from "./projects.types";
 import { ProjectCarousel } from "./ProjectCarousel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { GlobeIcon, X } from "lucide-react";
-import Link from "next/link";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
+import { useI18n } from "../../lib/i18n";
 
 export function ProjectExpandedCard({
   project,
@@ -20,6 +20,7 @@ export function ProjectExpandedCard({
 }) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
+  const { getProjectString, getProjectArray, t } = useI18n();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -39,6 +40,8 @@ export function ProjectExpandedCard({
 
   useOutsideClick(ref, () => onClose());
 
+  const tp = t('projects');
+
   return (
     <AnimatePresence>
       {project ? (
@@ -51,7 +54,7 @@ export function ProjectExpandedCard({
           />
           <motion.div
             ref={ref}
-            layoutId={`card-${project.title}-${id}`}
+            layoutId={`card-${getProjectString(project, 'title')}-${id}`}
             className="relative w-full max-w-[900px] h-full md:h-fit md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -68,15 +71,15 @@ export function ProjectExpandedCard({
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
-                  {project.title}
+                  {getProjectString(project, 'title')}
                 </h3>
-                {project.details?.subtitle ? (
+                {project.details?.subtitle || project.details?.subtitleKey ? (
                   <p className="text-neutral-700 dark:text-neutral-300 font-medium">
-                    {project.details.subtitle}
+                    {getProjectString({ ...project.details, id: project.id }, 'subtitle')}
                   </p>
                 ) : null}
                 <p className="text-neutral-600 dark:text-neutral-400">
-                  {project.description}
+                  {getProjectString(project, 'description')}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -120,73 +123,73 @@ export function ProjectExpandedCard({
 
               {project.details ? (
                 <div className="space-y-6">
-                  {project.details.overview ? (
+                  {project.details?.overview || project.details?.overviewKey ? (
                     <section>
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Overview</h4>
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{tp('overviewHeading')}</h4>
                       <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                        {project.details.overview}
+                        {getProjectString({ ...project.details, id: project.id }, 'overview')}
                       </p>
                     </section>
                   ) : null}
 
-                  {project.details.coreConcept ? (
+                  {project.details?.coreConcept ? (
                     <section>
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Core Concept</h4>
-                      {project.details.coreConcept.summary ? (
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{tp('coreConceptHeading')}</h4>
+                      {(project.details.coreConcept.summary || project.details.coreConcept.summaryKey) ? (
                         <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed mb-2">
-                          {project.details.coreConcept.summary}
+                          {getProjectString({ ...project.details.coreConcept, id: project.id }, 'summary')}
                         </p>
                       ) : null}
-                      {project.details.coreConcept.bullets?.length ? (
+                      {(project.details.coreConcept.bullets || project.details.coreConcept.bulletsKeys) ? (
                         <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                          {project.details.coreConcept.bullets.map((item) => (
-                            <li key={item}>{item}</li>
+                          {getProjectArray({ ...project.details.coreConcept, id: project.id }, 'bullets').map((item, idx) => (
+                            <li key={`${item}-${idx}`}>{item}</li>
                           ))}
                         </ul>
                       ) : null}
                     </section>
                   ) : null}
 
-                  {project.details.features?.length ? (
+                  {(project.details?.features || project.details?.featuresKeys) ? (
                     <section>
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">Key Features</h4>
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{tp('featuresHeading')}</h4>
                       <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                        {project.details.features.map((feature) => (
-                          <li key={feature}>{feature}</li>
+                        {getProjectArray({ ...project.details, id: project.id }, 'features').map((feature, idx) => (
+                          <li key={`${feature}-${idx}`}>{feature}</li>
                         ))}
                       </ul>
                     </section>
                   ) : null}
 
-                  {project.details.technical && (
+                  {project.details?.technical && (
                     <section className="space-y-4">
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100">Technical Architecture</h4>
-                      {project.details.technical.frontendStack?.length ? (
+                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100">{tp('technicalHeading')}</h4>
+                      {(project.details.technical.frontendStack || project.details.technical.frontendStackKeys) ? (
                         <div>
-                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">Frontend Stack</h5>
+                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">{tp('frontendStackHeading')}</h5>
                           <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                            {project.details.technical.frontendStack.map((item) => (
-                              <li key={item}>{item}</li>
+                            {getProjectArray({ ...project.details.technical, id: project.id }, 'frontendStack').map((item, idx) => (
+                              <li key={`${item}-${idx}`}>{item}</li>
                             ))}
                           </ul>
                         </div>
                       ) : null}
-                      {project.details.technical.projectStructure?.length ? (
+                      {(project.details.technical.projectStructure || project.details.technical.projectStructureKeys) ? (
                         <div>
-                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">Project Structure</h5>
+                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">{tp('projectStructureHeading')}</h5>
                           <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                            {project.details.technical.projectStructure.map((item) => (
-                              <li key={item}>{item}</li>
+                            {getProjectArray({ ...project.details.technical, id: project.id }, 'projectStructure').map((item, idx) => (
+                              <li key={`${item}-${idx}`}>{item}</li>
                             ))}
                           </ul>
                         </div>
                       ) : null}
-                      {project.details.technical.deployment?.length ? (
+                      {(project.details.technical.deployment || project.details.technical.deploymentKeys) ? (
                         <div>
-                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">Deployment</h5>
+                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">{tp('deploymentHeading')}</h5>
                           <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                            {project.details.technical.deployment.map((item) => (
-                              <li key={item}>{item}</li>
+                            {getProjectArray({ ...project.details.technical, id: project.id }, 'deployment').map((item, idx) => (
+                              <li key={`${item}-${idx}`}>{item}</li>
                             ))}
                           </ul>
                         </div>

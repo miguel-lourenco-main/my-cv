@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
+import { useI18n } from "../../lib/i18n";
 
 export function ProjectFocusCard({
   project,
@@ -19,6 +20,7 @@ export function ProjectFocusCard({
   onClick: (project: Project) => void;
 }) {
   const { resolvedTheme } = useTheme();
+  const { getProjectString } = useI18n();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -48,13 +50,13 @@ export function ProjectFocusCard({
     >
       <img
         src={coverImage}
-        alt={project.title}
+        alt={getProjectString(project, 'title')}
         className="object-cover absolute inset-0 w-full h-full"
       />
 
       <button
         className="absolute right-3 top-3 z-10 bg-black/40 hover:bg-black/60 text-white rounded-full p-2"
-        aria-label={`Open ${project.title} website`}
+        aria-label={`Open ${getProjectString(project, 'title')} website`}
         onClick={(e) => {
           e.stopPropagation();
           window.open(project.websiteUrl, "_blank");
@@ -74,8 +76,15 @@ export function ProjectFocusCard({
           hovered === index ? "opacity-100" : "opacity-0"
         )}
       >
-        <div className="text-lg md:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-          {project.title}
+        <div className="space-y-1">
+          <div className="text-lg md:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+            {getProjectString(project, 'title')}
+          </div>
+          {project.experience ? (
+            <div className="text-xs md:text-sm text-neutral-200/90">
+              {project.experience.org} • {project.experience.date}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

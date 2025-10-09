@@ -3,15 +3,17 @@
 import React from "react";
 import CategoryCard from "./CategoryCard";
 import NextLogo from "@/public/logos/nextjs.svg";
+import { useI18n } from "../../lib/i18n";
 
 export default function FrontendCard() {
-  const title = "Frontend";
+  const { t } = useI18n();
+  const title = t('categories')('frontend');
   const items = ["React", "Next.js (App Router)", "Tailwind CSS", "shadcn/ui", "Figma", "Vercel v0"];
   const iconURLs = [
-    "logos/react.svg",
-    "logos/tailwind_css.svg",
-    "logos/shadcn.png",
-    "logos/figma.svg",
+    "/logos/react.svg",
+    "/logos/tailwind_css.svg",
+    "/logos/shadcn.png",
+    "/logos/figma.svg",
   ];
   
   return (

@@ -5,6 +5,7 @@ import EmailButton from './EmailButton'
 import GitlabButton from './GitlabButton'
 import LinkedInButton from './LinkedInButton'
 import ThemeToggle from './ThemeToggle'
+import LanguageSwitcher from './LanguageSwitcher'
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false) // threshold state
@@ -51,9 +52,9 @@ export default function Navigation() {
   }, [isScrolled, visualScrolled])
 
   return (
-    <nav className="fixed top-0 w-full z-50">
+    <nav className="flex justify-center items-center fixed top-0 left-0 w-full z-50">
       <div
-        className={`w-full mx-auto ${visualScrolled ? 'max-w-[100vw]' : 'max-w-[1100px]'} ${animClass}`}
+        className={`w-full mx-auto ${visualScrolled ? 'max-w-[98vw]' : 'max-w-[1100px]'} ${animClass}`}
         onAnimationEnd={() => {
           if (isAnimatingRef.current) {
             setVisualScrolled(isScrolled)
@@ -74,6 +75,7 @@ export default function Navigation() {
                 <EmailButton width={22} height={22} className='p-0'/>
               </div>
             </div>
+            <LanguageSwitcher compact={visualScrolled} />
             <ThemeToggle />
           </div>
         </div>

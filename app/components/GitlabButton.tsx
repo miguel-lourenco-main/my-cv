@@ -17,7 +17,7 @@ export default function GitlabButton({
   return (
     <BaseButton href={href} className={className} theme="orange">
       <Image 
-        src="logos/gitlab-logo-500.svg" 
+        src="/logos/gitlab-logo-500.svg" 
         alt="GitLab" 
         width={width} 
         height={height}

@@ -1,0 +1,50 @@
+{
+  "title": "Sonora",
+  "description": "Interactive audiobooks with AI narration and branching stories.",
+  "subtitle": "AI-Powered Interactive Audiobook Platform",
+  "overview": "Interactive audiobook platform with AI narration and choice-driven stories. Pick a voice, explore multiple paths, and generate audio in real time.",
+  "coreConcept": {
+    "summary": "Interactive audiobooks with AI narration.",
+    "bullets": [
+      "Branching stories with multiple endings",
+      "AI voices via ElevenLabs and OpenAI",
+      "Real‑time audio with word‑level timing and subtitles",
+      "Custom voice creation and management",
+      "Pre‑recorded audio fallback",
+      "Responsive player with timeline, replay, and choices"
+    ]
+  },
+  "features": [
+    "Library: 10+ interactive stories (e.g., The Enchanted Forest, The Midnight Library, Project Hail Mary)",
+    "Voices: create and preview custom voices; high‑quality TTS",
+    "Branching navigation with user choices",
+    "Player: timeline, replay, auto‑advance",
+    "Performance: pre‑recorded fallback and smart source detection",
+    "Design: mobile‑optimized with light/dark themes"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 (App Router, static generation)",
+      "React 19 with TypeScript",
+      "Tailwind CSS",
+      "Framer Motion (3D card effects)",
+      "Radix UI via shadcn/ui",
+      "Custom 3D card components"
+    ],
+    "projectStructure": [
+      "Node‑based story engine (choices, timing)",
+      "Audio pipeline for TTS and subtitles",
+      "Voice management CRUD",
+      "Advanced player (timeline, replay, choices)",
+      "Type‑safe story data",
+      "Integrations: ElevenLabs + OpenAI",
+      "Static generation with lazy loading and code splitting"
+    ],
+    "deployment": [
+      "Static site with dynamic features",
+      "Organized audio assets with metadata",
+      "Secure env config and optimized builds"
+    ]
+  }
+}
+

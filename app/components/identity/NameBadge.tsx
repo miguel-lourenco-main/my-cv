@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "motion/react";
+import { useI18n } from "../../lib/i18n";
 
 type NameBadgeProps = {
   className?: string;
@@ -22,12 +23,15 @@ export default function NameBadge({
       ? "text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white"
       : "text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white";
 
+  const { t } = useI18n();
+  const tn = t('navigation');
+
   return (
     <Comp layoutId={layoutId} className={className}>
       <h1 className={titleClasses}>
-        Hi, I'm{' '}
+        {tn('greeting')}{' '}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-          Miguel Lourenço
+          {tn('name')}
         </span>
       </h1>
     </Comp>

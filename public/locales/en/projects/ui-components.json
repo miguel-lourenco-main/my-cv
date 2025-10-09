@@ -1,0 +1,49 @@
+{
+  "title": "UI Components Playground",
+  "description": "Component library and playground to browse, test, and copy React UI across themes.",
+  "subtitle": "React Component Library & Playground",
+  "overview": "A modern library and playground for reusable React components across multiple themes. Discover components, tweak props live, and copy production-ready code.",
+  "coreConcept": {
+    "summary": "An integration hub for themed UI components.",
+    "bullets": [
+      "One set of components, 6+ themes (Minimal, Modern, Gradient, Rounded, Dark, Neon)",
+      "Live props with instant preview and code output",
+      "Copyable, production-ready snippets",
+      "Consistent light/dark behavior"
+    ]
+  },
+  "features": [
+    "Curated components: Button, Card, Input, Slider, Switch, Textarea, Toggle",
+    "Multiple themes with consistent palettes",
+    "Interactive examples and real-time preview",
+    "Prop editing with type safety and code generation",
+    "Mobile-friendly interface with resizable panels",
+    "Theme gallery for side-by-side comparison"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 14 with App Router",
+      "React 18 with TypeScript",
+      "Tailwind CSS with extended safelist for dynamic class generation",
+      "Framer Motion for animations",
+      "Radix UI components via shadcn/ui",
+      "Monaco Editor for code editing and syntax highlighting"
+    ],
+    "projectStructure": [
+      "Dynamic Component Loading: runtime discovery and registration",
+      "Example-based usage demos",
+      "Theme integration: components adapt to selected theme",
+      "Component tests for props and behavior",
+      "Performance: dynamic imports and code splitting",
+      "Mobile-first responsive design",
+      "Theme management via CSS variables",
+      "Component registry for discovery and metadata"
+    ],
+    "deployment": [
+      "GitLab Pages",
+      "Static export with dynamic features where needed",
+      "Optimized bundle via code splitting and lazy loading"
+    ]
+  }
+}
+
