@@ -1,1 +1,49 @@
-{}
+{
+  "title": "Sonora",
+  "description": "Audiolibros interactivos con narración de IA e historias ramificadas.",
+  "subtitle": "Plataforma de Audiolibros Interactivos con IA",
+  "overview": "Plataforma de audiolibros interactivos con narración de IA e historias basadas en elecciones. Elige una voz, explora múltiples caminos y genera audio en tiempo real.",
+  "coreConcept": {
+    "summary": "Audiolibros interactivos con narración de IA.",
+    "bullets": [
+      "Historias ramificadas con múltiples finales",
+      "Voces de IA vía ElevenLabs y OpenAI",
+      "Audio en tiempo real con sincronización a nivel de palabra y subtítulos",
+      "Creación y gestión de voces personalizadas",
+      "Respaldo de audio pregrabado",
+      "Reproductor responsivo con línea de tiempo, repetición y elecciones"
+    ]
+  },
+  "features": [
+    "Biblioteca: 10+ historias interactivas (ej. El Bosque Encantado, La Biblioteca de Medianoche, Proyecto Hail Mary)",
+    "Voces: crear y previsualizar voces personalizadas; TTS de alta calidad",
+    "Navegación ramificada con elecciones del usuario",
+    "Reproductor: línea de tiempo, repetición, avance automático",
+    "Rendimiento: respaldo pregrabado y detección inteligente de fuente",
+    "Diseño: optimizado para móvil con temas claro/oscuro"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 (App Router, generación estática)",
+      "React 19 con TypeScript",
+      "Tailwind CSS",
+      "Framer Motion (efectos de tarjetas 3D)",
+      "Radix UI vía shadcn/ui",
+      "Componentes de tarjetas 3D personalizados"
+    ],
+    "projectStructure": [
+      "Motor de historias basado en nodos (elecciones, tiempo)",
+      "Pipeline de audio para TTS y subtítulos",
+      "CRUD de gestión de voces",
+      "Reproductor avanzado (línea de tiempo, repetición, elecciones)",
+      "Datos de historias tipo-seguros",
+      "Integraciones: ElevenLabs + OpenAI",
+      "Generación estática con carga diferida y división de código"
+    ],
+    "deployment": [
+      "Sitio estático con características dinámicas",
+      "Recursos de audio organizados con metadatos",
+      "Configuración de entorno segura y builds optimizados"
+    ]
+  }
+}

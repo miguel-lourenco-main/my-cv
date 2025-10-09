@@ -1,1 +1,9 @@
-{}
+{
+  "githubAlt": "Perfil de GitLab",
+  "linkedinAlt": "Perfil de LinkedIn",
+  "emailAlt": "Enviar correo electrónico",
+  "themeToggle": "Cambiar tema",
+  "languageSwitcher": "Cambiar idioma",
+  "greeting": "Hola, soy",
+  "name": "Miguel Lourenço"
+}

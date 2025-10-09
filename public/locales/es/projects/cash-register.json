@@ -1,1 +1,43 @@
-{}
+{
+  "title": "Caja Registradora",
+  "description": "POS móvil para restaurantes y bares.",
+  "subtitle": "Sistema Moderno de Punto de Venta",
+  "overview": "Un POS basado en web que optimiza el pedido con una interfaz ajustada para táctil y pantallas pequeñas.",
+  "coreConcept": {
+    "summary": "Un flujo POS completo desde menú hasta historial.",
+    "bullets": [
+      "Navegar menús categorizados (bebidas y comida)",
+      "Construir pedidos con carrito en tiempo real",
+      "Almacenar pedidos con historial completo",
+      "Carrito flotante para navegación rápida en móvil"
+    ]
+  },
+  "features": [
+    "Catálogo: bebidas y comida con precios e iconos",
+    "Pedidos: agregar con un toque, controles de cantidad, totales, retroalimentación suave",
+    "Móvil: carrito flotante, scroll suave, insignias",
+    "Pedidos: historial, marcas de tiempo, vista detallada, actualizaciones en vivo"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 con App Router y capacidad de exportación estática",
+      "React 19 con TypeScript",
+      "Tailwind CSS para estilos responsivos",
+      "Radix UI vía shadcn/ui",
+      "Lucide React para iconografía",
+      "Sonner para notificaciones toast"
+    ],
+    "projectStructure": [
+      "Backend Supabase con PostgreSQL, esquema tipado y RLS",
+      "Suscripciones en tiempo real para actualizaciones en vivo",
+      "Componentes cliente/servidor separados por preocupación",
+      "Operaciones de DB tipo-seguras con tipos generados",
+      "UI modular en /components/ui y lógica de negocio en /lib",
+      "Componentes clave: CashRegister, FloatingCartButton, OrderList, OrderDetails"
+    ],
+    "deployment": [
+      "GitLab Pages para frontend",
+      "Backend gestionado por Supabase"
+    ]
+  }
+}
