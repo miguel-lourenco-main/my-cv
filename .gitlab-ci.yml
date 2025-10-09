@@ -9,6 +9,7 @@ cache:
 
 stages:
   - build
+  - test
   - deploy
 
 variables:
@@ -23,8 +24,6 @@ before_script:
 
 build:
   stage: build
-  variables:
-    BASE_PATH: "/my-cv"
   script:
     - pnpm run build
   artifacts:
@@ -64,3 +63,5 @@ pages:staging:
     url: https://$CI_PROJECT_NAME-staging.gitlab.io
   only:
     - merge_requests 
+
+# i18n is now handled client-side, no CI translation needed
