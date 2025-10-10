@@ -53,13 +53,13 @@ i18n:translate:
     # 4) Prepare persistent translate branch
     - export TRANSLATE_BRANCH="${BRANCH_PREFIX}/${CI_COMMIT_REF_NAME}"
     - |
-      if git show-ref --verify --quiet "refs/heads/$TRANSLATE_BRANCH"; then
+      git fetch origin --prune || true
+      if git ls-remote --exit-code --heads origin "$TRANSLATE_BRANCH" >/dev/null 2>&1; then
         echo "Translate branch exists: $TRANSLATE_BRANCH";
-        git checkout "$TRANSLATE_BRANCH";
+        git checkout -B "$TRANSLATE_BRANCH" "origin/$TRANSLATE_BRANCH" || git checkout -B "$TRANSLATE_BRANCH";
         git merge --no-edit "origin/${CI_COMMIT_REF_NAME}" || true;
       else
         echo "Creating translate branch: $TRANSLATE_BRANCH";
-        git fetch origin "${CI_COMMIT_REF_NAME}:${CI_COMMIT_REF_NAME}" || true;
         git checkout -B "$TRANSLATE_BRANCH" "origin/${CI_COMMIT_REF_NAME}" || git checkout -B "$TRANSLATE_BRANCH";
       fi
     # 5) Ask Cursor to fill only missing keys based on i18n-missing.json
@@ -98,7 +98,7 @@ i18n:translate:
     # 6) Guard: ensure only public/locales/ changed compared to source branch, then push
     - |
       BASE_REF="origin/${CI_COMMIT_REF_NAME}"
-      git fetch origin "${CI_COMMIT_REF_NAME}:${CI_COMMIT_REF_NAME}" || true
+      git fetch origin --prune || true
       CHANGED=$(git diff --name-only "$BASE_REF"...HEAD || true)
       echo "$CHANGED" | sed 's/^/changed: /'
       if echo "$CHANGED" | grep -v '^public/locales/' | grep -q .; then
@@ -106,7 +106,11 @@ i18n:translate:
         git reset --hard "$BASE_REF";
         exit 3;
       fi
-      git push -u origin "$TRANSLATE_BRANCH" || true
+      # Rebase on remote translate branch if it exists to avoid non-fast-forward
+      if git ls-remote --exit-code --heads origin "$TRANSLATE_BRANCH" >/dev/null 2>&1; then
+        git rebase "origin/$TRANSLATE_BRANCH" || true
+      fi
+      git push --force-with-lease origin "$TRANSLATE_BRANCH:$TRANSLATE_BRANCH" || true
       echo "Compare changes: ${CI_PROJECT_URL}/-/compare/${CI_COMMIT_REF_NAME}...${TRANSLATE_BRANCH}"
   dependencies: []
 

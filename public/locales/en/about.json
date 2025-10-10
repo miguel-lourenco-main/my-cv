@@ -1,4 +1,14 @@
 {
-  "title": "Technical Skills"
+  "title": "Technical Skills",
+  "skills": [
+    {
+      "name": "React",
+      "level": "Expert"
+    },
+    {
+      "name": "Node.js",
+      "level": "Expert"
+    }
+  ]
 }
 
