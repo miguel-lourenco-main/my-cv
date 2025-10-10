@@ -29,9 +29,7 @@ i18n:translate:
     MODEL: auto
     BRANCH_PREFIX: "translate"
   rules:
-    - if: '$CI_COMMIT_MESSAGE =~ /\\[i18n-skip\\]/'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\//'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\// && $CI_COMMIT_MESSAGE !~ /\\[i18n-skip\\]/'
   script:
     # 1) Detect missing keys vs EN
     - node scripts/check-missing-i18n.js
@@ -64,7 +62,10 @@ i18n:translate:
         echo "Creating translate branch: $TRANSLATE_BRANCH";
         git checkout -B "$TRANSLATE_BRANCH" "origin/${CI_COMMIT_REF_NAME}" || git checkout -B "$TRANSLATE_BRANCH";
       fi
-    # 5) Ask Cursor to fill only missing key: merge $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME} [i18n-skip]CURSOR_API_KEY" ]; then
+    # 5) Ask Cursor to fill only missing keys based on i18n-missing.json
+    - |
+      # Support GitLab "File"-type variables: if CURSOR_API_KEY points to a file, read its contents
+      if [ -n "$CURSOR_API_KEY" ] && [ -f "$CURSOR_API_KEY" ]; then
         export CURSOR_API_KEY="$(cat "$CURSOR_API_KEY")"
       fi
       if [ -z "$CURSOR_API_KEY" ]; then
@@ -117,7 +118,7 @@ i18n:translate:
       git fetch origin --prune || true
       git reset --hard "origin/${CI_COMMIT_REF_NAME}"
       # Merge translate branch; on conflict, abort and skip pushing to source
-      git merge --no-ff -m "[i18n-skip]" "$TRANSLATE_BRANCH" \
+      git merge --no-ff -m "[i18n-skip]: merge $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME} [i18n-skip]" "$TRANSLATE_BRANCH" \
         || (echo "Merge conflict when merging $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME}; skipping push to source." && git merge --abort && exit 0)
       CHANGED_SRC=$(git diff --name-only "origin/${CI_COMMIT_REF_NAME}"...HEAD || true)
       echo "$CHANGED_SRC" | sed 's/^/src-changed: /'
