@@ -16,6 +16,14 @@
     {
       "name": "TypeScript",
       "level": "Experto"
+    },
+    {
+      "name": "Tailwind CSS",
+      "level": "Experto"
+    },
+    {
+      "name": "Framer Motion",
+      "level": "Experto"
     }
   ]
 }
