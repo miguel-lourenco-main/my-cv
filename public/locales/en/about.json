@@ -28,6 +28,10 @@
     {
       "name": "Shadcn/ui",
       "level": "Expert"
+    },
+    {
+      "name": "Zustand",
+      "level": "Expert"
     }
   ]
 }
