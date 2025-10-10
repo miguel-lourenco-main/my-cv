@@ -124,7 +124,6 @@ build:
     expire_in: 1 hour
   only:
     - main
-    - merge_requests
 
 pages:
   stage: deploy
@@ -140,20 +139,3 @@ pages:
   environment:
     name: production
     url: $CI_PAGES_URL
-    
-
-# Optional: Deploy to staging for merge requests
-pages:staging:
-  stage: deploy
-  script:
-    - cp -r out/* public/
-  artifacts:
-    paths:
-      - public
-  environment:
-    name: staging
-    url: https://$CI_PROJECT_NAME-staging.gitlab.io
-  only:
-    - merge_requests 
-
-# i18n is now handled client-side, no CI translation needed
