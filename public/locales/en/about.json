@@ -40,6 +40,10 @@
     {
       "name": "Monaco Editor",
       "level": "Expert"
+    },
+    {
+      "name": "Vercel",
+      "level": "Expert"
     }
   ]
 }
