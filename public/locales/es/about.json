@@ -8,6 +8,42 @@
     {
       "name": "Node.js",
       "level": "Experto"
+    },
+    {
+      "name": "Next.js",
+      "level": "Experto"
+    },
+    {
+      "name": "TypeScript",
+      "level": "Experto"
+    },
+    {
+      "name": "Tailwind CSS",
+      "level": "Experto"
+    },
+    {
+      "name": "Framer Motion",
+      "level": "Experto"
+    },
+    {
+      "name": "Shadcn/ui",
+      "level": "Experto"
+    },
+    {
+      "name": "Zustand",
+      "level": "Experto"
+    },
+    {
+      "name": "Radix UI",
+      "level": "Experto"
+    },
+    {
+      "name": "Monaco Editor",
+      "level": "Experto"
+    },
+    {
+      "name": "Vercel",
+      "level": "Experto"
     }
   ]
 }
