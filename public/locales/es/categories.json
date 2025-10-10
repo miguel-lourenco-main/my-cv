@@ -1,1 +1,7 @@
-{}
+{
+  "languages": "Idiomas",
+  "frontend": "Frontend",
+  "backend": "Backend",
+  "devops": "DevOps",
+  "tooling": "Herramientas"
+}

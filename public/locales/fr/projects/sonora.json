@@ -1,1 +1,49 @@
-{}
+{
+  "title": "Sonora",
+  "description": "Livres audio interactifs avec narration IA et histoires à embranchements.",
+  "subtitle": "Plateforme de Livres Audio Interactifs avec IA",
+  "overview": "Plateforme de livres audio interactifs avec narration IA et histoires basées sur les choix. Choisissez une voix, explorez plusieurs chemins et générez de l'audio en temps réel.",
+  "coreConcept": {
+    "summary": "Livres audio interactifs avec narration IA.",
+    "bullets": [
+      "Histoires à embranchements avec multiples fins",
+      "Voix IA via ElevenLabs et OpenAI",
+      "Audio en temps réel avec synchronisation au niveau des mots et sous-titres",
+      "Création et gestion de voix personnalisées",
+      "Fallback audio pré-enregistré",
+      "Lecteur responsive avec timeline, relecture et choix"
+    ]
+  },
+  "features": [
+    "Bibliothèque : 10+ histoires interactives (ex. La Forêt Enchantée, La Bibliothèque de Minuit, Projet Hail Mary)",
+    "Voix : créer et prévisualiser des voix personnalisées ; TTS haute qualité",
+    "Navigation à embranchements avec choix utilisateur",
+    "Lecteur : timeline, relecture, avancement automatique",
+    "Performance : fallback pré-enregistré et détection intelligente de source",
+    "Design : optimisé mobile avec thèmes clair/sombre"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 (App Router, génération statique)",
+      "React 19 avec TypeScript",
+      "Tailwind CSS",
+      "Framer Motion (effets de cartes 3D)",
+      "Radix UI via shadcn/ui",
+      "Composants de cartes 3D personnalisés"
+    ],
+    "projectStructure": [
+      "Moteur d'histoires basé sur les nœuds (choix, timing)",
+      "Pipeline audio pour TTS et sous-titres",
+      "CRUD de gestion des voix",
+      "Lecteur avancé (timeline, relecture, choix)",
+      "Données d'histoires type-sécurisées",
+      "Intégrations : ElevenLabs + OpenAI",
+      "Génération statique avec chargement paresseux et code splitting"
+    ],
+    "deployment": [
+      "Site statique avec fonctionnalités dynamiques",
+      "Ressources audio organisées avec métadonnées",
+      "Config d'environnement sécurisée et builds optimisés"
+    ]
+  }
+}

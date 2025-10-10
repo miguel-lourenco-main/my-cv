@@ -1,1 +1,48 @@
-{}
+{
+  "title": "Playground de Componentes UI",
+  "description": "Biblioteca de componentes y playground para navegar, probar y copiar React UI a través de temas.",
+  "subtitle": "Biblioteca de Componentes React y Playground",
+  "overview": "Una biblioteca moderna y playground para componentes React reutilizables a través de múltiples temas. Descubre componentes, ajusta props en vivo y copia código listo para producción.",
+  "coreConcept": {
+    "summary": "Un centro de integración para componentes UI temáticos.",
+    "bullets": [
+      "Un conjunto de componentes, 6+ temas (Minimal, Modern, Gradient, Rounded, Dark, Neon)",
+      "Props en vivo con vista previa instantánea y salida de código",
+      "Fragmentos copiables, listos para producción",
+      "Comportamiento consistente claro/oscuro"
+    ]
+  },
+  "features": [
+    "Componentes curados: Button, Card, Input, Slider, Switch, Textarea, Toggle",
+    "Múltiples temas con paletas consistentes",
+    "Ejemplos interactivos y vista previa en tiempo real",
+    "Edición de props con seguridad de tipos y generación de código",
+    "Interfaz amigable para móvil con paneles redimensionables",
+    "Galería de temas para comparación lado a lado"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 14 con App Router",
+      "React 18 con TypeScript",
+      "Tailwind CSS con safelist extendido para generación dinámica de clases",
+      "Framer Motion para animaciones",
+      "Componentes Radix UI vía shadcn/ui",
+      "Monaco Editor para edición de código y resaltado de sintaxis"
+    ],
+    "projectStructure": [
+      "Carga Dinámica de Componentes: descubrimiento y registro en tiempo de ejecución",
+      "Demos de uso basadas en ejemplos",
+      "Integración de temas: componentes se adaptan al tema seleccionado",
+      "Pruebas de componentes para props y comportamiento",
+      "Rendimiento: imports dinámicos y división de código",
+      "Diseño responsivo móvil-primero",
+      "Gestión de temas vía variables CSS",
+      "Registro de componentes para descubrimiento y metadatos"
+    ],
+    "deployment": [
+      "GitLab Pages",
+      "Exportación estática con características dinámicas donde sea necesario",
+      "Bundle optimizado vía división de código y carga diferida"
+    ]
+  }
+}

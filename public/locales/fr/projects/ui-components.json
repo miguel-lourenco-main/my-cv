@@ -1,1 +1,48 @@
-{}
+{
+  "title": "Playground de Composants UI",
+  "description": "Bibliothèque de composants et playground pour parcourir, tester et copier React UI à travers les thèmes.",
+  "subtitle": "Bibliothèque de Composants React et Playground",
+  "overview": "Une bibliothèque moderne et playground pour des composants React réutilisables à travers plusieurs thèmes. Découvrez les composants, ajustez les props en direct et copiez du code prêt pour la production.",
+  "coreConcept": {
+    "summary": "Un hub d'intégration pour des composants UI thématiques.",
+    "bullets": [
+      "Un ensemble de composants, 6+ thèmes (Minimal, Moderne, Gradient, Arrondi, Sombre, Neon)",
+      "Props en direct avec aperçu instantané et sortie de code",
+      "Snippets copiables, prêts pour la production",
+      "Comportement cohérent clair/sombre"
+    ]
+  },
+  "features": [
+    "Composants curés : Button, Card, Input, Slider, Switch, Textarea, Toggle",
+    "Multiples thèmes avec palettes cohérentes",
+    "Exemples interactifs et aperçu en temps réel",
+    "Édition de props avec sécurité de type et génération de code",
+    "Interface mobile-friendly avec panneaux redimensionnables",
+    "Galerie de thèmes pour comparaison côte à côte"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 14 avec App Router",
+      "React 18 avec TypeScript",
+      "Tailwind CSS avec safelist étendu pour génération dynamique de classes",
+      "Framer Motion pour les animations",
+      "Composants Radix UI via shadcn/ui",
+      "Monaco Editor pour édition de code et coloration syntaxique"
+    ],
+    "projectStructure": [
+      "Chargement Dynamique de Composants : découverte et enregistrement runtime",
+      "Demos d'usage basées sur exemples",
+      "Intégration de thèmes : composants s'adaptent au thème sélectionné",
+      "Tests de composants pour props et comportement",
+      "Performance : imports dynamiques et code splitting",
+      "Design responsive mobile-first",
+      "Gestion de thèmes via variables CSS",
+      "Registre de composants pour découverte et métadonnées"
+    ],
+    "deployment": [
+      "GitLab Pages",
+      "Exportation statique avec fonctionnalités dynamiques où nécessaire",
+      "Bundle optimisé via code splitting et chargement paresseux"
+    ]
+  }
+}

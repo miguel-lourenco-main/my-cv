@@ -1,1 +1,43 @@
-{}
+{
+  "title": "Caisse Enregistreuse",
+  "description": "POS mobile pour restaurants et bars.",
+  "subtitle": "Système de Point de Vente Moderne",
+  "overview": "Un POS basé sur le web qui rationalise la commande avec une interface adaptée au tactile et aux petits écrans.",
+  "coreConcept": {
+    "summary": "Un flux POS complet du menu à l'historique.",
+    "bullets": [
+      "Parcourir les menus catégorisés (boissons et nourriture)",
+      "Construire des commandes avec panier en temps réel",
+      "Stocker les commandes avec historique complet",
+      "Panier flottant pour navigation rapide sur mobile"
+    ]
+  },
+  "features": [
+    "Catalogue : boissons et nourriture avec prix et icônes",
+    "Commande : ajout en un clic, contrôles de quantité, totaux, retour fluide",
+    "Mobile : panier flottant, défilement fluide, badges",
+    "Commandes : historique, horodatage, vue détaillée, mises à jour en direct"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 15 avec App Router et capacité d'exportation statique",
+      "React 19 avec TypeScript",
+      "Tailwind CSS pour le style responsive",
+      "Radix UI via shadcn/ui",
+      "Lucide React pour l'iconographie",
+      "Sonner pour les notifications toast"
+    ],
+    "projectStructure": [
+      "Backend Supabase avec PostgreSQL, schéma typé et RLS",
+      "Abonnements en temps réel pour mises à jour en direct",
+      "Composants client/serveur séparés par préoccupation",
+      "Opérations DB type-sécurisées avec types générés",
+      "UI modulaire dans /components/ui et logique métier dans /lib",
+      "Composants clés : CashRegister, FloatingCartButton, OrderList, OrderDetails"
+    ],
+    "deployment": [
+      "GitLab Pages pour le frontend",
+      "Backend géré par Supabase"
+    ]
+  }
+}

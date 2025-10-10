@@ -1,1 +1,11 @@
-{}
+{
+  "title": "Proyectos",
+  "subtitle": "Aquí están algunos de los proyectos en los que he trabajado.",
+  "overviewHeading": "Resumen",
+  "coreConceptHeading": "Concepto Principal",
+  "featuresHeading": "Características Clave",
+  "technicalHeading": "Arquitectura Técnica",
+  "frontendStackHeading": "Stack Frontend",
+  "projectStructureHeading": "Estructura del Proyecto",
+  "deploymentHeading": "Despliegue"
+}
