@@ -24,6 +24,10 @@
     {
       "name": "Framer Motion",
       "level": "Expert"
+    },
+    {
+      "name": "Shadcn/ui",
+      "level": "Expert"
     }
   ]
 }
