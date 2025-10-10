@@ -29,7 +29,9 @@ i18n:translate:
     MODEL: auto
     BRANCH_PREFIX: "translate"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\// && $CI_COMMIT_MESSAGE !~ /\\[i18n-skip\\]/'
+    - if: '$CI_COMMIT_MESSAGE =~ [i18n-skip]'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\// &&'
   script:
     # 1) Detect missing keys vs EN
     - node scripts/check-missing-i18n.js
@@ -118,7 +120,7 @@ i18n:translate:
       git fetch origin --prune || true
       git reset --hard "origin/${CI_COMMIT_REF_NAME}"
       # Merge translate branch; on conflict, abort and skip pushing to source
-      git merge --no-ff -m "[i18n-skip]: merge $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME} [i18n-skip]" "$TRANSLATE_BRANCH" \
+      git merge --no-ff -m "[i18n-skip]" "$TRANSLATE_BRANCH" \
         || (echo "Merge conflict when merging $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME}; skipping push to source." && git merge --abort && exit 0)
       CHANGED_SRC=$(git diff --name-only "origin/${CI_COMMIT_REF_NAME}"...HEAD || true)
       echo "$CHANGED_SRC" | sed 's/^/src-changed: /'
