@@ -112,6 +112,22 @@ i18n:translate:
       fi
       git push --force-with-lease origin "$TRANSLATE_BRANCH:$TRANSLATE_BRANCH" || true
       echo "Compare changes: ${CI_PROJECT_URL}/-/compare/${CI_COMMIT_REF_NAME}...${TRANSLATE_BRANCH}"
+      # 7) Also apply the locales-only changes to the MR source branch and push
+    - |
+      git checkout "${CI_COMMIT_REF_NAME}"
+      git fetch origin --prune || true
+      git reset --hard "origin/${CI_COMMIT_REF_NAME}"
+      # Merge translate branch; on conflict, abort and skip pushing to source
+      git merge --no-ff --no-edit "$TRANSLATE_BRANCH" \
+        || (echo "Merge conflict when merging $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME}; skipping push to source." && git merge --abort && exit 0)
+      CHANGED_SRC=$(git diff --name-only "origin/${CI_COMMIT_REF_NAME}"...HEAD || true)
+      echo "$CHANGED_SRC" | sed 's/^/src-changed: /'
+      if echo "$CHANGED_SRC" | grep -v '^public/locales/' | grep -q .; then
+        echo "Aborting push to source: changes outside public/locales/ detected.";
+        git reset --hard "origin/${CI_COMMIT_REF_NAME}";
+      else
+        git push origin "${CI_COMMIT_REF_NAME}" || echo "Push to source branch failed (permissions or race)."
+      fi
   dependencies: []
 
 build:
