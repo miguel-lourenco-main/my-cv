@@ -29,6 +29,8 @@ i18n:translate:
     MODEL: auto
     BRANCH_PREFIX: "translate"
   rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /\\[i18n-skip\\]/'
+      when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME !~ /^translate\//'
   script:
     # 1) Detect missing keys vs EN
@@ -88,7 +90,7 @@ i18n:translate:
       1) For each locale listed in i18n-missing.json, open the corresponding JSON files and insert only the keys that are missing (create files if absent), preserving JSON structure and formatting.
       2) Do not overwrite or alter any existing translations or keys.
       3) Validate JSON formatting. Keep ordering stable where possible.
-      4) Stage and commit changes to the currently checked-out translate branch with a concise commit message like: 'chore(i18n): add missing <locale> keys'. Do NOT push or call any remote APIs; leave pushing to the shell script that runs after you finish.
+      4) Stage and commit changes to the currently checked-out translate branch with a concise commit message like: 'chore(i18n): add missing <locale> keys [i18n-skip]'. Do NOT push or call any remote APIs; leave pushing to the shell script that runs after you finish.
       5) If there are no changes to make, do nothing.
 
       # GitLab API:
@@ -118,7 +120,7 @@ i18n:translate:
       git fetch origin --prune || true
       git reset --hard "origin/${CI_COMMIT_REF_NAME}"
       # Merge translate branch; on conflict, abort and skip pushing to source
-      git merge --no-ff --no-edit "$TRANSLATE_BRANCH" \
+      git merge --no-ff -m "chore(i18n): merge $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME} [i18n-skip]" "$TRANSLATE_BRANCH" \
         || (echo "Merge conflict when merging $TRANSLATE_BRANCH into ${CI_COMMIT_REF_NAME}; skipping push to source." && git merge --abort && exit 0)
       CHANGED_SRC=$(git diff --name-only "origin/${CI_COMMIT_REF_NAME}"...HEAD || true)
       echo "$CHANGED_SRC" | sed 's/^/src-changed: /'
