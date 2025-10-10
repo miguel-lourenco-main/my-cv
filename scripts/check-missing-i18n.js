@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
 
@@ -27,10 +28,26 @@ function listJsonFilesRecursive(dir, baseDir) {
 function flattenJson(obj, prefix = '') {
   const flat = {};
   if (obj === null || obj === undefined) return flat;
-  const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
+  const isPlainObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+  // If the current value is an array, index its elements
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
+      const element = obj[i];
+      const nextKey = prefix ? `${prefix}[${i}]` : `[${i}]`;
+      if (isPlainObject(element) || Array.isArray(element)) {
+        Object.assign(flat, flattenJson(element, nextKey));
+      } else {
+        flat[nextKey] = element;
+      }
+    }
+    return flat;
+  }
+
+  // Plain object: recurse into properties
   for (const [key, value] of Object.entries(obj)) {
     const nextKey = prefix ? `${prefix}.${key}` : key;
-    if (isObject(value)) {
+    if (isPlainObject(value) || Array.isArray(value)) {
       Object.assign(flat, flattenJson(value, nextKey));
     } else {
       flat[nextKey] = value;
