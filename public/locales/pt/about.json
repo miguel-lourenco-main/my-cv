@@ -1,3 +1,13 @@
 {
-  "title": "Competências Técnicas"
+  "title": "Competências Técnicas",
+  "skills": [
+    {
+      "name": "React",
+      "level": "Especialista"
+    },
+    {
+      "name": "Node.js",
+      "level": "Especialista"
+    }
+  ]
 }
