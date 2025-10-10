@@ -36,6 +36,10 @@
     {
       "name": "Radix UI",
       "level": "Expert"
+    },
+    {
+      "name": "Monaco Editor",
+      "level": "Expert"
     }
   ]
 }
