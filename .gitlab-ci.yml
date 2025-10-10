@@ -126,7 +126,19 @@ i18n:translate:
         echo "Aborting push to source: changes outside public/locales/ detected.";
         git reset --hard "origin/${CI_COMMIT_REF_NAME}";
       else
-        git push origin "${CI_COMMIT_REF_NAME}" || echo "Push to source branch failed (permissions or race)."
+        PUSHED_TO_SOURCE=0
+        if git push origin "${CI_COMMIT_REF_NAME}"; then
+          PUSHED_TO_SOURCE=1
+          echo "Pushed locales changes to source branch: ${CI_COMMIT_REF_NAME}"
+        else
+          echo "Push to source branch failed (permissions or race)."
+        fi
+        # If the source push succeeded, clean up the intermediary translate branch locally and remotely
+        if [ "$PUSHED_TO_SOURCE" -eq 1 ]; then
+          git push origin --delete "$TRANSLATE_BRANCH" || true
+          git branch -D "$TRANSLATE_BRANCH" || true
+          echo "Cleaned intermediary branch: $TRANSLATE_BRANCH"
+        fi
       fi
   dependencies: []
 
