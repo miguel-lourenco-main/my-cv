@@ -7,7 +7,7 @@ import ProfileAvatar from "./identity/ProfileAvatar";
 import { Button } from "./shadcn/button";
 import { useI18n } from "../lib/i18n";
 
-export default function Hero({ showShared = true }: { showShared?: boolean }) {
+export default function Hero({ showShared = true, greeting }: { showShared?: boolean; greeting?: string }) {
   const { locale, t } = useI18n();
   const cvPath = locale === 'pt' ? '/cv_pt.pdf' : '/cv_en.pdf';
   const th = t('hero');
@@ -24,7 +24,7 @@ export default function Hero({ showShared = true }: { showShared?: boolean }) {
           />
         )}
         <div className="flex flex-col items-center text-center gap-y-6"> 
-          {showShared && <NameBadge layoutId="intro-name" />}
+          {showShared && <NameBadge layoutId="intro-name" greeting={greeting} />}
           <RevealStagger delay={2} interval={0.04}>
             <div className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
               <p>

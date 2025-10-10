@@ -11,6 +11,7 @@ type IntroOverlayProps = {
   onDone: () => void;
   starsDelayMs?: number;
   afterStarsDelayMs?: number; // time after stars appear to transition to main
+  greeting?: string;
 };
 
 export default function IntroOverlay({
@@ -18,6 +19,7 @@ export default function IntroOverlay({
   onDone,
   starsDelayMs = 300,
   afterStarsDelayMs = 1200,
+  greeting,
 }: IntroOverlayProps) {
   const [showStars, setShowStars] = useState(false);
   const cancelledRef = useRef(false);
@@ -88,7 +90,7 @@ export default function IntroOverlay({
                 alt="Miguel Lourenço"
                 imageClassName="rounded-xl object-cover"
               />
-              <NameBadge layoutId="intro-name" variant="intro" />
+              <NameBadge layoutId="intro-name" variant="intro" greeting={greeting} />
             </motion.div>
 
             {/* Skip button - accessible and minimal */}

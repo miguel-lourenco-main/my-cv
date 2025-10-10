@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { m, motion } from "motion/react";
-import { useI18n } from "../../lib/i18n";
+import { motion } from "motion/react";
 
 type NameBadgeProps = {
   className?: string;
   as?: keyof JSX.IntrinsicElements;
   layoutId?: string;
   variant?: "intro" | "hero";
+  greeting?: string;
 };
 
 export default function NameBadge({
@@ -16,6 +16,7 @@ export default function NameBadge({
   as = "div",
   layoutId = "intro-name",
   variant = "hero",
+  greeting,
 }: NameBadgeProps) {
   const Comp: any = (motion as any)[as] ?? motion.div;
   const titleClasses =
@@ -23,23 +24,10 @@ export default function NameBadge({
       ? "text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white"
       : "text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white";
 
-  const { t } = useI18n();
-  const tn = t('navigation');
-  
-  // Helper function to get translation with fallback
-  const getTranslation = (key: string, fallback: string) => {
-    try {
-      const result = tn(key);
-      return result && result !== key ? result : fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
   return (
     <Comp layoutId={layoutId} className={className}>
       <h1 className={titleClasses}>
-        {getTranslation('greeting', 'Hi, I\'m')}{' '}
+        {greeting || ' '} {""}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
           Miguel Lourenço
         </span>

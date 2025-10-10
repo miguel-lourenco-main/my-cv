@@ -14,7 +14,7 @@ import { LayoutGroup } from 'motion/react'
 import ParallaxRoot from '../components/parallax/ParallaxRoot'
 import ScrollParallaxLayer from '../components/parallax/ScrollParallaxLayer'
 
-export default function HomeClient() {
+export default function HomeClient({ greeting }: { greeting: string }) {
   const [showIntro, setShowIntro] = useState(true);
 
   const reducedMotion = useMemo(() => {
@@ -35,14 +35,14 @@ export default function HomeClient() {
     <div className="relative min-h-screen bg-background h-fit overflow-hidden">
       <SmoothCursor />
       <LayoutGroup id="root-shared">
-        <IntroOverlay show={showIntro} onDone={handleIntroDone} />
+        <IntroOverlay show={showIntro} onDone={handleIntroDone} greeting={greeting} />
         <ParallaxRoot>
           <ScrollParallaxLayer className="absolute inset-0 z-0 pointer-events-none h-[120%]" fromY={180} toY={-180} bleed={180}>
             <ShootingStars className='size-full' initialDelayMs={showIntro ? 1400 : 0} />
           </ScrollParallaxLayer>
           <div className={"flex flex-col gap-y-48 xl:gap-y-64 pb-12 pt-48 xl:pt-64 2xl:pt-72 px-4 sm:px-6 lg:px-8 relative z-10 transition-opacity duration-300 " + (showIntro ? "opacity-0 pointer-events-none" : "opacity-100") }>
             <Navigation />
-            <Hero showShared={!showIntro} />
+            <Hero showShared={!showIntro} greeting={greeting} />
             <About />
             <Projects />
             <Contact />
