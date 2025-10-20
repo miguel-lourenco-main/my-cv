@@ -33,7 +33,12 @@ export default function HomeClient({ greeting }: { greeting: string }) {
 
   return (
     <div className="relative min-h-screen bg-background h-fit overflow-hidden">
-      <SmoothCursor />
+      <SmoothCursor springConfig={{
+        damping: 900,
+        stiffness: 9000,
+        mass: 0.011,
+        restDelta: 0.9,
+      }}/>
       <LayoutGroup id="root-shared">
         <IntroOverlay show={showIntro} onDone={handleIntroDone} greeting={greeting} />
         <ParallaxRoot>
