@@ -63,6 +63,6 @@ This project is for portfolio purposes. All rights reserved.
 
 ---
 
-**Contact**: [LinkedIn](https://linkedin.com/in/miguel-lourenco) | [GitLab](https://gitlab.com/miguel-lourenco-main) | [Email](mailto:miguel.lourenco@example.com)
+**Contact**: [LinkedIn](https://www.linkedin.com/in/miguel-louren%C3%A7o-395335355/) | [GitLab](https://gitlab.com/miguel-lourenco-main) | [Email](mailto:migasoulou@gmail.com)
 
 **Built with ❤️ by Miguel Lourenço**
