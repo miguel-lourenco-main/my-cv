@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
@@ -23,6 +23,8 @@ export function ProjectFocusCard({
   const { resolvedTheme } = useTheme();
   const { getProjectString } = useI18n();
   const [mounted, setMounted] = useState(false);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -39,10 +41,27 @@ export function ProjectFocusCard({
     const themed = project.images.find((src) => src.endsWith(suffix));
     return themed ?? project.images[0];
   }, [project.images, resolvedTheme, mounted]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(null);
+    setMousePosition(null);
+  };
+
   return (
     <div
+      ref={cardRef}
       onMouseEnter={() => setHovered(index)}
-      onMouseLeave={() => setHovered(null)}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className={cn(
         "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out cursor-pointer",
         hovered !== null && hovered !== index && "blur-sm scale-[0.98]"
@@ -55,8 +74,29 @@ export function ProjectFocusCard({
         className="object-cover absolute inset-0 w-full h-full"
       />
 
+      {/* Water ripple effect */}
+      {hovered === index && mousePosition && (
+        <div className="absolute inset-0 pointer-events-none z-20">
+          {[0, 1, 2].map((rippleIndex) => (
+            <div
+              key={rippleIndex}
+              className="absolute rounded-full border-2 border-white/40"
+              style={{
+                left: mousePosition.x,
+                top: mousePosition.y,
+                transform: "translate(-50%, -50%)",
+                width: "0px",
+                height: "0px",
+                animation: `waterRipple 2.5s cubic-bezier(0.4, 0, 1, 1) infinite`,
+                animationDelay: `${rippleIndex * 0.67}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       <button
-        className="absolute right-3 top-3 z-10 bg-slate-800/40 hover:bg-slate-800 text-white rounded-full p-2"
+        className="absolute right-3 top-3 z-10 bg-transparent hover:bg-slate-800 text-white rounded-full p-2"
         aria-label={`Open ${getProjectString(project, 'title')} website`}
         onClick={(e) => {
           e.stopPropagation();

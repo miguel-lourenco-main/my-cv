@@ -2,7 +2,6 @@ import LanguagesCard from "./categories/LanguagesCard";
 import FrontendCard from "./categories/FrontendCard";
 import BackendCard from "./categories/BackendCard";
 import DevOpsCard from "./categories/DevOpsCard";
-import ToolingCard from "./categories/ToolingCard";
 import { RevealStagger } from "./Reveal";
 import { useI18n } from "../lib/i18n";
 import { useMobileDetection } from "../lib/use-mobile-detection";
@@ -16,7 +15,6 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     { key: "frontend", component: <FrontendCard /> },
     { key: "backend", component: <BackendCard /> },
     { key: "devops", component: <DevOpsCard /> },
-    { key: "tooling", component: <ToolingCard /> },
   ];
 
   //add to the ai tooling icon, a set that is made up of 3 ai tools that I regularly use
@@ -37,13 +35,13 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
   );
 
   const mobileGrid = isMobile ? (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${isLaptop ? "gap-6" : "gap-12"} lg:hidden block`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 ${isLaptop ? "gap-6" : "gap-12"} lg:hidden block`}>
       {categories.map((c) => (
         <div key={c.key}>{c.component}</div>
       ))}
     </div>
   ) : (
-    <RevealStagger className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${isLaptop ? "gap-6" : "gap-12"} lg:hidden block`} delay={0.1} interval={0.9}>
+    <RevealStagger className={`grid grid-cols-1 md:grid-cols-2 ${isLaptop ? "gap-6" : "gap-12"} lg:hidden block`} delay={0.1} interval={0.9}>
       {categories.map((c) => (
         <div key={c.key}>{c.component}</div>
       ))}
@@ -51,28 +49,26 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
   );
 
   const desktopFirstRow = isMobile ? (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${isLaptop ? "gap-6 mb-6" : "gap-12 mb-12"}`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 ${isLaptop ? "gap-6 mb-6" : "gap-12 mb-12"}`}>
       <LanguagesCard />
-      <FrontendCard />
-      <BackendCard />
+      <DevOpsCard />
     </div>
   ) : (
-    <RevealStagger className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${isLaptop ? "gap-6 mb-6" : "gap-12 mb-12"}`} delay={0.1} interval={0.9}>
+    <RevealStagger className={`grid grid-cols-1 md:grid-cols-2 ${isLaptop ? "gap-6 mb-6" : "gap-12 mb-12"}`} delay={0.1} interval={0.9}>
       <LanguagesCard />
-      <FrontendCard />
-      <BackendCard />
+      <DevOpsCard />
     </RevealStagger>
   );
 
   const desktopSecondRow = isMobile ? (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 ${isLaptop ? "gap-6" : "gap-12"} lg:max-w-5xl mx-auto`}>
-      <DevOpsCard />
-      <ToolingCard />
+    <div className={`grid grid-cols-1 md:grid-cols-2 ${isLaptop ? "gap-6 mb-6" : "gap-12 mb-12"}`}>
+      <FrontendCard />
+      <BackendCard />
     </div>
   ) : (
-    <RevealStagger className={`grid grid-cols-1 sm:grid-cols-2 ${isLaptop ? "gap-6" : "gap-12"} lg:max-w-5xl mx-auto`} delay={0.1} interval={0.9}>
-      <DevOpsCard />
-      <ToolingCard />
+    <RevealStagger className={`grid grid-cols-1 md:grid-cols-2 ${isLaptop ? "gap-6 mb-6" : "gap-12 mb-12"}`} delay={0.1} interval={0.9}>
+      <FrontendCard />
+      <BackendCard />
     </RevealStagger>
   );
 
@@ -80,7 +76,7 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     <section id="technical-skills" className={sectionClasses}>
       {titleWrapper}
       {mobileGrid}
-      <div className="lg:block hidden">
+      <div className="lg:block hidden w-[90%] sm:w-[85%] lg:w-[80%] xl:w-[75%] 2xl:w-[70%] mx-auto">
         {desktopFirstRow}
         {desktopSecondRow}
       </div>

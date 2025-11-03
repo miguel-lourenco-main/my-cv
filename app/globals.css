@@ -213,3 +213,19 @@ html {
 .phone-active [data-icon-item="true"] {
   transform: translateY(calc(var(--dist-ratio, 0) * 8px)) !important;
 }
+
+/* Water ripple effect for project cards */
+@keyframes waterRipple {
+  0% {
+    width: 0px;
+    height: 0px;
+    opacity: 0.8;
+    border-width: 2px;
+  }
+  100% {
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    border-width: 1px;
+  }
+}
