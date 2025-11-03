@@ -7,30 +7,36 @@ import ProfileAvatar from "./identity/ProfileAvatar";
 import { Button } from "./shadcn/button";
 import { useI18n } from "../lib/i18n";
 
-export default function Hero({ showShared = true, greeting }: { showShared?: boolean; greeting?: string }) {
+export default function Hero({ showShared = true, greeting, isLaptop = false }: { showShared?: boolean; greeting?: string; isLaptop?: boolean }) {
   const { locale, t } = useI18n();
   const cvPath = locale === 'pt' ? '/cv_pt.pdf' : '/cv_en.pdf';
   const th = t('hero');
+  
+  const sectionClasses = [
+    "flex flex-col max-w-7xl mx-auto",
+    isLaptop ? "h-screen flex-none snap-center justify-center" : "gap-y-12"
+  ].filter(Boolean).join(" ");
+
   return (
-    <section id="hero" className="flex flex-col max-w-7xl mx-auto gap-y-12">
-      <div className="flex flex-col lg:flex-row justify-center w-full space-x-0 space-y-12 lg:space-y-0 lg:space-x-12 items-center">
+    <section id="hero" className={sectionClasses}>
+      <div className={`flex flex-col lg:flex-row justify-center size-full ${isLaptop ? "space-x-8 items-center" : "space-x-0 space-y-12 lg:space-y-0 lg:space-x-12 items-center"}`}>
         {/* Avoid double animation for shared elements; keep subtle reveal for non-shared parts if needed */}
         {showShared && (
           <ProfileAvatar
             layoutId="intro-avatar"
-            width={360}
-            height={216}
+            width={isLaptop ? 320 : 360}
+            height={isLaptop ? 192 : 216}
             imageClassName="rounded-xl object-cover"
           />
         )}
-        <div className="flex flex-col items-center text-center gap-y-6"> 
+        <div className={`flex flex-col items-center text-center ${isLaptop ? "gap-y-4" : "gap-y-6"}`}> 
           {showShared && <NameBadge layoutId="intro-name" greeting={greeting} />}
           <RevealStagger delay={2} interval={0.04}>
-            <div className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+            <div className={`text-xl sm:text-2xl text-slate-600 dark:text-slate-300 ${isLaptop ? "mb-6" : "mb-8"} max-w-2xl mx-auto`}>
               <p>
                 {th('intro1')}
               </p>
-              <p className="mt-8">
+              <p className={isLaptop ? "mt-6" : "mt-8"}>
                 <span className="font-bold">{th('intro2')}</span>
               </p>
             </div>

@@ -72,13 +72,16 @@ export function ProjectFocusCard({
 
       <div
         className={cn(
-          "absolute inset-0 bg-black/50 flex items-end py-6 px-4 transition-opacity duration-300",
+          "absolute inset-0 bg-black/80 flex items-end py-6 px-4 transition-opacity duration-300",
           hovered === index ? "opacity-100" : "opacity-0"
         )}
       >
         <div className="space-y-1">
           <div className="text-lg md:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
             {getProjectString(project, 'title')}
+          </div>
+          <div className="text-xs md:text-sm text-neutral-200/90">
+            {getProjectString(project, 'description')}
           </div>
           {project.experience ? (
             <div className="text-xs md:text-sm text-neutral-200/90">

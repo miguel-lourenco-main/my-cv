@@ -1,8 +1,0 @@
-{
-  "root": "public/locales",
-  "sourceLocale": "en",
-  "targetLocales": ["pt", "fr", "es"],
-  "strategy": "fill-missing",
-  "preserveExisting": true
-}
-
