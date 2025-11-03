@@ -5,6 +5,7 @@ import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
+import { MoreHorizontalIcon } from "lucide-react";
 
 export function ProjectFocusCard({
   project,
@@ -55,19 +56,15 @@ export function ProjectFocusCard({
       />
 
       <button
-        className="absolute right-3 top-3 z-10 bg-black/40 hover:bg-black/60 text-white rounded-full p-2"
+        className="absolute right-3 top-3 z-10 bg-slate-800/40 hover:bg-slate-800 text-white rounded-full p-2"
         aria-label={`Open ${getProjectString(project, 'title')} website`}
         onClick={(e) => {
           e.stopPropagation();
-          window.open(project.websiteUrl, "_blank");
+          onClick(project)
         }}
       >
         {/* external link icon */}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-          <path d="M15 3h6v6" />
-          <path d="M10 14L21 3" />
-        </svg>
+        <MoreHorizontalIcon className="size-5" />
       </button>
 
       <div

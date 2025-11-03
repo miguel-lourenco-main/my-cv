@@ -14,8 +14,6 @@ export default function Navigation() {
   const isAnimatingRef = useRef(false)
   const mountedRef = useRef(false)
   const scrollerRef = useRef<Window | HTMLElement | null>(null)
-  const isAnimating = animClass !== ''
-  const effectiveScrolled = isAnimating ? isScrolled : visualScrolled
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -68,7 +66,7 @@ export default function Navigation() {
   return (
     <nav className="flex justify-center items-center fixed top-0 left-0 w-full z-50">
       <div
-        className={`w-full mx-auto ${visualScrolled ? 'max-w-[98vw]' : 'max-w-[70vw] 2xl:max-w-[1100px]'} ${animClass}`}
+        className={`w-full mx-auto ${!visualScrolled && 'max-w-[98vw] sm:max-w-[70vw] 2xl:max-w-[1100px]'} ${animClass}`}
         onAnimationEnd={() => {
           if (isAnimatingRef.current) {
             setVisualScrolled(isScrolled)
@@ -77,7 +75,7 @@ export default function Navigation() {
           }
         }}
       >
-        <div className={`flex justify-between items-center h-16 px-2`}>
+        <div className={`flex justify-between items-center h-16 px-2 sm:px-6`}>
           <div className="flex-shrink-0">
             <h1 className="text-xl font-bold text-slate-800 dark:text-white">Miguel Lourenço</h1>
           </div>
@@ -89,7 +87,7 @@ export default function Navigation() {
                 <EmailButton width={22} height={22} className='p-0'/>
               </div>
             </div>
-            <LanguageSwitcher compact={effectiveScrolled} />
+            <LanguageSwitcher/>
             <ThemeToggle />
           </div>
         </div>
