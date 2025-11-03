@@ -2,6 +2,7 @@
 
 import React from "react";
 import CategoryCard from "./CategoryCard";
+import IconImage from "./IconImage";
 import VercelLogo from "@/public/logos/vercel.svg";
 import { useI18n } from "../../lib/i18n";
 
@@ -17,7 +18,7 @@ export default function ToolingCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <img key={src + idx} src={src} alt="" aria-hidden="true" width={42} height={42} className="opacity-90" loading="lazy" decoding="async" />
+        <IconImage key={src + idx} src={src} />
       ))}
       <VercelLogo className="size-24 text-slate-900 dark:text-white [&_*]:fill-current" />
     </CategoryCard>

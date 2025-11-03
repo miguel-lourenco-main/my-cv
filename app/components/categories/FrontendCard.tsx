@@ -2,6 +2,7 @@
 
 import React from "react";
 import CategoryCard from "./CategoryCard";
+import IconImage from "./IconImage";
 import NextLogo from "@/public/logos/nextjs.svg";
 import { useI18n } from "../../lib/i18n";
 
@@ -19,7 +20,7 @@ export default function FrontendCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <img key={src + idx} src={src} alt="" aria-hidden="true" width={idx === 3 ? 28 : 42} height={idx === 3 ? 28 : 42} className="opacity-90" loading="lazy" decoding="async" />
+        <IconImage key={src + idx} src={src} width={idx === 3 ? 28 : 42} height={idx === 3 ? 28 : 42} />
       ))}
       <NextLogo className="size-12 text-slate-900 dark:text-white" />
     </CategoryCard>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import CategoryCard from "./CategoryCard";
+import IconImage from "./IconImage";
 import CiCdIcon from "@/public/logos/ci_cd.svg";
 import EnvConfigIcon from "@/public/logos/environment_config.svg";
 import { useI18n } from "../../lib/i18n";
@@ -17,7 +18,7 @@ export default function DevOpsCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <img key={src + idx} src={src} alt="" aria-hidden="true" width={idx === 0 ? 42 : 56} height={idx === 0 ? 42 : 56} className="opacity-90" loading="lazy" decoding="async" />
+        <IconImage key={src + idx} src={src} width={idx === 0 ? 42 : 56} height={idx === 0 ? 42 : 56} />
       ))}
       <CiCdIcon className="size-12 text-slate-900 dark:text-white" />
       <EnvConfigIcon className="size-12 text-slate-900 dark:text-white" />
