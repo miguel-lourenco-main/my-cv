@@ -68,7 +68,7 @@ export function ProjectExpandedCard({
             >
               <X className="size-4 text-gray-600 dark:text-gray-400" />
             </button>
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4 w-full">
               <div>
                 <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
                   {getProjectString(project, 'title')}
@@ -82,7 +82,7 @@ export function ProjectExpandedCard({
                   {getProjectString(project, 'description')}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex w-fit shrink-0 gap-2">
                 <BaseButton href={project.websiteUrl} className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white" theme="green">
                   Visit <GlobeIcon className="size-5" />
                 </BaseButton>

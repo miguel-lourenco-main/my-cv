@@ -2,6 +2,7 @@
 
 import React from "react";
 import CategoryCard from "./CategoryCard";
+import IconImage from "./IconImage";
 
 export default function LanguagesCard() {
   const title = "Languages";
@@ -17,17 +18,7 @@ export default function LanguagesCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <img
-          key={src + idx}
-          src={src}
-          alt=""
-          aria-hidden="true"
-          width={42}
-          height={42}
-          className="opacity-90"
-          loading="lazy"
-          decoding="async"
-        />
+        <IconImage key={src + idx} src={src} />
       ))}
     </CategoryCard>
   );

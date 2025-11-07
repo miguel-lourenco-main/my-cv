@@ -22,33 +22,42 @@ export interface BaseButtonProps {
   rel?: string;
 }
 
-const themeStyles = {
+/**
+ * Base classes shared across all themes
+ */
+const baseThemeClasses = "text-slate-800 font-bold dark:text-slate-200";
+
+/**
+ * Theme styles - generated programmatically but with explicit class names
+ * to ensure Tailwind CSS can detect them at build time
+ */
+const themeStyles: Record<ButtonTheme, { base: string; clicked: string }> = {
   orange: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-orange-50 dark:bg-orange-900/20"
   },
   blue: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-blue-50 dark:bg-blue-900/20"
   },
   green: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-green-50 dark:bg-green-900/20"
   },
   purple: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-purple-50 dark:bg-purple-900/20"
   },
   red: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-red-50 dark:bg-red-900/20"
   },
   gray: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-gray-50 dark:bg-gray-900/20"
   },
   default: {
-    base: "text-slate-800 font-bold dark:text-slate-200",
+    base: baseThemeClasses,
     clicked: "scale-95 bg-slate-50 dark:bg-slate-900/20"
   }
 };
