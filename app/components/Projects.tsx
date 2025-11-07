@@ -9,7 +9,13 @@ import { ProjectExpandedCard } from './projects/ProjectExpandedCard'
 import { Reveal, RevealStagger } from './Reveal'
 import { useI18n } from '../lib/i18n'
 
-export default function Projects({ isLaptop = false }: { isLaptop?: boolean }) {
+export default function Projects({ 
+  isLaptop = false,
+  onCursorModeChange,
+}: { 
+  isLaptop?: boolean;
+  onCursorModeChange?: (mode: 'default' | 'view') => void;
+}) {
   const { t } = useI18n()
   const tp = t('projects')
   const [activeProject, setActiveProject] = useState<Project | null>(null)
@@ -37,6 +43,7 @@ export default function Projects({ isLaptop = false }: { isLaptop?: boolean }) {
           <ProjectGrid
             projects={projectsData}
             onCardClick={(project) => setActiveProject(project)}
+            onCursorModeChange={onCursorModeChange}
           />
         </Reveal>
       </div>

@@ -8,9 +8,11 @@ import { Reveal } from "../Reveal";
 export function ProjectGrid({
   projects,
   onCardClick,
+  onCursorModeChange,
 }: {
   projects: Project[];
   onCardClick: (project: Project) => void;
+  onCursorModeChange?: (mode: 'default' | 'view') => void;
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
 
@@ -24,6 +26,7 @@ export function ProjectGrid({
             hovered={hovered}
             setHovered={setHovered}
             onClick={onCardClick}
+            onCursorModeChange={onCursorModeChange}
           />
         </Reveal>
       ))}

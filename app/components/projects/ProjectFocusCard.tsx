@@ -13,12 +13,14 @@ export function ProjectFocusCard({
   hovered,
   setHovered,
   onClick,
+  onCursorModeChange,
 }: {
   project: Project;
   index: number;
   hovered: number | null;
   setHovered: React.Dispatch<React.SetStateAction<number | null>>;
   onClick: (project: Project) => void;
+  onCursorModeChange?: (mode: 'default' | 'view') => void;
 }) {
   const { resolvedTheme } = useTheme();
   const { getProjectString } = useI18n();
@@ -51,15 +53,21 @@ export function ProjectFocusCard({
     });
   };
 
+  const handleMouseEnter = () => {
+    setHovered(index);
+    onCursorModeChange?.('view');
+  };
+
   const handleMouseLeave = () => {
     setHovered(null);
     setMousePosition(null);
+    onCursorModeChange?.('default');
   };
 
   return (
     <div
       ref={cardRef}
-      onMouseEnter={() => setHovered(index)}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(

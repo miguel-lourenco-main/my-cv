@@ -17,6 +17,7 @@ import { useIsLaptop } from '../lib/use-laptop-detection'
 
 export default function HomeClient({ greeting }: { greeting: string }) {
   const [showIntro, setShowIntro] = useState(true);
+  const [cursorMode, setCursorMode] = useState<'default' | 'view'>('default');
   const isLaptop = useIsLaptop();
 
   const reducedMotion = useMemo(() => {
@@ -51,7 +52,7 @@ export default function HomeClient({ greeting }: { greeting: string }) {
         stiffness: 9000,
         mass: 0.011,
         restDelta: 0.9,
-      }}/>
+      }} cursorMode={cursorMode}/>
       <LayoutGroup id="root-shared">
         <IntroOverlay show={showIntro} onDone={handleIntroDone} greeting={greeting} />
         <ParallaxRoot>
@@ -63,7 +64,7 @@ export default function HomeClient({ greeting }: { greeting: string }) {
             {isLaptop && <div className="fixed top-0 left-0 right-0 z-50"><Navigation /></div>}
             <Hero showShared={!showIntro} greeting={greeting} isLaptop={isLaptop} />
             <About isLaptop={isLaptop} />
-            <Projects isLaptop={isLaptop} />
+            <Projects isLaptop={isLaptop} onCursorModeChange={setCursorMode} />
             <Contact isLaptop={isLaptop} />
           </div>
         </ParallaxRoot>

@@ -2,6 +2,7 @@
 
 import { FC, useEffect, useRef, useState } from "react"
 import { motion, useSpring } from "motion/react"
+import { EyeIcon, ViewIcon } from "lucide-react"
 
 interface Position {
   x: number
@@ -9,71 +10,76 @@ interface Position {
 }
 
 export interface SmoothCursorProps {
-  cursor?: React.ReactNode
   springConfig?: {
     damping: number
     stiffness: number
     mass: number
     restDelta: number
   }
+  cursorMode?: 'default' | 'view'
 }
 const DefaultCursorSVG: FC = () => {
     return <RocketCursorSVG />;
-  };
+
+};
+
+const ViewCursorSVG: FC = () => {
+  return <div className="relative"><RocketCursorSVG /><EyeIcon className="absolute -bottom-2.5 right-0 size-5 transform -rotate-45" /></div>;
+};
   
-  const RocketCursorSVG: FC = () => {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="40"
-        height="40"
-        viewBox="0 0 32 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="lucide lucide-rocket"
-        style={{ 
-          color: 'hsl(var(--foreground))'
-        }}
-      >
-        {/* Rotate the rocket upright (lucide points 45deg by default) */}
-        <g transform="rotate(-45 12 12)">
-          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-        </g>
-  
-        {/* Inline thrusters inside SVG, kept within 24x24 viewBox */}
-        <g>
-          <rect x="9.5" y="18.5" width="1.6" height="3" fill="#FF4500" rx="0.8">
-            <animate attributeName="height" values="3;5;3" dur="0.33s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="0.33s" repeatCount="indefinite" />
-          </rect>
-          <rect x="11.7" y="18" width="1.8" height="3.8" fill="#1E90FF" rx="0.9">
-            <animate attributeName="height" values="3.8;6;3.8" dur="0.27s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="0.27s" repeatCount="indefinite" />
-          </rect>
-          <rect x="14.1" y="18.5" width="1.6" height="3" fill="#FFA500" rx="0.8">
-            <animate attributeName="height" values="3;5;3" dur="0.39s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="0.39s" repeatCount="indefinite" />
-          </rect>
-        </g>
-      </svg>
-    );
-  };
+const RocketCursorSVG: FC = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="40"
+      height="40"
+      viewBox="0 0 32 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-rocket"
+      style={{ 
+        color: 'hsl(var(--foreground))'
+      }}
+    >
+      {/* Rotate the rocket upright (lucide points 45deg by default) */}
+      <g transform="rotate(-45 12 12)">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+      </g>
+
+      {/* Inline thrusters inside SVG, kept within 24x24 viewBox */}
+      <g>
+        <rect x="9.5" y="18.5" width="1.6" height="3" fill="#FF4500" rx="0.8">
+          <animate attributeName="height" values="3;5;3" dur="0.33s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="0.33s" repeatCount="indefinite" />
+        </rect>
+        <rect x="11.7" y="18" width="1.8" height="3.8" fill="#1E90FF" rx="0.9">
+          <animate attributeName="height" values="3.8;6;3.8" dur="0.27s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="0.27s" repeatCount="indefinite" />
+        </rect>
+        <rect x="14.1" y="18.5" width="1.6" height="3" fill="#FFA500" rx="0.8">
+          <animate attributeName="height" values="3;5;3" dur="0.39s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="0.39s" repeatCount="indefinite" />
+        </rect>
+      </g>
+    </svg>
+  );
+};
   
 
 export function SmoothCursor({
-  cursor = <DefaultCursorSVG />,
   springConfig = {
     damping: 45,
     stiffness: 400,
     mass: 1,
     restDelta: 0.001,
   },
+  cursorMode = 'default',
 }: SmoothCursorProps) {
   const [isMoving, setIsMoving] = useState(false)
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
@@ -188,7 +194,7 @@ export function SmoothCursor({
         damping: 30,
       }}
     >
-      {cursor}
+      {cursorMode === 'default' ? <DefaultCursorSVG /> : <ViewCursorSVG />}
     </motion.div>
   )
 }
