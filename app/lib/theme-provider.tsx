@@ -11,7 +11,7 @@ export function ThemeProvider(props: React.ComponentProps<typeof NextThemesProvi
       attribute="class"
       enableSystem
       disableTransitionOnChange
-      defaultTheme={defaultTheme ?? 'system'}
+      defaultTheme={'dark'}
       storageKey={storageKey ?? 'theme'}
       {...rest}
     >

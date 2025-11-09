@@ -13,7 +13,7 @@ const LOCALES = [
   { code: 'es', label: 'ES', name: 'Español' }
 ]
 
-export default function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
+export default function LanguageSwitcher() {
   const router = useRouter()
   const pathname = usePathname()
   const { locale, setLocale, t } = useI18n()
@@ -40,7 +40,7 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
   return (
     <div className="relative" ref={menuRef}>
       <button
-        className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 text-sm font-semibold bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+        className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 text-sm font-semibold bg-slate-200 dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
         aria-label={t('navigation')('languageSwitcher')}
         onClick={() => setOpen(v => !v)}
         disabled={isPending}
