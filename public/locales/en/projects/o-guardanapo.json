@@ -4,7 +4,7 @@
   "subtitle": "Web application for the snack-bar business O Guardanapo",
   "overview": "O Guardanapo is a web application for the snack-bar business built as a TypeScript monorepo using Next.js 15, Supabase, and a shared UI/infra toolkit. The repo is organized as a Turborepo + pnpm workspace with multiple apps (web, e2e) and reusable packages for UI, Supabase, routing, monitoring, i18n, mailers, and more.",
   "coreConcept": {
-    "summary": "Improve my parents experience for creating and promoting the daily menu and products",
+    "summary": "Improve my parents' experience for creating and promoting the daily menu and products",
     "bullets": [
       "Facilitate the creation and promotion of the daily menu and products",
       "Increase the accessibility by providing different idioms to choose from",
