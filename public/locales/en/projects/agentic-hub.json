@@ -40,8 +40,8 @@
       "`data` and `scripts` directories for imports, translations, product transforms, and maintenance scripts"
     ],
     "deployment": [
-      "Build and deploy via Gitlab Pipelines",
-      "Deployed to Gitlab Pages"
+      "Build and deploy via GitLab Pipelines",
+      "Deployed to GitLab Pages"
     ]
   }
 }

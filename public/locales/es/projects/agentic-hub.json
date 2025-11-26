@@ -41,7 +41,7 @@
     ],
     "deployment": [
       "Build y deploy vía GitLab Pipelines",
-      "Desplegado en Gitlab Pages"
+      "Desplegado en GitLab Pages"
     ]
   }
 }

@@ -41,7 +41,7 @@
     ],
     "deployment": [
       "Construído e publicado via GitLab Pipelines",
-      "Publicado em Gitlab Pages"
+      "Publicado em GitLab Pages"
     ]
   }
 }

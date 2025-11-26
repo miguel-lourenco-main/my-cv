@@ -14,7 +14,7 @@
   "features": [
     "Catálogo dividido em categorias de bebidas e comida com preços para cada produto",
     "Carrinho de compras com funcionalidades de adicionar ou remover produtos e ajustar quantidades",
-    "Para mobile, um carrinho flutuante que facilita a navegação enre o último produto adicionado e o carrinho de compras",
+    "Para mobile, um carrinho flutuante que facilita a navegação entre o último produto adicionado e o carrinho de compras",
     "Histórico de pedidos com timestamps, detalhes do pedido e atualizações em tempo real"
   ],
   "technical": {
@@ -36,7 +36,7 @@
     ],
     "deployment": [
       "Construído e publicado via GitLab Pipelines",
-      "Publicado em Gitlab Pages"
+      "Publicado em GitLab Pages"
     ]
   }
 }
