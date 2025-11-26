@@ -4,40 +4,39 @@
   "subtitle": "Sistema Moderno de Ponto de Venda",
   "overview": "Um POS web que simplifica os pedidos com uma interface otimizada para toque e ecrãs pequenos.",
   "coreConcept": {
-    "summary": "Fluxo POS completo do menu ao histórico.",
+    "summary": "Nasceu da necessidade de utilizar a app num evento rural do qual fiz parte da organização",
     "bullets": [
-      "Explora menus categorizados (bebidas e comida)",
-      "Constrói pedidos com carrinho em tempo real",
-      "Guarda pedidos com histórico completo",
-      "Carrinho flutuante para navegação rápida no mobile"
+      "Desenvolvido em menos de 12 horas",
+      "Desenvolvido iterativamente ao longo do evento em que foi utilizado",
+      "Assegura a facilidade de acesso ao estar disponível online"
     ]
   },
   "features": [
-    "Catálogo: bebidas e comida com preços e ícones",
-    "Pedidos: adicionar com um toque, quantidades, totais, feedback fluido",
-    "Mobile: carrinho flutuante, scroll suave, badges",
-    "Pedidos: histórico, timestamps, detalhe, atualizações em tempo real"
+    "Catálogo dividido em categorias de bebidas e comida com preços para cada produto",
+    "Carrinho de compras com funcionalidades de adicionar ou remover produtos e ajustar quantidades",
+    "Para mobile, um carrinho flutuante que facilita a navegação enre o último produto adicionado e o carrinho de compras",
+    "Histórico de pedidos com timestamps, detalhes do pedido e atualizações em tempo real"
   ],
   "technical": {
     "frontendStack": [
-      "Next.js 15 com App Router e export estático",
+      "Next.js 15 com App Router e geração estática",
       "React 19 com TypeScript",
       "Tailwind CSS",
       "Radix UI via shadcn/ui",
-      "Lucide React para ícones",
-      "Sonner para toasts"
+      "Lucide React para iconografia",
+      "Sonner para notificações toast"
     ],
     "projectStructure": [
-      "Backend Supabase com PostgreSQL, schema tipado e RLS",
-      "Subscrições em tempo real",
-      "Componentes client/server por responsabilidade",
-      "Operações de BD type‑safe com tipos gerados",
-      "UI modular em /components/ui e lógica em /lib",
+      "Backend Supabase com PostgreSQL, esquema tipado e RLS",
+      "Subscrições em tempo real para atualizações em tempo real",
+      "Componentes cliente/servidor separados por preocupação",
+      "Operações de BD tipo‑seguras com tipos gerados",
+      "UI modular em /components/ui e lógica de negócio em /lib",
       "Componentes chave: CashRegister, FloatingCartButton, OrderList, OrderDetails"
     ],
     "deployment": [
-      "Frontend no GitLab Pages",
-      "Backend gerido no Supabase"
+      "Construído e publicado via GitLab Pipelines",
+      "Publicado em Gitlab Pages"
     ]
   }
 }

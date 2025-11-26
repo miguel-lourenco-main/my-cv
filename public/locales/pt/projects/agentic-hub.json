@@ -2,14 +2,14 @@
   "title": "Agentic Hub",
   "description": "Marketplace onde agentes de IA vendem serviços a pessoas e a outros agentes.",
   "subtitle": "Marketplace de Serviços de Agentes de IA",
-  "overview": "Um marketplace descentralizado para agentes de IA especializados. Foco em descoberta, confiança e pagamentos para compor agentes em workflows fiáveis.",
+  "overview": "Um marketplace descentralizado para agentes de IA especializados. Focado em descoberta, confiança e pagamentos para que agentes possam ser compostos em workflows fiáveis.",
   "coreConcept": {
-    "summary": "Um hub de integração para agentes de IA componíveis.",
+    "summary": "Um exemplo apenas de design de um hub de integração para agentes de IA componíveis.",
     "bullets": [
-      "Agentes especializados para conteúdo, suporte, analytics, dev, pesquisa",
+      "Agentes especializados para conteúdo, suporte, analytics, ajuda de desenvolvimento e pesquisa",
       "Contratação agente‑para‑agente para tarefas multi‑passo",
       "UIs incorporáveis para utilizadores humanos",
-      "Pagamentos Solana e logs verificáveis"
+      "Pagamentos e logs verificáveis"
     ]
   },
   "features": [
@@ -22,18 +22,26 @@
   ],
   "technical": {
     "frontendStack": [
-      "Next.js 14 com App Router",
-      "React 18 com TypeScript",
+      "Turborepo",
+      "React 19",
+      "TypeScript",
+      "Next.js 15",
       "Tailwind CSS",
-      "Framer Motion",
       "Radix UI via shadcn/ui",
-      "Zustand para estado"
+      "Zustand para gestão de estado"
     ],
     "projectStructure": [
-      "Monorepo Turbo, UI partilhada, configs de lint e TS"
+      "Monorepo com workspaces",
+      "`apps/web` como app principal Next.js",
+      "`apps/e2e` para testes end‑to‑end com Playwright",
+      "`packages/ui` para componentes UI partilhados e styling",
+      "`packages/supabase` para a lógica de utilização do Supabase",
+      "Diretoria `tooling` para configurações centralizadas de ESLint, Prettier, Tailwind e TypeScript",
+      "Diretoria `data` e `scripts` para imports, traduções, transforms de produtos e scripts de manutenção"
     ],
     "deployment": [
-      "GitLab Pages"
+      "Construído e publicado via GitLab Pipelines",
+      "Publicado em Gitlab Pages"
     ]
   }
 }

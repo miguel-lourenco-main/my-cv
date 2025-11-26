@@ -1,0 +1,50 @@
+{
+  "title": "O Guardanapo",
+  "description": "Web application for the snack-bar business O Guardanapo, built as a Turborepo monorepo with Next.js, TypeScript, Supabase, and a shared UI/infra toolkit.",
+  "subtitle": "Web application for the snack-bar business O Guardanapo",
+  "overview": "O Guardanapo is a web application for the snack-bar business built as a TypeScript monorepo using Next.js 15, Supabase, and a shared UI/infra toolkit. The repo is organized as a Turborepo + pnpm workspace with multiple apps (web, e2e) and reusable packages for UI, Supabase, routing, monitoring, i18n, mailers, and more.",
+  "coreConcept": {
+    "summary": "Improve my parents experience for creating and promoting the daily menu and products",
+    "bullets": [
+      "Facilitate the creation and promotion of the daily menu and products",
+      "Increase the accessibility by providing different idioms to choose from",
+      "Provide additional information to the customers about the products and the business",
+      "Allow customers to interact with the business"
+    ]
+  },
+  "features": [
+    "Monorepo with Turborepo + pnpm",
+    "Main web app in `apps/web` built on Next.js 15",
+    "End-to-end tests in `apps/e2e` using Playwright",
+    "Shared UI component library in `packages/ui` with Tailwind CSS and Radix UI",
+    "Supabase integration via `packages/supabase` for database, auth, and type-safe client utilities",
+    "Shared packages for routing, i18n, monitoring, and mailers",
+    "Data and scripts folders for CSV imports, seeding, and maintenance tasks"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Turborepo",
+      "React 19",
+      "TypeScript as the main language",
+      "Next.js 15 for the web application",
+      "Tailwind CSS for utility-first styling",
+      "Radix UI primitives plus a custom `@kit/ui` component library"
+    ],
+    "projectStructure": [
+      "Monorepo with workspaces",
+      "`apps/web` as the main Next.js app",
+      "`apps/e2e` for Playwright end-to-end testing",
+      "`packages/ui` for shared UI components and styling",
+      "`packages/supabase` for Supabase client and tooling",
+      "Additional shared packages for routing, shared utilities, i18n, monitoring, and mailers",
+      "`tooling` directory for centralized ESLint, Prettier, Tailwind, and TypeScript configs",
+      "`data` and `scripts` directories for imports, translations, product transforms, and maintenance scripts"
+    ],
+    "deployment": [
+      "Build and deploy via Gitlab Pipelines",
+      "Deployed to Vercel"
+    ]
+  }
+}
+
+

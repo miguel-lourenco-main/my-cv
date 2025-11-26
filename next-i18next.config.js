@@ -18,6 +18,7 @@ module.exports = {
     'projects/sonora',
     'projects/agentic-hub',
     'projects/cash-register',
+    'projects/o-guardanapo',
   ],
   defaultNS: 'projects',
   fallbackLng: 'en',

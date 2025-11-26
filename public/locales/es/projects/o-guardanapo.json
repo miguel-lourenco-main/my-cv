@@ -1,0 +1,50 @@
+{
+  "title": "O Guardanapo",
+  "description": "Aplicación web para el negocio de snack-bar O Guardanapo, construida como un monorepo Turborepo con Next.js, TypeScript, Supabase y un toolkit compartido de UI/infra.",
+  "subtitle": "Aplicación web para el snack-bar O Guardanapo",
+  "overview": "O Guardanapo es una aplicación web para el negocio de snack-bar construida como un monorepo TypeScript utilizando Next.js 15, Supabase y un toolkit de UI/infra compartido. El repositorio está organizado como un workspace Turborepo + pnpm con múltiples apps (web, e2e) y paquetes reutilizables para UI, Supabase, routing, monitoring, i18n, mailers y más.",
+  "coreConcept": {
+    "summary": "Mejorar la experiencia de mis padres al crear y promocionar el menú diario y los productos.",
+    "bullets": [
+      "Facilitar la creación y promoción del menú diario y los productos",
+      "Aumentar la accesibilidad ofreciendo distintos idiomas",
+      "Proporcionar más información a los clientes sobre los productos y el negocio",
+      "Permitir que los clientes interactúen con el negocio"
+    ]
+  },
+  "features": [
+    "Monorepo con Turborepo + pnpm",
+    "Aplicación web principal en `apps/web` construida con Next.js 15",
+    "Tests end‑to‑end en `apps/e2e` usando Playwright",
+    "Biblioteca de componentes UI en `packages/ui` con Tailwind CSS y Radix UI",
+    "Integración con Supabase vía `packages/supabase` para base de datos, auth y cliente type‑safe",
+    "Paquetes compartidos para routing, i18n, monitoring y mailers",
+    "Carpetas de datos y scripts para imports de CSV, seeding y tareas de mantenimiento"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Turborepo",
+      "React 19",
+      "TypeScript como lenguaje principal",
+      "Next.js 15 para la aplicación web",
+      "Tailwind CSS para estilos utility‑first",
+      "Primitivos Radix UI más la librería de componentes personalizada `@kit/ui`"
+    ],
+    "projectStructure": [
+      "Monorepo Turborepo + pnpm con workspaces",
+      "`apps/web` como app principal de Next.js",
+      "`apps/e2e` para tests end‑to‑end con Playwright",
+      "`packages/ui` para componentes UI compartidos y estilos",
+      "`packages/supabase` para cliente Supabase y tooling",
+      "Paquetes adicionales para routing, utilidades compartidas, i18n, monitoring y mailers",
+      "Directorio `tooling` para configuraciones centralizadas de ESLint, Prettier, Tailwind y TypeScript",
+      "Directorios `data` y `scripts` para imports, traducciones, transforms de productos y scripts de mantenimiento"
+    ],
+    "deployment": [
+      "Build y deploy vía GitLab Pipelines",
+      "Desplegado en Vercel"
+    ]
+  }
+}
+
+

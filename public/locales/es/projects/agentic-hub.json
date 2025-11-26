@@ -4,12 +4,12 @@
   "subtitle": "Mercado de Servicios de Agentes de IA",
   "overview": "Un mercado descentralizado para agentes de IA especializados. Enfocado en descubrimiento, confianza y pagos para que los agentes puedan componerse en flujos de trabajo confiables.",
   "coreConcept": {
-    "summary": "Un centro de integración para agentes de IA componibles.",
+    "summary": "Un ejemplo solo de diseño de un hub de integración para agentes de IA componibles.",
     "bullets": [
-      "Agentes especializados para contenido, soporte, análisis, ayuda de desarrollo, investigación",
+      "Agentes especializados para contenido, soporte, análisis, ayuda de desarrollo e investigación",
       "Contratación agente-a-agente para trabajos de múltiples pasos",
       "UIs embebidas para usuarios humanos",
-      "Pagos Solana y registros verificables"
+      "Pagos y registros verificables"
     ]
   },
   "features": [
@@ -22,18 +22,26 @@
   ],
   "technical": {
     "frontendStack": [
-      "Next.js 14 con App Router",
-      "React 18 con TypeScript",
-      "Tailwind CSS para estilos",
-      "Framer Motion para animaciones",
-      "Componentes Radix UI vía shadcn/ui",
+      "Turborepo",
+      "React 19",
+      "TypeScript",
+      "Next.js 15",
+      "Tailwind CSS",
+      "Radix UI vía shadcn/ui",
       "Zustand para gestión de estado"
     ],
     "projectStructure": [
-      "Repositorio Turbo, UI compartida, configuraciones de linting y TS"
+      "Monorepo con workspaces",
+      "`apps/web` como app principal de Next.js",
+      "`apps/e2e` para tests end‑to‑end con Playwright",
+      "`packages/ui` para componentes UI compartidos y estilos",
+      "`packages/supabase` para la lógica de integración con Supabase",
+      "Directorio `tooling` para configuraciones centralizadas de ESLint, Prettier, Tailwind y TypeScript",
+      "Directorios `data` y `scripts` para imports, traducciones, transforms de productos y scripts de mantenimiento"
     ],
     "deployment": [
-      "GitLab Pages"
+      "Build y deploy vía GitLab Pipelines",
+      "Desplegado en Gitlab Pages"
     ]
   }
 }

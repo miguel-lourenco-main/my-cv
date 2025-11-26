@@ -2,27 +2,26 @@
   "title": "Caja Registradora",
   "description": "POS móvil para restaurantes y bares.",
   "subtitle": "Sistema Moderno de Punto de Venta",
-  "overview": "Un POS basado en web que optimiza el pedido con una interfaz ajustada para táctil y pantallas pequeñas.",
+  "overview": "Un POS basado en web que simplifica los pedidos con una interfaz optimizada para táctil y pantallas pequeñas.",
   "coreConcept": {
-    "summary": "Un flujo POS completo desde menú hasta historial.",
+    "summary": "Nació de la necesidad de usar la app en un evento rural del que formé parte de la organización.",
     "bullets": [
-      "Navegar menús categorizados (bebidas y comida)",
-      "Construir pedidos con carrito en tiempo real",
-      "Almacenar pedidos con historial completo",
-      "Carrito flotante para navegación rápida en móvil"
+      "Desarrollado en menos de 12 horas",
+      "Evolucionado iterativamente durante el evento en el que se utilizó",
+      "Garantiza facilidad de acceso al estar disponible en línea"
     ]
   },
   "features": [
-    "Catálogo: bebidas y comida con precios e iconos",
-    "Pedidos: agregar con un toque, controles de cantidad, totales, retroalimentación suave",
-    "Móvil: carrito flotante, scroll suave, insignias",
-    "Pedidos: historial, marcas de tiempo, vista detallada, actualizaciones en vivo"
+    "Catálogo dividido en categorías de bebidas y comida con precios para cada producto",
+    "Carrito de compras con funcionalidades para añadir o quitar productos y ajustar cantidades",
+    "En móvil, un carrito flotante que facilita la navegación entre el último producto añadido y el carrito",
+    "Historial de pedidos con timestamps, detalles del pedido y actualizaciones en tiempo real"
   ],
   "technical": {
     "frontendStack": [
-      "Next.js 15 con App Router y capacidad de exportación estática",
+      "Next.js 15 con App Router y generación estática",
       "React 19 con TypeScript",
-      "Tailwind CSS para estilos responsivos",
+      "Tailwind CSS",
       "Radix UI vía shadcn/ui",
       "Lucide React para iconografía",
       "Sonner para notificaciones toast"
@@ -30,14 +29,14 @@
     "projectStructure": [
       "Backend Supabase con PostgreSQL, esquema tipado y RLS",
       "Suscripciones en tiempo real para actualizaciones en vivo",
-      "Componentes cliente/servidor separados por preocupación",
-      "Operaciones de DB tipo-seguras con tipos generados",
+      "Componentes cliente/servidor separados por responsabilidad",
+      "Operaciones de BD tipo‑seguras con tipos generados",
       "UI modular en /components/ui y lógica de negocio en /lib",
       "Componentes clave: CashRegister, FloatingCartButton, OrderList, OrderDetails"
     ],
     "deployment": [
-      "GitLab Pages para frontend",
-      "Backend gestionado por Supabase"
+      "Construido y publicado vía GitLab Pipelines",
+      "Publicado en GitLab Pages"
     ]
   }
 }

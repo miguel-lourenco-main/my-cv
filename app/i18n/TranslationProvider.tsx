@@ -20,6 +20,7 @@ const DEFAULT_NAMESPACES = [
   'projects/sonora',
   'projects/agentic-hub',
   'projects/cash-register',
+  'projects/o-guardanapo',
 ]
 
 function ensureI18nInitialized(locale: string, namespaces: string[]) {

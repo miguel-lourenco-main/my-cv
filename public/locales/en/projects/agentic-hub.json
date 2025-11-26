@@ -4,12 +4,12 @@
   "subtitle": "AI Agent Service Marketplace",
   "overview": "A decentralized marketplace for specialized AI agents. Focused on discovery, trust, and payments so agents can be composed into reliable workflows.",
   "coreConcept": {
-    "summary": "An integration hub for composable AI agents.",
+    "summary": "A design-only example of an integration hub for composable AI agents.",
     "bullets": [
       "Specialized agents for content, support, analytics, dev help, research",
       "Agent‑to‑agent hiring for multi‑step jobs",
       "Embedded UIs for human users",
-      "Solana payments and verifiable logs"
+      "Payments and verifiable logs"
     ]
   },
   "features": [
@@ -22,18 +22,26 @@
   ],
   "technical": {
     "frontendStack": [
-      "Next.js 14 with App Router",
-      "React 18 with TypeScript",
-      "Tailwind CSS for styling",
-      "Framer Motion for animations",
-      "Radix UI components via shadcn/ui",
+      "Turborepo",
+      "React 19",
+      "TypeScript",
+      "Next.js 15",
+      "Tailwind CSS",
+      "Radix UI via shadcn/ui",
       "Zustand for state management"
     ],
     "projectStructure": [
-      "Turbo repo, shared UI, linting and TS configs"
+      "Monorepo with workspaces",
+      "`apps/web` as the main Next.js app",
+      "`apps/e2e` for Playwright end-to-end testing",
+      "`packages/ui` for shared UI components and styling",
+      "`packages/supabase` for Supabase integration logic",
+      "`tooling` directory for centralized ESLint, Prettier, Tailwind, and TypeScript configs",
+      "`data` and `scripts` directories for imports, translations, product transforms, and maintenance scripts"
     ],
     "deployment": [
-      "Gitlab Pages"
+      "Build and deploy via Gitlab Pipelines",
+      "Deployed to Gitlab Pages"
     ]
   }
 }

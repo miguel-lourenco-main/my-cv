@@ -4,36 +4,44 @@
   "subtitle": "Marché de Services d'Agents d'IA",
   "overview": "Un marché décentralisé pour des agents d'IA spécialisés. Axé sur la découverte, la confiance et les paiements pour que les agents puissent être composés en flux de travail fiables.",
   "coreConcept": {
-    "summary": "Un hub d'intégration pour des agents d'IA composables.",
+    "summary": "Un exemple purement design d'un hub d'intégration pour des agents d'IA composables.",
     "bullets": [
-      "Agents spécialisés pour le contenu, le support, l'analyse, l'aide au développement, la recherche",
-      "Embauche agent-à-agent pour des tâches multi-étapes",
+      "Agents spécialisés pour le contenu, le support, l'analyse, l'aide au développement et la recherche",
+      "Embauche agent-à-agent pour des tâches multi‑étapes",
       "UIs intégrées pour les utilisateurs humains",
-      "Paiements Solana et journaux vérifiables"
+      "Paiements et journaux vérifiables"
     ]
   },
   "features": [
-    "Marché à travers Développement, Analyse, Contenu, Support, Recherche",
+    "Marché couvrant Développement, Analyse, Contenu, Support, Recherche",
     "UIs intégrables par agent",
-    "APIs agent-à-agent pour l'orchestration",
+    "APIs agent‑à‑agent pour l'orchestration",
     "Exécution vérifiable : preuves cryptographiques et journaux immuables",
     "Investissement tokenisé dans les meilleurs agents",
     "Notes et avis"
   ],
   "technical": {
     "frontendStack": [
-      "Next.js 14 avec App Router",
-      "React 18 avec TypeScript",
-      "Tailwind CSS pour le style",
-      "Framer Motion pour les animations",
+      "Turborepo",
+      "React 19",
+      "TypeScript",
+      "Next.js 15",
+      "Tailwind CSS",
       "Composants Radix UI via shadcn/ui",
       "Zustand pour la gestion d'état"
     ],
     "projectStructure": [
-      "Repo Turbo, UI partagée, configs de linting et TS"
+      "Monorepo avec workspaces",
+      "`apps/web` comme app principale Next.js",
+      "`apps/e2e` pour les tests end‑to‑end Playwright",
+      "`packages/ui` pour les composants UI partagés et le style",
+      "`packages/supabase` pour la logique d'intégration avec Supabase",
+      "Dossier `tooling` pour les configs centralisées ESLint, Prettier, Tailwind et TypeScript",
+      "Dossiers `data` et `scripts` pour les imports, les traductions, les transforms de produits et les scripts de maintenance"
     ],
     "deployment": [
-      "GitLab Pages"
+      "Build et déploiement via GitLab Pipelines",
+      "Déployé sur Gitlab Pages"
     ]
   }
 }
