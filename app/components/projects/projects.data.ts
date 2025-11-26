@@ -3,10 +3,38 @@ import { Project } from "./projects.types";
 // Project data with translatable strings - the actual strings are now in the i18n system
 export const projects: Project[] = [
   {
-    id: "ui-components",
-    // Translation keys for this project
+    id: "o-guardanapo",
     titleKey: "title",
     descriptionKey: "description",
+    images: [],
+    websiteUrl: "https://o-guardanapo.site",
+    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/o-guardanapo",
+    technologies: [
+      { name: "React", icon: "/logos/react.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "TypeScript", icon: "/logos/typescript.svg" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+    },
+    experience: { name: "O Guardanapo", org: "Freelance", date: "2025" },
+  },
+  {
+    id: "ui-components",
+    titleKey: "title",
+    descriptionKey: "description",
+    // Translation keys for this project
     images: [
       "/projects_images/ui-components/hero_start_L.png",
       "/projects_images/ui-components/hero_start_D.png",

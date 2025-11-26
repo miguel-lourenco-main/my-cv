@@ -4,19 +4,18 @@
   "subtitle": "Modern Point of Sale System",
   "overview": "A web‑based POS that streamlines ordering with an interface tuned for touch and small screens.",
   "coreConcept": {
-    "summary": "A complete POS flow from menu to history.",
+    "summary": "Born from the need to use the app at a rural event I helped organize.",
     "bullets": [
-      "Browse categorized menus (drinks and food)",
-      "Build orders with real‑time cart",
-      "Store orders with full history",
-      "Floating cart for quick navigation on mobile"
+      "Developed in under 12 hours",
+      "Evolved iteratively during the event where it was used",
+      "Ensures easy access by being available online"
     ]
   },
   "features": [
-    "Catalog: drinks and food with prices and icons",
-    "Ordering: one‑tap add, quantity controls, totals, smooth feedback",
-    "Mobile: floating cart, smooth scroll, badges",
-    "Orders: history, timestamps, detail view, live updates"
+    "Catalog split into drink and food categories with prices for each product",
+    "Cart with add/remove functionality and quantity adjustments",
+    "On mobile, a floating cart that makes it easy to jump between the last added item and the cart",
+    "Order history with timestamps, order details, and real-time updates"
   ],
   "technical": {
     "frontendStack": [
@@ -29,15 +28,15 @@
     ],
     "projectStructure": [
       "Supabase backend with PostgreSQL, typed schema, and RLS",
-      "Real‑time subscriptions for live updates",
+      "Real-time subscriptions for live updates",
       "Client/server components separated by concern",
-      "Type‑safe DB operations with generated types",
+      "Type-safe DB operations with generated types",
       "Modular UI in /components/ui and business logic in /lib",
       "Key components: CashRegister, FloatingCartButton, OrderList, OrderDetails"
     ],
     "deployment": [
-      "GitLab Pages for frontend",
-      "Supabase managed backend"
+      "Built and published via GitLab Pipelines",
+      "Deployed to GitLab Pages"
     ]
   }
 }
