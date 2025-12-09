@@ -157,7 +157,8 @@ async function main() {
     const urlMatch = gitlabUrl.match(/gitlab\.com\/(.+)$/);
     const projectPath = urlMatch ? urlMatch[1].replace(/\/+$/, "") : null;
 
-    // Try raw URL first, then API as fallback, across multiple branches
+    // Try raw URL first, then ALWAYS try API as fallback (when projectPath is known),
+    // across multiple branches.
     for (const branch of branchesToTry) {
       const rawUrl = `${gitlabUrl.replace(/\/+$/, "")}/-/raw/${branch}/README.md`;
 
@@ -168,8 +169,8 @@ async function main() {
         break;
       } catch (err) {
         lastError = err;
-        // If raw URL fails and we have a project path, try API
-        if (projectPath && (err.message.includes("404") || err.message.includes("403") || err.message.includes("401"))) {
+        // If raw URL fails and we have a project path, always try API as fallback
+        if (projectPath) {
           try {
             console.log(`[readmes] Raw URL failed, trying API for ${id} (branch: ${branch})`);
             newContent = await fetchReadmeApi(projectPath, branch);
