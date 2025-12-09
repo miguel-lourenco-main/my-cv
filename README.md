@@ -95,12 +95,6 @@ The site is designed as a **production-ready personal brand hub**: focused on cl
 - Per-locale descriptions and metadata
 - Integration points for external resources (e.g. GitLab READMEs and demos)
 
-### Contact & Footer
-
-- Direct CTAs for **Email**, **LinkedIn**, and **GitLab**
-- Clear footer with short personal signature and social links
-```
-
 ## 🤝 Contributing
 
 This is a personal portfolio project, but **ideas, issues, and suggestions are always welcome**. Feel free to open an issue or submit a merge request if you see something that could be improved.
