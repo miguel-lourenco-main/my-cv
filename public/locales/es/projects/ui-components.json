@@ -44,5 +44,6 @@
       "Exportación estática con características dinámicas donde sea necesario",
       "Bundle optimizado vía división de código y carga diferida"
     ]
-  }
+  },
+  "personalExperience": "El Playground de Componentes UI fue una experiencia de aprendizaje fantástica que me permitió explorar la arquitectura de componentes y sistemas de temas en profundidad. Construir un sistema donde los componentes pudieran adaptarse a múltiples temas manteniendo consistencia fue desafiante pero gratificante. Aprendí mucho sobre variables CSS, generación dinámica de clases y cómo estructurar una biblioteca de componentes para reutilización. La funcionalidad de playground interactivo fue particularmente divertida de implementar, ya que requirió generación de código en tiempo real y manipulación de props. Este proyecto me ayudó a entender la importancia de la experiencia del desarrollador y cómo las buenas herramientas pueden acelerar el desarrollo. También reforzó mi apreciación por las APIs de componentes bien diseñadas y el poder de la composición en React."
 }

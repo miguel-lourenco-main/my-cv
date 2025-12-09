@@ -43,5 +43,6 @@
       "Build y deploy vía GitLab Pipelines",
       "Desplegado en GitLab Pages"
     ]
-  }
+  },
+  "personalExperience": "Agentic Hub fue una exploración fascinante del futuro de los mercados de agentes de IA. Trabajar en este proyecto en Binedge me dio la oportunidad de pensar profundamente sobre cómo los agentes de IA podrían interactuar entre sí y con humanos. El concepto de contratación agente-a-agente fue particularmente interesante de diseñar, ya que requirió consideración cuidadosa de APIs, flujos de trabajo y mecanismos de confianza. Construir la interfaz del mercado con múltiples categorías de agentes me desafió a crear patrones de navegación y descubrimiento intuitivos. Los componentes UI embebibles para cada tipo de agente requirieron diseño cuidadoso para garantizar consistencia mientras permitían personalización específica del agente. Este proyecto me empujó a pensar sobre composabilidad, diseño de API y cómo los sistemas complejos pueden hacerse accesibles a través de una buena UX. Fue emocionante trabajar en algo que sentía que estaba en la vanguardia del diseño de aplicaciones de IA."
 }

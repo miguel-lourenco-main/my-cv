@@ -8,10 +8,24 @@ import { useMobileDetection } from "../lib/use-mobile-detection";
 import { getGridClasses, getGridClassesWithMargin } from "../lib/grid-utils";
 import { getSectionClasses } from "../lib/use-section-classes";
 
+/**
+ * About section component displaying technical skills in category cards.
+ * Features responsive grid layouts with different arrangements for mobile and desktop.
+ * Uses conditional reveal animations based on device type.
+ * 
+ * @param props - Component props
+ * @param props.isLaptop - Whether device is detected as laptop (affects layout and snap scrolling)
+ * 
+ * @example
+ * ```tsx
+ * <About isLaptop={false} />
+ * ```
+ */
 export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
   const { t } = useI18n();
   const { isMobile } = useMobileDetection();
   const ta = t('about');
+  // Category cards configuration
   const categories = [
     { key: "languages", component: <LanguagesCard /> },
     { key: "frontend", component: <FrontendCard /> },
@@ -19,14 +33,14 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     { key: "devops", component: <DevOpsCard /> },
   ];
 
-  //add to the ai tooling icon, a set that is made up of 3 ai tools that I regularly use
-
+  // Build section classes with conditional laptop styling
   const sectionClasses = getSectionClasses(
     "max-w-9xl mx-auto",
     isLaptop,
     "h-screen flex-none snap-center flex flex-col justify-center"
   );
 
+  // Title with conditional reveal animation
   const titleWrapper = (
     <ConditionalReveal
       isMobile={isMobile}
@@ -38,6 +52,7 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     </ConditionalReveal>
   );
 
+  // Mobile: Single column grid with all categories
   const mobileGrid = (
     <ConditionalReveal
       isMobile={isMobile}
@@ -51,6 +66,7 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     </ConditionalReveal>
   );
 
+  // Desktop: First row with Languages and DevOps
   const desktopFirstRow = (
     <ConditionalReveal
       isMobile={isMobile}
@@ -63,6 +79,7 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     </ConditionalReveal>
   );
 
+  // Desktop: Second row with Frontend and Backend
   const desktopSecondRow = (
     <ConditionalReveal
       isMobile={isMobile}

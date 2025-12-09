@@ -6,6 +6,15 @@ import IconImage from "./IconImage";
 import NextLogo from "@/public/logos/nextjs.svg";
 import { useI18n } from "../../lib/i18n";
 
+/**
+ * Frontend category card component.
+ * Displays frontend technologies and frameworks with translatable title.
+ * 
+ * @example
+ * ```tsx
+ * <FrontendCard />
+ * ```
+ */
 export default function FrontendCard() {
   const { t } = useI18n();
   const title = t('categories')('frontend');

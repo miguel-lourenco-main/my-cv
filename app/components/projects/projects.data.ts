@@ -1,6 +1,16 @@
 import { Project } from "./projects.types";
 
-// Project data with translatable strings - the actual strings are now in the i18n system
+/**
+ * Project data array with translatable content.
+ * Uses i18n keys for internationalization - actual strings are in locale JSON files.
+ * Images support theme variants with _L.png (light) and _D.png (dark) suffixes.
+ * 
+ * @example
+ * ```ts
+ * import { projects } from './projects.data';
+ * <ProjectGrid projects={projects} />
+ * ```
+ */
 export const projects: Project[] = [
   {
     id: "o-guardanapo",
@@ -26,6 +36,9 @@ export const projects: Project[] = [
         frontendStackKeys: "technical.frontendStack",
         projectStructureKeys: "technical.projectStructure",
         deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
       },
     },
     experience: { name: "O Guardanapo", org: "Freelance", date: "2025" },
@@ -83,6 +96,9 @@ export const projects: Project[] = [
         projectStructureKeys: "technical.projectStructure",
         deploymentKeys: "technical.deployment",
       },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
     },
     experience: { name: "UI Components Playground", org: "Freelance", date: "2025" },
 
@@ -118,6 +134,9 @@ export const projects: Project[] = [
         frontendStackKeys: "technical.frontendStack",
         projectStructureKeys: "technical.projectStructure",
         deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
       },
     },
     experience: { name: "Sonora", org: "Binedge", date: "2024-2025" }
@@ -158,6 +177,9 @@ export const projects: Project[] = [
         projectStructureKeys: "technical.projectStructure",
         deploymentKeys: "technical.deployment",
       },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
     },
     experience: { name: "Agentic Hub", org: "Binedge", date: "2024" },
     
@@ -193,6 +215,9 @@ export const projects: Project[] = [
         frontendStackKeys: "technical.frontendStack",
         projectStructureKeys: "technical.projectStructure",
         deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
       },
     },
     experience: { name: "Cash Register", org: "Freelance", date: "2025" },

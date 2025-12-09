@@ -3,6 +3,18 @@ import GitlabButton from "./GitlabButton";
 import LinkedInButton from "./LinkedInButton";
 import { useI18n } from "../lib/i18n";
 
+/**
+ * Contact section component displaying contact information and social links.
+ * Features responsive layout with laptop-specific snap scrolling support.
+ * 
+ * @param props - Component props
+ * @param props.isLaptop - Whether device is detected as laptop (affects layout and snap scrolling)
+ * 
+ * @example
+ * ```tsx
+ * <Contact isLaptop={false} />
+ * ```
+ */
 export default function Contact({ isLaptop = false }: { isLaptop?: boolean }) {
   const { t } = useI18n();
   const tc = t('contact');

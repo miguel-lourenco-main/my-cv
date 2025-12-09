@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useId, useRef } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "../../lib/hooks/use-outside-click";
 import type { Project } from "./projects.types";
@@ -10,7 +10,26 @@ import { GlobeIcon, X } from "lucide-react";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
 import { useI18n } from "../../lib/i18n";
+import { cn } from "@/app/lib/utils";
+import { GitlabReadmeViewer } from "./GitlabReadmeViewer";
 
+/**
+ * Expanded project card modal component.
+ * Displays detailed project information including carousel, technologies, and descriptions.
+ * Supports keyboard navigation (Escape to close) and outside click to close.
+ * 
+ * @param props - ProjectExpandedCard component props
+ * @param props.project - Project data to display (null to hide modal)
+ * @param props.onClose - Close handler function
+ * 
+ * @example
+ * ```tsx
+ * <ProjectExpandedCard 
+ *   project={activeProject} 
+ *   onClose={() => setActiveProject(null)} 
+ * />
+ * ```
+ */
 export function ProjectExpandedCard({
   project,
   onClose,
@@ -22,10 +41,14 @@ export function ProjectExpandedCard({
   const ref = useRef<HTMLDivElement>(null);
   const { getProjectString, getProjectArray, t } = useI18n();
 
+  const [activeTab, setActiveTab] = useState<"info" | "experience">("info");
+
+  // Handle keyboard navigation and prevent body scroll when modal is open
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
     }
+    // Prevent body scroll when modal is open
     if (project) {
       document.body.style.overflow = "hidden";
     } else {
@@ -38,9 +61,10 @@ export function ProjectExpandedCard({
     };
   }, [project, onClose]);
 
+  // Close modal when clicking outside
   useOutsideClick(ref, () => onClose());
 
-  const tp = t('projects');
+  const tp = t("projects");
 
   return (
     <AnimatePresence>
@@ -54,8 +78,8 @@ export function ProjectExpandedCard({
           />
           <motion.div
             ref={ref}
-            layoutId={`card-${getProjectString(project, 'title')}-${id}`}
-            className="relative w-full max-w-[900px] h-full md:h-fit md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden shadow-lg z-50"
+            layoutId={`card-${getProjectString(project, "title")}-${id}`}
+            className="relative w-full max-w-[900px] h-full md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
@@ -71,22 +95,31 @@ export function ProjectExpandedCard({
             <div className="flex items-center justify-between gap-4 w-full">
               <div>
                 <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
-                  {getProjectString(project, 'title')}
+                  {getProjectString(project, "title")}
                 </h3>
                 {project.details?.subtitle || project.details?.subtitleKey ? (
                   <p className="text-neutral-700 dark:text-neutral-300 font-medium">
-                    {getProjectString({ ...project.details, id: project.id }, 'subtitle')}
+                    {getProjectString({ ...project.details, id: project.id }, "subtitle")}
                   </p>
                 ) : null}
                 <p className="text-neutral-600 dark:text-neutral-400">
-                  {getProjectString(project, 'description')}
+                  {getProjectString(project, "description")}
                 </p>
               </div>
               <div className="flex w-fit shrink-0 gap-2">
-                <BaseButton href={project.websiteUrl} className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white" theme="green">
+                <BaseButton
+                  href={project.websiteUrl}
+                  className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white"
+                  theme="green"
+                >
                   Visit <GlobeIcon className="size-5" />
                 </BaseButton>
-                <GitlabButton href={project.gitlabUrl} width={20} height={20} className='bg-orange-100 rounded-full p-2 hover:bg-orange-200'/>
+                <GitlabButton
+                  href={project.gitlabUrl}
+                  width={20}
+                  height={20}
+                  className="bg-orange-100 rounded-full p-2 hover:bg-orange-200"
+                />
               </div>
             </div>
 
@@ -119,86 +152,60 @@ export function ProjectExpandedCard({
               ))}
             </div>
 
-            <div className="flex flex-col gap-6 overflow-auto">
-
-              {project.details ? (
-                <div className="space-y-6">
-                  {project.details?.overview || project.details?.overviewKey ? (
-                    <section>
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{tp('overviewHeading')}</h4>
-                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                        {getProjectString({ ...project.details, id: project.id }, 'overview')}
-                      </p>
-                    </section>
-                  ) : null}
-
-                  {project.details?.coreConcept ? (
-                    <section>
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{tp('coreConceptHeading')}</h4>
-                      {(project.details.coreConcept.summary || project.details.coreConcept.summaryKey) ? (
-                        <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed mb-2">
-                          {getProjectString({ ...project.details.coreConcept, id: project.id }, 'summary')}
-                        </p>
-                      ) : null}
-                      {(project.details.coreConcept.bullets || project.details.coreConcept.bulletsKeys) ? (
-                        <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                          {getProjectArray({ ...project.details.coreConcept, id: project.id }, 'bullets').map((item, idx) => (
-                            <li key={`${item}-${idx}`}>{item}</li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </section>
-                  ) : null}
-
-                  {(project.details?.features || project.details?.featuresKeys) ? (
-                    <section>
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100 mb-1">{tp('featuresHeading')}</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                        {getProjectArray({ ...project.details, id: project.id }, 'features').map((feature, idx) => (
-                          <li key={`${feature}-${idx}`}>{feature}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  ) : null}
-
-                  {project.details?.technical && (
-                    <section className="space-y-4">
-                      <h4 className="font-semibold text-neutral-800 dark:text-neutral-100">{tp('technicalHeading')}</h4>
-                      {(project.details.technical.frontendStack || project.details.technical.frontendStackKeys) ? (
-                        <div>
-                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">{tp('frontendStackHeading')}</h5>
-                          <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                            {getProjectArray({ ...project.details.technical, id: project.id }, 'frontendStack').map((item, idx) => (
-                              <li key={`${item}-${idx}`}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : null}
-                      {(project.details.technical.projectStructure || project.details.technical.projectStructureKeys) ? (
-                        <div>
-                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">{tp('projectStructureHeading')}</h5>
-                          <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                            {getProjectArray({ ...project.details.technical, id: project.id }, 'projectStructure').map((item, idx) => (
-                              <li key={`${item}-${idx}`}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : null}
-                      {(project.details.technical.deployment || project.details.technical.deploymentKeys) ? (
-                        <div>
-                          <h5 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-1">{tp('deploymentHeading')}</h5>
-                          <ul className="list-disc pl-5 space-y-1 text-neutral-700 dark:text-neutral-300">
-                            {getProjectArray({ ...project.details.technical, id: project.id }, 'deployment').map((item, idx) => (
-                              <li key={`${item}-${idx}`}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : null}
-                    </section>
+            <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+              <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
+                <button
+                  type="button"
+                  className={cn(
+                    "px-3 py-1.5 text-sm font-medium border-b-2 transition-colors",
+                    activeTab === "info"
+                      ? "border-green-500 text-neutral-900 dark:text-neutral-50"
+                      : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
                   )}
-                </div>
-              ) : null}
+                  onClick={() => setActiveTab("info")}
+                >
+                  {tp("projectInfoHeading")}
+                </button>
 
+                {project.details?.personalExperience &&
+                  (project.details.personalExperience.text ||
+                    project.details.personalExperience.textKey) && (
+                    <button
+                      type="button"
+                      className={cn(
+                        "px-3 py-1.5 text-sm font-medium border-b-2 transition-colors",
+                        activeTab === "experience"
+                          ? "border-green-500 text-neutral-900 dark:text-neutral-50"
+                          : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+                      )}
+                      onClick={() => setActiveTab("experience")}
+                    >
+                      {tp("personalExperienceHeading")}
+                    </button>
+                  )}
+              </div>
+
+              <div className="relative flex-1 min-h-0">
+                {activeTab === "info" && (
+                  <div className="h-full overflow-y-auto pr-1 space-y-6">
+                    <GitlabReadmeViewer projectId={project.id} />
+                  </div>
+                )}
+
+                {activeTab === "experience" &&
+                  project.details?.personalExperience &&
+                  (project.details.personalExperience.text ||
+                    project.details.personalExperience.textKey) && (
+                    <div className="h-full overflow-y-auto pr-1">
+                      <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
+                        {getProjectString(
+                          { ...project.details.personalExperience, id: project.id },
+                          "text"
+                        )}
+                      </p>
+                    </div>
+                  )}
+              </div>
             </div>
           </motion.div>
         </div>
@@ -206,5 +213,3 @@ export function ProjectExpandedCard({
     </AnimatePresence>
   );
 }
-
-

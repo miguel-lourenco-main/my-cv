@@ -6,6 +6,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ChevronDownIcon, GlobeIcon } from 'lucide-react'
 import { useOutsideClick } from '../lib/hooks/use-outside-click'
 
+/**
+ * Available locales configuration.
+ */
 const LOCALES = [
   { code: 'en', label: 'EN', name: 'English' },
   { code: 'pt', label: 'PT', name: 'Português' },
@@ -13,20 +16,38 @@ const LOCALES = [
   { code: 'es', label: 'ES', name: 'Español' }
 ]
 
+/**
+ * Language switcher dropdown component.
+ * Allows users to change the application locale.
+ * Updates the URL path to reflect the selected locale.
+ * 
+ * @example
+ * ```tsx
+ * <LanguageSwitcher />
+ * ```
+ */
 export default function LanguageSwitcher() {
   const router = useRouter()
   const pathname = usePathname()
   const { locale, setLocale, t } = useI18n()
+  // Track navigation transition state
   const [isPending, startTransition] = useTransition()
 
+  // Dropdown open/close state
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  // Close dropdown when clicking outside
   useOutsideClick(menuRef, () => setOpen(false))
 
+  /**
+   * Handle locale selection and update URL path.
+   * Replaces the locale segment in the current pathname.
+   */
   const onSelect = (next: string) => {
     if (next === locale) return
     setOpen(false)
     setLocale(next)
+    // Update URL path with new locale
     const segments = pathname.split('/').filter(Boolean)
     segments[0] = next
     const target = '/' + segments.join('/') + (pathname.endsWith('/') ? '/' : '')

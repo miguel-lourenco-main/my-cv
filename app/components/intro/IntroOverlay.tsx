@@ -6,14 +6,39 @@ import StarsBackground from "../shadcn/stars-background";
 import NameBadge from "../identity/NameBadge";
 import ProfileAvatar from "../identity/ProfileAvatar";
 
+/**
+ * Props for the IntroOverlay component.
+ */
 type IntroOverlayProps = {
+  /** Whether to show the intro overlay */
   show: boolean;
+  /** Callback when intro animation completes or is skipped */
   onDone: () => void;
+  /** Delay in milliseconds before stars appear */
   starsDelayMs?: number;
-  afterStarsDelayMs?: number; // time after stars appear to transition to main
+  /** Time in milliseconds after stars appear before transitioning to main content */
+  afterStarsDelayMs?: number;
+  /** Optional greeting text for the name badge */
   greeting?: string;
 };
 
+/**
+ * Full-screen intro overlay component with animated stars background.
+ * Displays profile avatar and name badge with smooth transitions.
+ * Respects prefers-reduced-motion and can be skipped by user.
+ * 
+ * @param props - IntroOverlay component props
+ * @param props.show - Whether overlay is visible
+ * @param props.onDone - Completion callback
+ * @param props.starsDelayMs - Stars animation delay (default: 300ms)
+ * @param props.afterStarsDelayMs - Delay after stars before transition (default: 1200ms)
+ * @param props.greeting - Greeting text for name badge
+ * 
+ * @example
+ * ```tsx
+ * <IntroOverlay show={true} onDone={() => setShowIntro(false)} />
+ * ```
+ */
 export default function IntroOverlay({
   show,
   onDone,
@@ -22,23 +47,29 @@ export default function IntroOverlay({
   greeting,
 }: IntroOverlayProps) {
   const [showStars, setShowStars] = useState(false);
+  // Track if animation was cancelled (e.g., by skip button)
   const cancelledRef = useRef(false);
 
+  // Check for reduced motion preference
   const reducedMotion = useMemo(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }, []);
 
+  // Handle intro animation sequence
   useEffect(() => {
     if (!show) return;
+    // Skip animation if user prefers reduced motion
     if (reducedMotion) {
       onDone();
       return;
     }
     cancelledRef.current = false;
+    // Show stars after delay
     const starTimer = window.setTimeout(() => {
       if (!cancelledRef.current) setShowStars(true);
     }, Math.max(0, starsDelayMs));
+    // Transition to main content after stars + additional delay
     const doneTimer = window.setTimeout(() => {
       if (!cancelledRef.current) onDone();
     }, Math.max(0, starsDelayMs + afterStarsDelayMs));
@@ -49,6 +80,7 @@ export default function IntroOverlay({
     };
   }, [show, starsDelayMs, afterStarsDelayMs, onDone, reducedMotion]);
 
+  // Handle skip button click
   const handleSkip = () => {
     cancelledRef.current = true;
     onDone();

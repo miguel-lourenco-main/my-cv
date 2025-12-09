@@ -4,6 +4,15 @@ import React from "react";
 import CategoryCard from "./CategoryCard";
 import IconImage from "./IconImage";
 
+/**
+ * Languages category card component.
+ * Displays programming languages and related technologies.
+ * 
+ * @example
+ * ```tsx
+ * <LanguagesCard />
+ * ```
+ */
 export default function LanguagesCard() {
   const title = "Languages";
   const items = ["TypeScript/JavaScript", "C# (.NET for Visual Studio extensions)", "HTML/CSS"];

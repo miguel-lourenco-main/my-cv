@@ -3,14 +3,38 @@
 import React from "react";
 import { motion } from "motion/react";
 
+/**
+ * Props for the NameBadge component.
+ */
 type NameBadgeProps = {
+  /** Additional CSS classes */
   className?: string;
+  /** HTML element type to render (default: "div") */
   as?: keyof JSX.IntrinsicElements;
+  /** Layout ID for Framer Motion shared element transitions */
   layoutId?: string;
+  /** Visual variant style */
   variant?: "intro" | "hero";
+  /** Optional greeting text to display before name */
   greeting?: string;
 };
 
+/**
+ * Name badge component displaying the name "Miguel Lourenço" with gradient styling.
+ * Supports shared element transitions via Framer Motion layoutId.
+ * 
+ * @param props - NameBadge component props
+ * @param props.className - Additional CSS classes
+ * @param props.as - HTML element type (default: "div")
+ * @param props.layoutId - Layout ID for shared element transitions (default: "intro-name")
+ * @param props.variant - Visual variant (default: "hero")
+ * @param props.greeting - Optional greeting text
+ * 
+ * @example
+ * ```tsx
+ * <NameBadge layoutId="intro-name" greeting="Hello" />
+ * ```
+ */
 export default function NameBadge({
   className,
   as = "div",

@@ -45,5 +45,6 @@
       "Assets de áudio organizados com metadados",
       "Configuração segura de ambiente e builds otimizados"
     ]
-  }
+  },
+  "personalExperience": "Sonora foi um dos meus projetos tecnicamente mais desafiadores. Trabalhar com geração de áudio em tempo real, marcação de palavras e narrativas ramificadas exigiu que mergulhasse profundamente no processamento de áudio e gestão de estado. Integrar com as APIs da ElevenLabs e OpenAI ensinou-me muito sobre trabalhar com serviços externos e lidar com operações assíncronas de forma eficiente. O sistema de histórias ramificadas foi particularmente interessante de arquitetar, pois exigiu consideração cuidadosa da gestão de estado e fluxo do utilizador. Construir o leitor de áudio com controlos de cronologia e sincronização de legendas foi uma grande experiência de aprendizagem no manuseamento de media. Este projeto na Binedge permitiu-me trabalhar com tecnologia de ponta e empurrar os limites do que pensava ser possível com tecnologias web. A satisfação de ver utilizadores navegar através de histórias interativas com vozes geradas por IA foi incrível."
 }

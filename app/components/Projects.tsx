@@ -9,6 +9,20 @@ import { ProjectExpandedCard } from './projects/ProjectExpandedCard'
 import { Reveal, RevealStagger } from './Reveal'
 import { useI18n } from '../lib/i18n'
 
+/**
+ * Projects section component displaying a grid of project cards.
+ * Features expandable project details modal and responsive layout.
+ * Supports laptop-specific snap scrolling behavior.
+ * 
+ * @param props - Component props
+ * @param props.isLaptop - Whether device is detected as laptop (affects layout and snap scrolling)
+ * @param props.onCursorModeChange - Optional callback when cursor mode changes (for custom cursor effects)
+ * 
+ * @example
+ * ```tsx
+ * <Projects isLaptop={false} onCursorModeChange={(mode) => console.log(mode)} />
+ * ```
+ */
 export default function Projects({ 
   isLaptop = false,
   onCursorModeChange,
@@ -18,8 +32,10 @@ export default function Projects({
 }) {
   const { t } = useI18n()
   const tp = t('projects')
+  // Track which project card is currently expanded
   const [activeProject, setActiveProject] = useState<Project | null>(null)
 
+  // Build section classes with conditional laptop styling
   const sectionClasses = [
     "max-w-[98%] xl:max-w-7xl 3xl:max-w-10xl w-full mx-auto",
     isLaptop ? "h-screen flex-none snap-center flex flex-col" : ""
@@ -48,6 +64,7 @@ export default function Projects({
         </Reveal>
       </div>
 
+      {/* Animated modal for expanded project details */}
       <AnimatePresence>
         {activeProject ? (
           <ProjectExpandedCard

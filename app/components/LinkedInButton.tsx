@@ -3,6 +3,20 @@
 import BaseButton from "./Button";
 import { cn } from "../lib/utils";
 
+/**
+ * LinkedIn button component with LinkedIn logo.
+ * Uses blue theme and links to LinkedIn profile.
+ * 
+ * @param props - LinkedInButton component props
+ * @param props.className - Additional CSS classes
+ * @param props.width - Icon width in pixels
+ * @param props.height - Icon height in pixels
+ * 
+ * @example
+ * ```tsx
+ * <LinkedInButton width={20} height={20} />
+ * ```
+ */
 export default function LinkedInButton({
   className,
   width,
