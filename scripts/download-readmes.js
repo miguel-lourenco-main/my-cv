@@ -20,6 +20,14 @@ const DEFAULT_BRANCH = process.env.README_BRANCH || "main";
 // Support multiple token sources:
 // - CI_JOB_TOKEN: automatically available in GitLab CI for same project/group
 // - GITLAB_TOKEN or GITLAB_README_TOKEN: custom token for accessing other projects
+const TOKEN_SOURCE = process.env.CI_JOB_TOKEN
+  ? "CI_JOB_TOKEN"
+  : process.env.GITLAB_TOKEN
+  ? "GITLAB_TOKEN"
+  : process.env.GITLAB_README_TOKEN
+  ? "GITLAB_README_TOKEN"
+  : null;
+
 const GITLAB_TOKEN =
   process.env.CI_JOB_TOKEN ||
   process.env.GITLAB_TOKEN ||
@@ -55,14 +63,31 @@ function extractProjectsFromTs(source) {
 async function fetchReadmeRaw(url) {
   const headers = {};
   if (GITLAB_TOKEN) {
-    // Use PRIVATE-TOKEN header for GitLab API authentication
-    headers["PRIVATE-TOKEN"] = GITLAB_TOKEN;
+    // CI job tokens must use JOB-TOKEN; personal/project tokens use PRIVATE-TOKEN.
+    if (TOKEN_SOURCE === "CI_JOB_TOKEN") {
+      headers["JOB-TOKEN"] = GITLAB_TOKEN;
+    } else {
+      headers["PRIVATE-TOKEN"] = GITLAB_TOKEN;
+    }
   }
 
   const res = await fetch(url, { headers });
 
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    const base = `Raw HTTP ${res.status} ${res.statusText} for ${url}`;
+    if (res.status === 403 || res.status === 401) {
+      throw new Error(
+        `${base} – auth failed using ${
+          TOKEN_SOURCE || "no token"
+        }. If this is running in CI, ensure the token has access to this project (job token allowlist or PAT with read_api/read_repository).`
+      );
+    }
+    if (res.status === 404) {
+      throw new Error(
+        `${base} – README.md not found on this branch or is not accessible.`
+      );
+    }
+    throw new Error(base);
   }
 
   const text = await res.text();
@@ -83,13 +108,30 @@ async function fetchReadmeApi(projectPath, branch) {
 
   const headers = {};
   if (GITLAB_TOKEN) {
-    headers["PRIVATE-TOKEN"] = GITLAB_TOKEN;
+    if (TOKEN_SOURCE === "CI_JOB_TOKEN") {
+      headers["JOB-TOKEN"] = GITLAB_TOKEN;
+    } else {
+      headers["PRIVATE-TOKEN"] = GITLAB_TOKEN;
+    }
   }
 
   const res = await fetch(apiUrl, { headers });
 
   if (!res.ok) {
-    throw new Error(`API HTTP ${res.status} ${res.statusText}`);
+    const base = `API HTTP ${res.status} ${res.statusText} for ${apiUrl}`;
+    if (res.status === 403 || res.status === 401) {
+      throw new Error(
+        `${base} – auth failed using ${
+          TOKEN_SOURCE || "no token"
+        }. Check that the token can read project "${projectPath}" (job token allowlist / PAT scopes).`
+      );
+    }
+    if (res.status === 404) {
+      throw new Error(
+        `${base} – README.md not found in project "${projectPath}" on branch "${branch}".`
+      );
+    }
+    throw new Error(base);
   }
 
   const text = await res.text();
@@ -143,7 +185,9 @@ async function main() {
   const branchesToTry = [DEFAULT_BRANCH, "master", "develop", "dev"];
 
   if (GITLAB_TOKEN) {
-    console.log(`[readmes] Using GitLab authentication token (${GITLAB_TOKEN.substring(0, 8)}...)`);
+    console.log(
+      `[readmes] Using GitLab authentication from ${TOKEN_SOURCE} for private repos`
+    );
   } else {
     console.log(`[readmes] No authentication token provided - public repos only`);
   }
