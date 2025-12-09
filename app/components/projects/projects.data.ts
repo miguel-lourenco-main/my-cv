@@ -77,7 +77,7 @@ export const projects: Project[] = [
       "/projects_images/ui-components/component_end_D.png",
     ],
     websiteUrl: "https://ui-components-5218c2.gitlab.io/",
-    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/ui-components",
+    gitlabUrl: "https://gitlab.com/public-work4/ui-components",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
@@ -116,7 +116,7 @@ export const projects: Project[] = [
       "/projects_images/sonora/story_page_D.png",
     ],
     websiteUrl: "https://sonora-d09e63.gitlab.io/",
-    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/sonora",
+    gitlabUrl: "https://gitlab.com/public-work4/sonora",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
@@ -158,7 +158,7 @@ export const projects: Project[] = [
       "/projects_images/agentic-hub/agent_invest_D.png",
     ],
     websiteUrl: "https://agentichub-64abdc.gitlab.io",
-    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/agentichub",
+    gitlabUrl: "https://gitlab.com/public-work4/agentichub",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
@@ -197,7 +197,7 @@ export const projects: Project[] = [
       "/projects_images/cash-register/order_info_D.png",
     ],
     websiteUrl: "https://cash-register-a85839.gitlab.io/",
-    gitlabUrl: "https://gitlab.com/miguel-lourenco-main/cash_register",
+    gitlabUrl: "https://gitlab.com/public-work4/cash_register",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
