@@ -44,7 +44,8 @@
       "Build and deploy via GitLab Pipelines",
       "Deployed to Vercel"
     ]
-  }
+  },
+  "personalExperience": "Working on O Guardanapo was a deeply personal project for me. This was my first experience building a complete monorepo solution using Turborepo, and it was created to help my parents manage their snack-bar business more efficiently. The challenge of organizing multiple apps and shared packages taught me a lot about monorepo architecture and workspace management. I particularly enjoyed integrating Supabase for the backend, which allowed me to create a robust database solution with type-safe operations. Seeing my parents use the application daily to update menus and interact with customers has been incredibly rewarding. This project pushed me to think about scalability, maintainability, and user experience from a business owner's perspective."
 }
 
 

@@ -6,6 +6,9 @@ import { ThemeProvider } from './lib/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
+/**
+ * Root layout metadata for SEO and social sharing.
+ */
 export const metadata: Metadata = {
   metadataBase: new URL('https://miguel-lourenco-main.gitlab.io/my-cv/'),
   title: 'Miguel Lourenço | Full Stack Developer',
@@ -32,6 +35,15 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Root layout component wrapping the entire application.
+ * Provides theme provider, font loading, and scroll restoration handling.
+ * 
+ * @param props - RootLayout component props
+ * @param props.children - Application content
+ * 
+ * @returns Root HTML structure with providers
+ */
 export default function RootLayout({
   children,
 }: {
@@ -40,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.className} antialiased bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`} suppressHydrationWarning>
+        {/* Disable browser scroll restoration to prevent unwanted scroll positions */}
         <Script id="disable-scroll-restoration" strategy="beforeInteractive">{`
           (function(){
             try {

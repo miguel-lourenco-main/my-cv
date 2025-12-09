@@ -4,6 +4,19 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useTheme } from "../../lib/theme-provider";
 
+/**
+ * Image carousel component for project galleries.
+ * Features theme-aware image filtering (light/dark variants), navigation controls,
+ * and a lightbox modal for full-screen viewing.
+ * 
+ * @param props - ProjectCarousel component props
+ * @param props.images - Array of image paths (supports _L.png and _D.png suffixes for theme variants)
+ * 
+ * @example
+ * ```tsx
+ * <ProjectCarousel images={project.images} />
+ * ```
+ */
 export function ProjectCarousel({ images }: { images: string[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -16,6 +29,8 @@ export function ProjectCarousel({ images }: { images: string[] }) {
     setMounted(true);
   }, []);
 
+  // Filter images based on current theme (light/dark variants)
+  // Prevents hydration mismatch by using light theme during SSR
   const filteredImages = useMemo(() => {
     // During SSR or before mount, always use light theme to prevent hydration mismatch
     if (!mounted) {
@@ -98,6 +113,17 @@ export function ProjectCarousel({ images }: { images: string[] }) {
   );
 }
 
+/**
+ * Full-screen lightbox modal for viewing images.
+ * Supports keyboard navigation (arrow keys, escape) and backdrop click to close.
+ * 
+ * @param props - Lightbox component props
+ * @param props.images - Array of image paths to display
+ * @param props.index - Current image index
+ * @param props.onClose - Close handler
+ * @param props.onPrev - Previous image handler
+ * @param props.onNext - Next image handler
+ */
 function Lightbox({
   images,
   index,
@@ -113,14 +139,17 @@ function Lightbox({
 }) {
   const [current, setCurrent] = useState(index);
 
+  // Sync current index when prop changes
   useEffect(() => setCurrent(index), [index]);
 
+  // Handle keyboard navigation and prevent body scroll
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft") onPrev();
       if (e.key === "ArrowRight") onNext();
     }
+    // Prevent body scroll when lightbox is open
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
@@ -130,6 +159,7 @@ function Lightbox({
     };
   }, [onClose, onPrev, onNext]);
 
+  // Close lightbox when clicking backdrop (not the image)
   const handleBackdrop = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
   }, [onClose]);

@@ -3,6 +3,9 @@
 import { cn } from "../lib/utils";
 import { useState } from "react";
 
+/**
+ * Available button theme color options.
+ */
 export type ButtonTheme = 
   | "orange" 
   | "blue" 
@@ -12,24 +15,35 @@ export type ButtonTheme =
   | "gray" 
   | "default";
 
+/**
+ * Props for the BaseButton component.
+ */
 export interface BaseButtonProps {
+  /** Additional CSS classes */
   className?: string;
+  /** Link URL (renders as anchor tag if provided) */
   href?: string;
+  /** Button content */
   children: React.ReactNode;
+  /** Color theme for the button */
   theme?: ButtonTheme;
+  /** Click handler function */
   onClick?: () => void;
+  /** Link target attribute */
   target?: string;
+  /** Link rel attribute */
   rel?: string;
 }
 
 /**
- * Base classes shared across all themes
+ * Base classes shared across all button themes.
  */
 const baseThemeClasses = "text-slate-800 font-bold dark:text-slate-200";
 
 /**
- * Theme styles - generated programmatically but with explicit class names
- * to ensure Tailwind CSS can detect them at build time
+ * Theme styles mapping for each button theme.
+ * Includes base styles and clicked state styles.
+ * Class names are explicit to ensure Tailwind CSS can detect them at build time.
  */
 const themeStyles: Record<ButtonTheme, { base: string; clicked: string }> = {
   orange: {
@@ -62,6 +76,27 @@ const themeStyles: Record<ButtonTheme, { base: string; clicked: string }> = {
   }
 };
 
+/**
+ * Base button component with theme support and click feedback.
+ * Renders as an anchor tag if href is provided, otherwise as a button.
+ * Features visual feedback on click with theme-specific styling.
+ * 
+ * @param props - BaseButton component props
+ * @param props.className - Additional CSS classes
+ * @param props.href - Link URL (renders as anchor if provided)
+ * @param props.children - Button content
+ * @param props.theme - Color theme (default: "orange")
+ * @param props.onClick - Click handler function
+ * @param props.target - Link target (default: "_blank")
+ * @param props.rel - Link rel attribute (default: "noopener noreferrer")
+ * 
+ * @example
+ * ```tsx
+ * <BaseButton href="https://example.com" theme="blue" onClick={() => console.log('clicked')}>
+ *   Click Me
+ * </BaseButton>
+ * ```
+ */
 export default function BaseButton({
   className,
   href,
@@ -71,13 +106,14 @@ export default function BaseButton({
   target = "_blank",
   rel = "noopener noreferrer",
 }: BaseButtonProps) {
+  // Track click state for visual feedback
   const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = () => {
     setIsClicked(true);
     onClick?.();
     
-    // Reset feedback after 2 seconds
+    // Reset visual feedback after 2 seconds
     setTimeout(() => {
       setIsClicked(false);
     }, 2000);
@@ -103,7 +139,17 @@ export default function BaseButton({
   );
 }
 
-// Legacy component for backward compatibility
+/**
+ * Legacy button component for backward compatibility.
+ * Wraps BaseButton with default GitLab link and orange theme.
+ * 
+ * @param props - RefButton component props
+ * @param props.className - Additional CSS classes
+ * @param props.href - Link URL (default: GitLab profile)
+ * @param props.children - Button content
+ * 
+ * @deprecated Use BaseButton directly instead
+ */
 export function RefButton({
   className,
   href = "https://gitlab.com/miguel-lourenco-main",

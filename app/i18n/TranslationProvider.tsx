@@ -6,8 +6,12 @@ import { initReactI18next, useTranslation as useRT } from 'react-i18next'
 import HttpBackend from 'i18next-http-backend'
 import { locales as supportedLocales } from '../i18n'
 
+// Track if i18next has been initialized
 let initialized = false
 
+/**
+ * Default namespaces loaded for all pages.
+ */
 const DEFAULT_NAMESPACES = [
   'navigation',
   'footer',
@@ -23,6 +27,12 @@ const DEFAULT_NAMESPACES = [
   'projects/o-guardanapo',
 ]
 
+/**
+ * Initialize i18next if not already initialized, or change language if needed.
+ * 
+ * @param locale - Locale code to initialize with
+ * @param namespaces - Array of namespace strings to load
+ */
 function ensureI18nInitialized(locale: string, namespaces: string[]) {
   if (!initialized) {
     i18next
@@ -47,16 +57,40 @@ function ensureI18nInitialized(locale: string, namespaces: string[]) {
   }
 }
 
+/**
+ * i18n context interface providing translation functionality.
+ */
 export type I18nCompatContext = {
+  /** Current locale code */
   locale: string
+  /** Function to change locale */
   setLocale: (lng: string) => void
+  /** Translation function that returns a namespaced translator */
   t: (namespace: string) => (key: string, options?: Record<string, any>) => any
+  /** Get translated string for project data (supports i18n keys) */
   getProjectString: (obj: any, field: string) => string
+  /** Get translated array for project data (supports i18n keys) */
   getProjectArray: (obj: any, field: string) => string[]
 }
 
 const I18nCompat = createContext<I18nCompatContext | null>(null)
 
+/**
+ * Translation provider component that initializes i18next and provides translation context.
+ * Supports project-specific namespaces and dynamic locale switching.
+ * 
+ * @param props - TranslationProvider component props
+ * @param props.children - Child components to wrap with translation context
+ * @param props.locale - Initial locale code
+ * @param props.namespaces - Additional namespaces to load (default: ['projects'])
+ * 
+ * @example
+ * ```tsx
+ * <TranslationProvider locale="en" namespaces={['projects', 'hero']}>
+ *   <App />
+ * </TranslationProvider>
+ * ```
+ */
 export function TranslationProvider({
   children,
   locale,
@@ -131,6 +165,19 @@ export function TranslationProvider({
   return <I18nCompat.Provider value={value}>{children}</I18nCompat.Provider>
 }
 
+/**
+ * Hook to access i18n translation functions and locale.
+ * Must be used within a TranslationProvider.
+ * 
+ * @returns I18nCompatContext with translation functions and locale
+ * @throws Error if used outside TranslationProvider
+ * 
+ * @example
+ * ```tsx
+ * const { t, locale, getProjectString } = useI18n();
+ * const title = t('hero')('title');
+ * ```
+ */
 export function useI18n(): I18nCompatContext {
   const ctx = useContext(I18nCompat)
   if (!ctx) throw new Error('useI18n must be used within TranslationProvider')

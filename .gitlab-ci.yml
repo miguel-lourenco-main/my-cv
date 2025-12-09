@@ -147,6 +147,7 @@ i18n:translate:
 build:
   stage: build
   script:
+    - node scripts/download-readmes.js
     - pnpm run build
   artifacts:
     paths:

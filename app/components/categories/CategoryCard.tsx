@@ -5,12 +5,35 @@ import { RevealStagger } from "../Reveal";
 import { Reveal } from "../Reveal";
 import { useIsPhone } from "@/app/lib/use-mobile-detection";
 
+/**
+ * Props for the CategoryCard component.
+ */
 type CategoryCardProps = {
+  /** Category title */
   title: string;
+  /** Array of item names to display */
   items: string[];
+  /** Icon elements to display */
   children: React.ReactNode;
 };
 
+/**
+ * Category card component displaying skills/technologies in a category.
+ * Features scroll-based activation on mobile, hover effects on desktop,
+ * and animated icon positioning based on distance from center.
+ * 
+ * @param props - CategoryCard component props
+ * @param props.title - Category title
+ * @param props.items - Array of item names
+ * @param props.children - Icon elements to display
+ * 
+ * @example
+ * ```tsx
+ * <CategoryCard title="Frontend" items={['React', 'Next.js']}>
+ *   <IconImage src="/logos/react.svg" />
+ * </CategoryCard>
+ * ```
+ */
 export default function CategoryCard({ title, items, children }: CategoryCardProps) {
   const iconsContainerRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);

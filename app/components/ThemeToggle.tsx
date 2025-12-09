@@ -3,20 +3,33 @@
 import { useTheme } from '../lib/theme-provider'
 import { useEffect, useState } from 'react'
 
+/**
+ * Theme toggle button component that cycles through light, dark, and system themes.
+ * Prevents hydration mismatch by only rendering after mount.
+ * Displays appropriate icon based on current theme state.
+ * 
+ * @example
+ * ```tsx
+ * <ThemeToggle />
+ * ```
+ */
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme()
+  // Track mount state to prevent hydration mismatch
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // Render placeholder until mounted to avoid hydration issues
   if (!mounted) {
     return (
       <div className="w-9 h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"></div>
     )
   }
 
+  // Cycle through themes: light -> dark -> system -> light
   const toggleTheme = () => {
     console.log('toggleTheme', theme)
     if (theme === 'light') {

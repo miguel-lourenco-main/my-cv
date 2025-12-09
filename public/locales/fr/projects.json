@@ -2,10 +2,12 @@
   "title": "Projets",
   "subtitle": "Voici quelques-uns des projets sur lesquels j'ai travaillé.",
   "overviewHeading": "Aperçu",
+  "projectInfoHeading": "Informations du Projet",
   "coreConceptHeading": "Concept Principal",
   "featuresHeading": "Fonctionnalités Clés",
   "technicalHeading": "Architecture Technique",
   "frontendStackHeading": "Stack Frontend",
   "projectStructureHeading": "Structure du Projet",
-  "deploymentHeading": "Déploiement"
+  "deploymentHeading": "Déploiement",
+  "personalExperienceHeading": "Mon Expérience"
 }

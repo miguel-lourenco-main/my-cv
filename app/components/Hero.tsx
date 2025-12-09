@@ -7,11 +7,27 @@ import ProfileAvatar from "./identity/ProfileAvatar";
 import { Button } from "./shadcn/button";
 import { useI18n } from "../lib/i18n";
 
+/**
+ * Hero section component displaying profile information and introduction.
+ * Features animated reveals, CV download functionality, and responsive layout.
+ * 
+ * @param props - Component props
+ * @param props.showShared - Whether to show shared elements (avatar, name badge) for page transitions
+ * @param props.greeting - Optional greeting text to display in the name badge
+ * @param props.isLaptop - Whether the device is detected as a laptop (affects layout and snap scrolling)
+ * 
+ * @example
+ * ```tsx
+ * <Hero showShared={true} greeting="Hello" isLaptop={false} />
+ * ```
+ */
 export default function Hero({ showShared = true, greeting, isLaptop = false }: { showShared?: boolean; greeting?: string; isLaptop?: boolean }) {
   const { locale, t } = useI18n();
+  // Select CV file based on locale
   const cvPath = locale === 'pt' ? '/cv_pt.pdf' : '/cv_en.pdf';
   const th = t('hero');
   
+  // Build section classes with conditional laptop styling
   const sectionClasses = [
     "flex flex-col max-w-7xl mx-auto",
     isLaptop ? "h-screen flex-none snap-center justify-center" : "gap-y-12"
@@ -43,6 +59,7 @@ export default function Hero({ showShared = true, greeting, isLaptop = false }: 
           </RevealStagger>
           <RevealStagger delay={2.1} interval={0.04}>
             <Button size="lg" className="gap-x-2" onClick={() => {
+              // Programmatically trigger CV download
               const link = document.createElement('a');
               link.href = cvPath;
               link.download = "Miguel_Lourenco_CV.pdf";
@@ -50,6 +67,7 @@ export default function Hero({ showShared = true, greeting, isLaptop = false }: 
               link.style.display = "none";
               document.body.appendChild(link);
               link.click();
+              // Clean up temporary link element
               setTimeout(() => {
                 document.body.removeChild(link);
               }, 100);

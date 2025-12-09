@@ -3,6 +3,20 @@
 import BaseButton from "./Button";
 import { cn } from "../lib/utils";
 
+/**
+ * Email button component with mailto link.
+ * Uses green theme and displays email icon.
+ * 
+ * @param props - EmailButton component props
+ * @param props.className - Additional CSS classes
+ * @param props.width - Icon width in pixels
+ * @param props.height - Icon height in pixels
+ * 
+ * @example
+ * ```tsx
+ * <EmailButton width={22} height={22} />
+ * ```
+ */
 export default function EmailButton({
   className,
   width,

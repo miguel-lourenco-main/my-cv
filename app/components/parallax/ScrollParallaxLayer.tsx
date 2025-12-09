@@ -4,11 +4,17 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { cn } from "@/app/lib/utils";
 
+/**
+ * Props for the ScrollParallaxLayer component.
+ */
 type ScrollParallaxLayerProps = {
+  /** Content to apply parallax effect to */
   children: React.ReactNode;
+  /** Additional CSS classes */
   className?: string;
-  /** Translate from (px) when page is at top to (px) when page is at bottom */
+  /** Y translation in pixels when page is at top */
   fromY?: number;
+  /** Y translation in pixels when page is at bottom */
   toY?: number;
   /**
    * Extra vertical bleed (in px) to extend the layer beyond its parent on both
@@ -16,14 +22,39 @@ type ScrollParallaxLayerProps = {
    * reveals edges during transforms. Example: set to max(|fromY|, |toY|).
    */
   bleed?: number;
-  /** Smoothing spring config */
+  /** Spring animation stiffness */
   stiffness?: number;
+  /** Spring animation damping */
   damping?: number;
+  /** Spring animation mass */
   mass?: number;
   /** Disable motion entirely (e.g., reduced motion) */
   disabled?: boolean;
 };
 
+/**
+ * Scroll-based parallax layer component.
+ * Creates smooth vertical parallax effect based on page scroll progress.
+ * Uses Framer Motion springs for smooth animations and respects reduced motion preferences.
+ * 
+ * @param props - ScrollParallaxLayer component props
+ * @param props.children - Content to animate
+ * @param props.className - Additional CSS classes
+ * @param props.fromY - Starting Y position (default: -180px)
+ * @param props.toY - Ending Y position (default: 180px)
+ * @param props.bleed - Vertical bleed to prevent edge reveal (default: 0)
+ * @param props.stiffness - Spring stiffness (default: 120)
+ * @param props.damping - Spring damping (default: 26)
+ * @param props.mass - Spring mass (default: 0.4)
+ * @param props.disabled - Disable parallax effect
+ * 
+ * @example
+ * ```tsx
+ * <ScrollParallaxLayer fromY={-100} toY={100} bleed={100}>
+ *   <div>Parallax content</div>
+ * </ScrollParallaxLayer>
+ * ```
+ */
 export default function ScrollParallaxLayer({
   children,
   className,

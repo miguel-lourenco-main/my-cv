@@ -7,6 +7,30 @@ import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
 import { MoreHorizontalIcon } from "lucide-react";
 
+/**
+ * Project card component with hover effects and focus blur.
+ * Features theme-aware cover images, water ripple effect on hover,
+ * and blur effect for non-hovered cards.
+ * 
+ * @param props - ProjectFocusCard component props
+ * @param props.project - Project data to display
+ * @param props.index - Card index in the grid
+ * @param props.hovered - Index of currently hovered card (null if none)
+ * @param props.setHovered - Function to set hovered card index
+ * @param props.onClick - Click handler function
+ * @param props.onCursorModeChange - Optional callback for cursor mode changes
+ * 
+ * @example
+ * ```tsx
+ * <ProjectFocusCard
+ *   project={project}
+ *   index={0}
+ *   hovered={hovered}
+ *   setHovered={setHovered}
+ *   onClick={handleClick}
+ * />
+ * ```
+ */
 export function ProjectFocusCard({
   project,
   index,
@@ -25,6 +49,7 @@ export function ProjectFocusCard({
   const { resolvedTheme } = useTheme();
   const { getProjectString } = useI18n();
   const [mounted, setMounted] = useState(false);
+  // Track mouse position for ripple effect
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +57,8 @@ export function ProjectFocusCard({
     setMounted(true);
   }, []);
 
+  // Select theme-appropriate cover image (light/dark variants)
+  // Prevents hydration mismatch by using light theme during SSR
   const coverImage = useMemo(() => {
     // During SSR or before mount, always use light theme to prevent hydration mismatch
     if (!mounted) {
@@ -82,7 +109,7 @@ export function ProjectFocusCard({
         className="object-cover absolute inset-0 w-full h-full"
       />
 
-      {/* Water ripple effect */}
+      {/* Water ripple effect - animated circles expanding from mouse position */}
       {hovered === index && mousePosition && (
         <div className="absolute inset-0 pointer-events-none z-20">
           {[0, 1, 2].map((rippleIndex) => (

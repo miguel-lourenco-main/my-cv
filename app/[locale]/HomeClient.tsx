@@ -15,16 +15,33 @@ import ParallaxRoot from '../components/parallax/ParallaxRoot'
 import ScrollParallaxLayer from '../components/parallax/ScrollParallaxLayer'
 import { useIsLaptop } from '../lib/use-laptop-detection'
 
+/**
+ * Client-side home page component.
+ * Orchestrates all main sections, intro overlay, parallax effects, and smooth cursor.
+ * Handles laptop-specific layout and scroll snap behavior.
+ * 
+ * @param props - HomeClient component props
+ * @param props.greeting - Greeting text from server-side i18n
+ * 
+ * @example
+ * ```tsx
+ * <HomeClient greeting="Hello" />
+ * ```
+ */
 export default function HomeClient({ greeting }: { greeting: string }) {
+  // Intro overlay visibility state
   const [showIntro, setShowIntro] = useState(true);
+  // Cursor mode for custom cursor effects
   const [cursorMode, setCursorMode] = useState<'default' | 'view'>('default');
   const isLaptop = useIsLaptop();
 
+  // Check for reduced motion preference
   const reducedMotion = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }, []);
 
+  // Skip intro if user prefers reduced motion
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (reducedMotion) setShowIntro(false);

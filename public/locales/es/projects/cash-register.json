@@ -38,5 +38,6 @@
       "Construido y publicado vía GitLab Pipelines",
       "Publicado en GitLab Pages"
     ]
-  }
+  },
+  "personalExperience": "Caja Registradora nació de la necesidad durante un evento rural del que formé parte de la organización. El desafío de construir un sistema POS funcional en menos de 12 horas fue intenso pero increíblemente educativo. Trabajar bajo presión de tiempo me obligó a tomar decisiones arquitectónicas rápidas y priorizar características que realmente se usarían. El desarrollo iterativo durante el propio evento fue una experiencia única: pude ver usuarios reales interactuar con el sistema y hacer mejoras sobre la marcha. La funcionalidad de carrito flotante para móvil fue un resultado directo de ver a personas luchar con el diseño inicial. Este proyecto me enseñó el valor de la simplicidad, la iteración rápida y construir para restricciones del mundo real. Usar Supabase para actualizaciones en tiempo real fue crucial, y ver pedidos aparecer instantáneamente en múltiples dispositivos fue satisfactorio. Es un gran ejemplo de cómo las restricciones pueden llevar a soluciones creativas."
 }
