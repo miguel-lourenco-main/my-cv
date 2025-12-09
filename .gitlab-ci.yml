@@ -147,6 +147,8 @@ i18n:translate:
 build:
   stage: build
   script:
+    # CI_JOB_TOKEN is automatically available and can access projects in the same group
+    # For accessing other projects, set GITLAB_TOKEN or GITLAB_README_TOKEN as a CI/CD variable
     - node scripts/download-readmes.js
     - pnpm run build
   artifacts:

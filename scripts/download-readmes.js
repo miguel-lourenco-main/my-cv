@@ -17,7 +17,14 @@ const fs = require("fs");
 const path = require("path");
 
 const DEFAULT_BRANCH = process.env.README_BRANCH || "main";
-const GITLAB_TOKEN = process.env.GITLAB_TOKEN || process.env.GITLAB_README_TOKEN || "";
+// Support multiple token sources:
+// - CI_JOB_TOKEN: automatically available in GitLab CI for same project/group
+// - GITLAB_TOKEN or GITLAB_README_TOKEN: custom token for accessing other projects
+const GITLAB_TOKEN =
+  process.env.CI_JOB_TOKEN ||
+  process.env.GITLAB_TOKEN ||
+  process.env.GITLAB_README_TOKEN ||
+  "";
 
 function readFileSafe(filePath) {
   try {
@@ -45,10 +52,10 @@ function extractProjectsFromTs(source) {
   return projects;
 }
 
-async function fetchReadme(url) {
+async function fetchReadmeRaw(url) {
   const headers = {};
   if (GITLAB_TOKEN) {
-    // Personal access token for private projects, if needed.
+    // Use PRIVATE-TOKEN header for GitLab API authentication
     headers["PRIVATE-TOKEN"] = GITLAB_TOKEN;
   }
 
@@ -64,6 +71,33 @@ async function fetchReadme(url) {
   const trimmed = text.trimStart().toLowerCase();
   if (trimmed.startsWith("<!doctype html") || trimmed.startsWith("<html")) {
     throw new Error("Received HTML page instead of markdown (likely an error page)");
+  }
+
+  return text;
+}
+
+async function fetchReadmeApi(projectPath, branch) {
+  // Try GitLab API v4 as fallback for private repositories
+  const encodedPath = encodeURIComponent(projectPath);
+  const apiUrl = `https://gitlab.com/api/v4/projects/${encodedPath}/repository/files/README.md/raw?ref=${branch}`;
+
+  const headers = {};
+  if (GITLAB_TOKEN) {
+    headers["PRIVATE-TOKEN"] = GITLAB_TOKEN;
+  }
+
+  const res = await fetch(apiUrl, { headers });
+
+  if (!res.ok) {
+    throw new Error(`API HTTP ${res.status} ${res.statusText}`);
+  }
+
+  const text = await res.text();
+
+  // Guard against HTML/JSON error responses
+  const trimmed = text.trimStart().toLowerCase();
+  if (trimmed.startsWith("<!doctype html") || trimmed.startsWith("<html") || trimmed.startsWith("{")) {
+    throw new Error("Received HTML/JSON response instead of markdown");
   }
 
   return text;
@@ -105,34 +139,75 @@ async function main() {
   );
 
   let hadErrors = false;
+  // Common branch names to try as fallbacks
+  const branchesToTry = [DEFAULT_BRANCH, "master", "develop", "dev"];
+
+  if (GITLAB_TOKEN) {
+    console.log(`[readmes] Using GitLab authentication token (${GITLAB_TOKEN.substring(0, 8)}...)`);
+  } else {
+    console.log(`[readmes] No authentication token provided - public repos only`);
+  }
 
   for (const { id, gitlabUrl } of projects) {
-    const rawUrl = `${gitlabUrl.replace(/\/+$/, "")}/-/raw/${DEFAULT_BRANCH}/README.md`;
     const targetPath = path.join(readmesDir, `${id}.md`);
+    let newContent = null;
+    let lastError = null;
 
-    try {
-      console.log(`[readmes] Fetching ${id} from ${rawUrl}`);
-      const newContent = await fetchReadme(rawUrl);
+    // Extract project path from GitLab URL (e.g., "public-work4/sonora" from "https://gitlab.com/public-work4/sonora")
+    const urlMatch = gitlabUrl.match(/gitlab\.com\/(.+)$/);
+    const projectPath = urlMatch ? urlMatch[1].replace(/\/+$/, "") : null;
 
-      const existing = readFileSafe(targetPath);
-      if (existing !== null && existing === newContent) {
-        console.log(`[readmes] ${id}.md unchanged, skipping write.`);
-        continue;
+    // Try raw URL first, then API as fallback, across multiple branches
+    for (const branch of branchesToTry) {
+      const rawUrl = `${gitlabUrl.replace(/\/+$/, "")}/-/raw/${branch}/README.md`;
+
+      try {
+        console.log(`[readmes] Fetching ${id} from ${rawUrl}`);
+        newContent = await fetchReadmeRaw(rawUrl);
+        // Success! Break out of branch loop
+        break;
+      } catch (err) {
+        lastError = err;
+        // If raw URL fails and we have a project path, try API
+        if (projectPath && (err.message.includes("404") || err.message.includes("403") || err.message.includes("401"))) {
+          try {
+            console.log(`[readmes] Raw URL failed, trying API for ${id} (branch: ${branch})`);
+            newContent = await fetchReadmeApi(projectPath, branch);
+            // Success! Break out of branch loop
+            break;
+          } catch (apiErr) {
+            lastError = apiErr;
+            // Continue to next branch
+            continue;
+          }
+        } else {
+          // Continue to next branch
+          continue;
+        }
       }
+    }
 
-      fs.writeFileSync(targetPath, newContent, "utf8");
-      console.log(
-        `[readmes] ${existing === null ? "Created" : "Updated"} ${path.relative(
-          repoRoot,
-          targetPath
-        )}`
-      );
-    } catch (err) {
+    if (newContent === null) {
       hadErrors = true;
       console.error(
-        `[readmes] Failed to update README for ${id} (${gitlabUrl}): ${String(err.message || err)}`
+        `[readmes] Failed to update README for ${id} (${gitlabUrl}): ${String(lastError?.message || lastError || "No branch contained a valid README.md")}`
       );
+      continue;
     }
+
+    const existing = readFileSafe(targetPath);
+    if (existing !== null && existing === newContent) {
+      console.log(`[readmes] ${id}.md unchanged, skipping write.`);
+      continue;
+    }
+
+    fs.writeFileSync(targetPath, newContent, "utf8");
+    console.log(
+      `[readmes] ${existing === null ? "Created" : "Updated"} ${path.relative(
+        repoRoot,
+        targetPath
+      )}`
+    );
   }
 
   if (hadErrors) {
