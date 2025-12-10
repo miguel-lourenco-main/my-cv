@@ -45,6 +45,6 @@
       "Optimized bundle via code splitting and lazy loading"
     ]
   },
-  "personalExperience": "The UI Components Playground was a fantastic learning experience that allowed me to explore component architecture and theme systems in depth. Building a system where components could adapt to multiple themes while maintaining consistency was challenging but rewarding. I learned a lot about CSS variables, dynamic class generation, and how to structure a component library for reusability. The interactive playground feature was particularly fun to implement, as it required real-time code generation and prop manipulation. This project helped me understand the importance of developer experience and how good tooling can accelerate development. It also reinforced my appreciation for well-designed component APIs and the power of composition in React."
+  "personalExperience": "While working on my parents snack-bar website, I started another website meant to be a project with a simple objective that I could use as a base to transform into a useful and stunning app, where I had more creative freedom and direction to explore ideas and further consolidate what I learned so far.\n\nIn the end, it turned into a component web app where users have access to a library of components and themes that are interlinked, meaning that all components can implement any given theme style."
 }
 

@@ -4,7 +4,7 @@
   "subtitle": "Web application for the snack-bar business O Guardanapo",
   "overview": "O Guardanapo is a web application for the snack-bar business built as a TypeScript monorepo using Next.js 15, Supabase, and a shared UI/infra toolkit. The repo is organized as a Turborepo + pnpm workspace with multiple apps (web, e2e) and reusable packages for UI, Supabase, routing, monitoring, i18n, mailers, and more.",
   "coreConcept": {
-    "summary": "Improve my parents' experience for creating and promoting the daily menu and products",
+    "summary": "Improve my parents experience for creating and promoting the daily menu and products",
     "bullets": [
       "Facilitate the creation and promotion of the daily menu and products",
       "Increase the accessibility by providing different idioms to choose from",
@@ -45,7 +45,7 @@
       "Deployed to Vercel"
     ]
   },
-  "personalExperience": "Working on O Guardanapo was a deeply personal project for me. This was my first experience building a complete monorepo solution using Turborepo, and it was created to help my parents manage their snack-bar business more efficiently. The challenge of organizing multiple apps and shared packages taught me a lot about monorepo architecture and workspace management. I particularly enjoyed integrating Supabase for the backend, which allowed me to create a robust database solution with type-safe operations. Seeing my parents use the application daily to update menus and interact with customers has been incredibly rewarding. This project pushed me to think about scalability, maintainability, and user experience from a business owner's perspective."
+  "personalExperience": "Working on O Guardanapo was a deeply personal and educational experience for me. My parents run a snack-bar in the heart of Lisbon, and this was my first time building a fully fledged web application for real users rather than just personal use.\n\nI created the site to improve how my mom creates and publishes the daily menu and to make it easier for my dad to communicate with foreign customers who often struggle to order and end up playing 'charades' at the counter. Along the way I learned hard lessons about choosing the right tools—starting from an overpowered template with Stripe, authentication and many other features when all I truly needed was Supabase added a lot of unnecessary complexity and refactoring work.\n\nThe final product lets my mom manage a multilingual daily menu on the homepage, customers explore each dish with photos, ingredients and allergen or dietary labels, and anyone quickly access the menu through QR codes around the snack-bar. Having my parents as direct users gave me fast feedback and pushed me to think about planning, UI design, infrastructure, deployment and iterative refinement from both the business-owner and customer perspectives."
 }
 
 
