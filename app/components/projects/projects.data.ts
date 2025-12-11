@@ -13,7 +13,238 @@ import { Project } from "./projects.types";
  */
 export const projects: Project[] = [
   {
+    id: "edgen-chat",
+    type: "professional",
+    company: {
+      name: "Edgen",
+      icon: "/logos/edgen-logo.svg",
+      url: "https://edgen.co",
+    },
+    clients: [{
+      name: "SIBS",
+      icon: "/logos/sibs-logo.svg",
+      url: "https://sibs.com",
+    }],
+    titleKey: "title",
+    descriptionKey: "description",
+    images: [
+      "/projects_images/edgen-chat/main_L.png",
+      "/projects_images/edgen-chat/main_D.png",
+    ],
+    websiteUrl: "#",
+    gitlabUrl: "#",
+    technologies: [
+      { name: "React", icon: "/logos/react.svg" },
+      { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "LLM", icon: "/logos/llm.svg" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
+    },
+    experience: { name: "EdgenChat", org: "Edgen", date: "2024" },
+  },
+  {
+    id: "edgen-code",
+    type: "professional",
+    company: {
+      name: "Edgen",
+      icon: "/logos/edgen-logo.svg",
+      url: "https://edgen.co",
+    },
+    clients: [{
+      name: "SIBS",
+      icon: "/logos/sibs-logo.svg",
+      url: "https://sibs.com",
+    }],
+    titleKey: "title",
+    descriptionKey: "description",
+    images: [
+      "/projects_images/edgen-code/main_L.png",
+      "/projects_images/edgen-code/main_D.png",
+    ],
+    websiteUrl: "#",
+    gitlabUrl: "#",
+    technologies: [
+      { name: "React", icon: "/logos/react.svg" },
+      { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "C#", icon: "/logos/c_sharp.svg" },
+      { name: "LLM", icon: "/logos/llm.svg" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
+    },
+    experience: { name: "EdgenCode", org: "Edgen", date: "2024" },
+  },
+  {
+    id: "edgen-translate",
+    type: "professional",
+    company: {
+      name: "Edgen",
+      icon: "/logos/edgen-logo.svg",
+      url: "https://edgen.co",
+    },
+    clients: [{
+      name: "SIBS",
+      icon: "/logos/sibs-logo.svg",
+      url: "https://sibs.com",
+    }],
+    titleKey: "title",
+    descriptionKey: "description",
+    images: [
+      "/projects_images/edgen-translate/main_L.png",
+      "/projects_images/edgen-translate/main_D.png",
+    ],
+    websiteUrl: "#",
+    gitlabUrl: "#",
+    technologies: [
+      { name: "React", icon: "/logos/react.svg" },
+      { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "LLM", icon: "/logos/llm.svg" },
+      { name: "File Processing", icon: "/logos/file_processing.svg" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
+    },
+    experience: { name: "EdgenTranslate", org: "Edgen", date: "2024" },
+  },
+  {
+    id: "sonora",
+    type: "professional",
+    company: {
+      name: "Edgen",
+      icon: "/logos/edgen-logo.svg",
+      url: "https://edgen.co",
+    },
+    clients: [], // Add client icons here when provided
+    titleKey: "title",
+    descriptionKey: "description",
+    images: [
+      "/projects_images/sonora/main_page_L.png",
+      "/projects_images/sonora/main_page_D.png",
+      "/projects_images/sonora/voices_page_L.png",
+      "/projects_images/sonora/voices_page_D.png",
+      "/projects_images/sonora/story_page_L.png",
+      "/projects_images/sonora/story_page_D.png",
+    ],
+    websiteUrl: "https://sonora-d09e63.gitlab.io/",
+    gitlabUrl: "https://gitlab.com/public-work4/sonora",
+    technologies: [
+      { name: "React", icon: "/logos/react.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "TypeScript", icon: "/logos/typescript.svg" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
+    },
+    experience: { name: "Sonora", org: "Edgen", date: "2024-2025" }
+  },
+  {
+    id: "agentic-hub",
+    type: "professional",
+    company: "Edgen",
+    clients: [], // Add client icons here when provided
+    titleKey: "title",
+    descriptionKey: "description",
+    images: [
+      "/projects_images/agentic-hub/main_page_L.png",
+      "/projects_images/agentic-hub/main_page_D.png",
+      "/projects_images/agentic-hub/agents_list_L.png",
+      "/projects_images/agentic-hub/agents_list_D.png",
+      "/projects_images/agentic-hub/agent_info_L.png",
+      "/projects_images/agentic-hub/agent_info_D.png",
+      "/projects_images/agentic-hub/agent_hire_L.png",
+      "/projects_images/agentic-hub/agent_hire_D.png",
+      "/projects_images/agentic-hub/agent_invest_L.png",
+      "/projects_images/agentic-hub/agent_invest_D.png",
+    ],
+    websiteUrl: "https://agentichub-64abdc.gitlab.io",
+    gitlabUrl: "https://gitlab.com/public-work4/agentichub",
+    technologies: [
+      { name: "React", icon: "/logos/react.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "TypeScript", icon: "/logos/typescript.svg" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
+    },
+    experience: { name: "Agentic Hub", org: "Edgen", date: "2024" },
+    
+  },
+  {
     id: "o-guardanapo",
+    type: "personal",
     titleKey: "title",
     descriptionKey: "description",
     images: [
@@ -60,6 +291,7 @@ export const projects: Project[] = [
   },
   {
     id: "ui-components",
+    type: "personal",
     titleKey: "title",
     descriptionKey: "description",
     // Translation keys for this project
@@ -119,88 +351,8 @@ export const projects: Project[] = [
 
   },
   {
-    id: "sonora",
-    titleKey: "title",
-    descriptionKey: "description",
-    images: [
-      "/projects_images/sonora/main_page_L.png",
-      "/projects_images/sonora/main_page_D.png",
-      "/projects_images/sonora/voices_page_L.png",
-      "/projects_images/sonora/voices_page_D.png",
-      "/projects_images/sonora/story_page_L.png",
-      "/projects_images/sonora/story_page_D.png",
-    ],
-    websiteUrl: "https://sonora-d09e63.gitlab.io/",
-    gitlabUrl: "https://gitlab.com/public-work4/sonora",
-    technologies: [
-      { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
-      { name: "TypeScript", icon: "/logos/typescript.svg" },
-    ],
-    details: {
-      subtitleKey: "subtitle",
-      overviewKey: "overview",
-      coreConcept: {
-        summaryKey: "coreConcept.summary",
-        bulletsKeys: "coreConcept.bullets",
-      },
-      featuresKeys: "features",
-      technical: {
-        frontendStackKeys: "technical.frontendStack",
-        projectStructureKeys: "technical.projectStructure",
-        deploymentKeys: "technical.deployment",
-      },
-      personalExperience: {
-        textKey: "personalExperience",
-      },
-    },
-    experience: { name: "Sonora", org: "Binedge", date: "2024-2025" }
-  },
-  {
-    id: "agentic-hub",
-    titleKey: "title",
-    descriptionKey: "description",
-    images: [
-      "/projects_images/agentic-hub/main_page_L.png",
-      "/projects_images/agentic-hub/main_page_D.png",
-      "/projects_images/agentic-hub/agents_list_L.png",
-      "/projects_images/agentic-hub/agents_list_D.png",
-      "/projects_images/agentic-hub/agent_info_L.png",
-      "/projects_images/agentic-hub/agent_info_D.png",
-      "/projects_images/agentic-hub/agent_hire_L.png",
-      "/projects_images/agentic-hub/agent_hire_D.png",
-      "/projects_images/agentic-hub/agent_invest_L.png",
-      "/projects_images/agentic-hub/agent_invest_D.png",
-    ],
-    websiteUrl: "https://agentichub-64abdc.gitlab.io",
-    gitlabUrl: "https://gitlab.com/public-work4/agentichub",
-    technologies: [
-      { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
-      { name: "TypeScript", icon: "/logos/typescript.svg" },
-    ],
-    details: {
-      subtitleKey: "subtitle",
-      overviewKey: "overview",
-      coreConcept: {
-        summaryKey: "coreConcept.summary",
-        bulletsKeys: "coreConcept.bullets",
-      },
-      featuresKeys: "features",
-      technical: {
-        frontendStackKeys: "technical.frontendStack",
-        projectStructureKeys: "technical.projectStructure",
-        deploymentKeys: "technical.deployment",
-      },
-      personalExperience: {
-        textKey: "personalExperience",
-      },
-    },
-    experience: { name: "Agentic Hub", org: "Binedge", date: "2024" },
-    
-  },
-  {
     id: "cash-register",
+    type: "personal",
     titleKey: "title",
     descriptionKey: "description",
     images: [

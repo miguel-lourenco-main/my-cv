@@ -1,0 +1,47 @@
+{
+  "title": "EdgenChat",
+  "description": "Application de chat avec capacités RAG pour interroger des documents en utilisant LLM.",
+  "subtitle": "Application de Chat avec IA pour l'Interrogation de Documents",
+  "overview": "Une application de chat similaire à ChatGPT qui communique avec une API de système d'inférence de modèles locaux. Les utilisateurs peuvent discuter avec un LLM sur des informations générales ou l'interroger concernant des fichiers qu'ils téléchargent. Le système utilise RAG (Génération Augmentée par Récupération) pour récupérer rapidement des informations pertinentes des documents et les organiser à l'aide du LLM.",
+  "coreConcept": {
+    "summary": "Application de chat avec interrogation de documents alimentée par RAG.",
+    "bullets": [
+      "Interface de chat similaire à ChatGPT",
+      "Intégration avec l'API d'inférence de modèles locaux",
+      "Téléchargement et traitement de fichiers",
+      "Système RAG pour la récupération de documents",
+      "Organisation d'informations alimentée par LLM",
+      "Capacités de conversation générale"
+    ]
+  },
+  "features": [
+    "Interface de chat: UI de conversation intuitive similaire à ChatGPT",
+    "Interrogation de documents: téléchargez des fichiers et posez des questions sur leur contenu",
+    "Intégration RAG: récupération rapide d'informations pertinentes des documents",
+    "Traitement LLM: organisation et résumé intelligents des informations",
+    "Chat général: conversez avec le LLM sur n'importe quel sujet",
+    "Support de fichiers: traite divers formats de documents"
+  ],
+  "technical": {
+    "frontendStack": [
+      "React avec TypeScript",
+      "Tailwind CSS pour le style",
+      "Composants UI modernes",
+      "Intégration API pour la communication LLM"
+    ],
+    "projectStructure": [
+      "Composants d'interface de chat",
+      "Système de téléchargement et de traitement de fichiers",
+      "Couche d'intégration RAG",
+      "Couche de communication API",
+      "Gestion d'état pour les conversations",
+      "Analyse et indexation de documents"
+    ],
+    "deployment": [
+      "Déploiement d'application web",
+      "Intégration avec l'API d'inférence locale",
+      "Pipeline de stockage et de traitement de fichiers"
+    ]
+  },
+  "personalExperience": "J'ai commencé par travailler sur l'interface utilisateur de cette application de chat, qui communiquerait avec l'API de l'un des projets publics de la startup, un système d'inférence de modèles locaux similaire à Ollama. Cette application était similaire à ChatGPT, où vous pouviez discuter avec un LLM sur des informations générales, mais vous pouviez également l'interroger concernant des fichiers que l'utilisateur pouvait saisir. Le système utilisait RAG pour récupérer rapidement des informations pertinentes des fichiers et organiser les informations pour l'utilisateur en utilisant le LLM.\n\nTravailler sur ce projet m'a donné une expérience précieuse dans la construction d'interfaces de chat et l'intégration avec les APIs LLM. Comprendre comment fonctionnent les systèmes RAG et implémenter le pipeline de traitement de fichiers était particulièrement intéressant et éducatif."
+}

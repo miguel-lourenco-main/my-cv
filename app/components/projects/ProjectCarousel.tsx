@@ -3,6 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useTheme } from "../../lib/theme-provider";
+import { Moon, Sun } from "lucide-react";
+import { cn } from "@/app/lib/utils";
 
 /**
  * Image carousel component for project galleries.
@@ -24,12 +26,21 @@ export function ProjectCarousel({ images }: { images: string[] }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
+  // Local photo theme state (independent from app theme)
+  // Initialize based on app theme, but can be toggled independently
+  const [photoTheme, setPhotoTheme] = useState<"light" | "dark">("light");
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Initialize photo theme based on app theme only once on mount
+    if (!initialized && resolvedTheme) {
+      setPhotoTheme(resolvedTheme === "dark" ? "dark" : "light");
+      setInitialized(true);
+    }
+  }, [resolvedTheme, initialized]);
 
-  // Filter images based on current theme (light/dark variants)
+  // Filter images based on photo theme (independent from app theme)
   // Prevents hydration mismatch by using light theme during SSR
   const filteredImages = useMemo(() => {
     // During SSR or before mount, always use light theme to prevent hydration mismatch
@@ -38,11 +49,15 @@ export function ProjectCarousel({ images }: { images: string[] }) {
       return lightImages.length > 0 ? lightImages : images;
     }
     
-    const isDark = resolvedTheme === "dark";
+    const isDark = photoTheme === "dark";
     const suffix = isDark ? "_D.png" : "_L.png";
     const candidates = images.filter((src) => src.endsWith(suffix));
     return candidates.length > 0 ? candidates : images;
-  }, [images, resolvedTheme, mounted]);
+  }, [images, photoTheme, mounted]);
+
+  const togglePhotoTheme = () => {
+    setPhotoTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -56,7 +71,7 @@ export function ProjectCarousel({ images }: { images: string[] }) {
 
   return (
     <div className="w-full">
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="relative overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {filteredImages.map((src, idx) => (
             <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>
@@ -72,6 +87,19 @@ export function ProjectCarousel({ images }: { images: string[] }) {
             </div>
           ))}
         </div>
+        {/* Photo theme toggle button */}
+        <button
+          onClick={togglePhotoTheme}
+          className={cn("absolute top-3 right-3 z-10 flex items-center justify-center w-9 h-9 rounded-full hover:scale-105 backdrop-blur-sm border transition-all shadow-sm", photoTheme === "light" ? "bg-black text-white" : "bg-white text-black")}
+          aria-label={`Switch to ${photoTheme === "light" ? "dark" : "light"} photo theme`}
+          title={`Switch to ${photoTheme === "light" ? "dark" : "light"} photo theme`}
+        >
+          {photoTheme === "light" ? (
+            <Moon className="w-4 h-4" />
+          ) : (
+            <Sun className="w-4 h-4" />
+          )}
+        </button>
       </div>
       <div className="flex items-center justify-between mt-3">
         <div className="flex gap-2">

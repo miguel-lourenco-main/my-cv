@@ -6,12 +6,14 @@ import { useOutsideClick } from "../../lib/hooks/use-outside-click";
 import type { Project } from "./projects.types";
 import { ProjectCarousel } from "./ProjectCarousel";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { GlobeIcon, X } from "lucide-react";
+import { Briefcase, GlobeIcon, User, X } from "lucide-react";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
 import { useI18n } from "../../lib/i18n";
 import { cn } from "@/app/lib/utils";
 import { GitlabReadmeViewer } from "./GitlabReadmeViewer";
+import Image from "next/image";
+import { CompanyClientCircles } from "./CompanyClientCircles";
 
 /**
  * Expanded project card modal component.
@@ -94,9 +96,24 @@ export function ProjectExpandedCard({
             </button>
             <div className="flex items-center justify-between gap-4 w-full">
               <div>
-                <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">
-                  {getProjectString(project, "title")}
-                </h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="flex items-center gap-2 text-2xl font-bold text-neutral-800 dark:text-neutral-100">
+                    {getProjectString(project, "title")}
+                    {project.type === "professional" ? (
+                      <CompanyClientCircles
+                        company={project.company}
+                        clients={project.clients}
+                        size={30}
+                      />
+                    ) : (
+                      <div title="Personal" className={cn(
+                        "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-purple-500/90 text-white"
+                      )}>
+                        <User className="size-3" />
+                      </div>
+                    )}
+                  </h3>
+                </div>
                 {project.details?.subtitle || project.details?.subtitleKey ? (
                   <p className="text-neutral-700 dark:text-neutral-300 font-medium">
                     {getProjectString({ ...project.details, id: project.id }, "subtitle")}
@@ -124,33 +141,6 @@ export function ProjectExpandedCard({
             </div>
 
             <ProjectCarousel images={project.images} />
-
-            <div className="flex items-center gap-3 flex-wrap">
-              {project.technologies.map((tech) => (
-                <Tooltip.Provider delayDuration={150} key={tech.name}>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <div className="h-8 w-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                        <img
-                          src={tech.icon}
-                          alt={tech.name}
-                          className="h-6 w-6"
-                        />
-                      </div>
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content
-                        sideOffset={6}
-                        className="rounded bg-black text-white px-2 py-1 text-xs shadow"
-                      >
-                        {tech.name}
-                        <Tooltip.Arrow className="fill-black" />
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
-              ))}
-            </div>
 
             <div className="flex-1 flex flex-col gap-4 overflow-hidden">
               <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">

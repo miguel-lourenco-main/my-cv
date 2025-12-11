@@ -1,0 +1,47 @@
+{
+  "title": "EdgenChat",
+  "description": "Aplicação de chat com capacidades RAG para consultar documentos usando LLM.",
+  "subtitle": "Aplicação de Chat com IA para Consulta de Documentos",
+  "overview": "Uma aplicação de chat similar ao ChatGPT que se comunica com uma API de sistema de inferência de modelos locais. Os usuários podem conversar com um LLM sobre informações gerais ou consultá-lo sobre arquivos que fazem upload. O sistema utiliza RAG (Geração Aumentada por Recuperação) para recuperar rapidamente informações relevantes dos documentos e organizá-las usando o LLM.",
+  "coreConcept": {
+    "summary": "Aplicação de chat com consulta de documentos alimentada por RAG.",
+    "bullets": [
+      "Interface de chat similar ao ChatGPT",
+      "Integração com API de inferência de modelos locais",
+      "Upload e processamento de arquivos",
+      "Sistema RAG para recuperação de documentos",
+      "Organização de informações alimentada por LLM",
+      "Capacidades de conversação geral"
+    ]
+  },
+  "features": [
+    "Interface de chat: UI de conversação intuitiva similar ao ChatGPT",
+    "Consulta de documentos: faça upload de arquivos e faça perguntas sobre seu conteúdo",
+    "Integração RAG: recuperação rápida de informações relevantes de documentos",
+    "Processamento LLM: organização e resumo inteligente de informações",
+    "Chat geral: converse com o LLM sobre qualquer tópico",
+    "Suporte de arquivos: processa vários formatos de documentos"
+  ],
+  "technical": {
+    "frontendStack": [
+      "React com TypeScript",
+      "Tailwind CSS para estilos",
+      "Componentes UI modernos",
+      "Integração API para comunicação LLM"
+    ],
+    "projectStructure": [
+      "Componentes de interface de chat",
+      "Sistema de upload e processamento de arquivos",
+      "Camada de integração RAG",
+      "Camada de comunicação API",
+      "Gerenciamento de estado para conversas",
+      "Análise e indexação de documentos"
+    ],
+    "deployment": [
+      "Implantação de aplicação web",
+      "Integração com API de inferência local",
+      "Pipeline de armazenamento e processamento de arquivos"
+    ]
+  },
+  "personalExperience": "Comecei trabalhando na UI para esta aplicação de chat, que se comunicaria com a API de um dos projetos públicos da startup, um sistema de inferência de modelos locais similar ao Ollama. Este aplicativo era similar ao ChatGPT, onde você poderia conversar com um LLM sobre informações gerais, mas também poderia consultá-lo sobre arquivos que o usuário poderia inserir. O sistema usava RAG para recuperar rapidamente informações relevantes dos arquivos e organizar as informações para o usuário usando o LLM.\n\nTrabalhar neste projeto me deu uma experiência valiosa na construção de interfaces de chat e integração com APIs LLM. Entender como os sistemas RAG funcionam e implementar o pipeline de processamento de arquivos foi particularmente interessante e educativo."
+}

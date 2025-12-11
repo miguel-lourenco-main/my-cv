@@ -1,0 +1,47 @@
+{
+  "title": "EdgenChat",
+  "description": "Chat application with RAG capabilities for querying documents using LLM.",
+  "subtitle": "AI-Powered Chat Application with Document Querying",
+  "overview": "A ChatGPT-like chat application that communicates with a local model inference system API. Users can chat with an LLM about general information or query it regarding files they upload. The system uses RAG (Retrieval-Augmented Generation) to quickly fetch relevant information from documents and organize it using the LLM.",
+  "coreConcept": {
+    "summary": "Chat application with RAG-powered document querying.",
+    "bullets": [
+      "Chat interface similar to ChatGPT",
+      "Integration with local model inference API",
+      "File upload and processing",
+      "RAG system for document retrieval",
+      "LLM-powered information organization",
+      "General conversation capabilities"
+    ]
+  },
+  "features": [
+    "Chat interface: intuitive conversation UI similar to ChatGPT",
+    "Document querying: upload files and ask questions about their content",
+    "RAG integration: fast retrieval of relevant information from documents",
+    "LLM processing: intelligent organization and summarization of information",
+    "General chat: converse with the LLM about any topic",
+    "File support: process various document formats"
+  ],
+  "technical": {
+    "frontendStack": [
+      "React with TypeScript",
+      "Tailwind CSS for styling",
+      "Modern UI components",
+      "API integration for LLM communication"
+    ],
+    "projectStructure": [
+      "Chat interface components",
+      "File upload and processing system",
+      "RAG integration layer",
+      "API communication layer",
+      "State management for conversations",
+      "Document parsing and indexing"
+    ],
+    "deployment": [
+      "Web application deployment",
+      "Integration with local inference API",
+      "File storage and processing pipeline"
+    ]
+  },
+  "personalExperience": "I started by working on the UI for this chat application, which would communicate with the API for one of the public projects of the startup, a local model inference system similar to Ollama. This app was similar to ChatGPT, where you could chat with an LLM about general information, but you could also query it regarding files that the user could input. The system used RAG to quickly fetch relevant information from the files and organize the information for the user using the LLM.\n\nWorking on this project gave me valuable experience in building chat interfaces and integrating with LLM APIs. Understanding how RAG systems work and implementing the file processing pipeline was particularly interesting and educational."
+}

@@ -1,0 +1,47 @@
+{
+  "title": "EdgenCode",
+  "description": "Visual Studio Code extension providing AI-powered chat and code assistance.",
+  "subtitle": "VS Code Extension with AI Chat Capabilities",
+  "overview": "A Visual Studio Code extension similar to EdgenChat, providing AI-powered chat and code assistance directly within the IDE. Built using VS Code extension APIs and integrating with the local model inference system.",
+  "coreConcept": {
+    "summary": "VS Code extension bringing AI chat to the development environment.",
+    "bullets": [
+      "Visual Studio Code extension",
+      "AI chat interface within IDE",
+      "Code assistance and suggestions",
+      "Integration with local LLM API",
+      "Seamless IDE integration",
+      "Developer-focused features"
+    ]
+  },
+  "features": [
+    "VS Code integration: native extension running within the IDE",
+    "Chat interface: AI-powered chat accessible from the editor",
+    "Code assistance: get help with code-related questions",
+    "API integration: connects to local model inference system",
+    "Developer workflow: designed to fit into existing development processes",
+    "Extension architecture: built using VS Code extension APIs"
+  ],
+  "technical": {
+    "frontendStack": [
+      "TypeScript",
+      "VS Code Extension API",
+      "React for UI components",
+      "VS Code Webview API"
+    ],
+    "projectStructure": [
+      "VS Code extension manifest and configuration",
+      "Extension activation and lifecycle management",
+      "Webview UI components",
+      "API communication layer",
+      "Integration with VS Code APIs",
+      "Extension packaging and distribution"
+    ],
+    "deployment": [
+      "VS Code extension package",
+      "Distribution via VS Code marketplace or private repository",
+      "Extension installation and updates"
+    ]
+  },
+  "personalExperience": "I also worked on an application similar to the previous one (EdgenChat), but this one needed to run as a Visual Studio extension, which I had no experience in doing. After digging through the VS documentation and some open source projects on GitHub, I was able to somewhat understand how to code a working VS extension and produce a working app that fit our purpose.\n\nThis project was particularly challenging because I had to learn the VS Code extension architecture from scratch. Understanding how extensions work, how to create webviews, and how to integrate with the VS Code API was a steep learning curve. However, it was very rewarding to see the extension working within the IDE and providing value to developers."
+}

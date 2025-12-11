@@ -1,0 +1,47 @@
+{
+  "title": "EdgenCode",
+  "description": "Extensión de Visual Studio Code que proporciona chat y asistencia de código potenciada por IA.",
+  "subtitle": "Extensión de VS Code con Capacidades de Chat de IA",
+  "overview": "Una extensión de Visual Studio Code similar a EdgenChat, que proporciona chat y asistencia de código potenciada por IA directamente dentro del IDE. Construida usando las APIs de extensión de VS Code e integrada con el sistema de inferencia de modelos locales.",
+  "coreConcept": {
+    "summary": "Extensión de VS Code que lleva el chat de IA al entorno de desarrollo.",
+    "bullets": [
+      "Extensión de Visual Studio Code",
+      "Interfaz de chat de IA dentro del IDE",
+      "Asistencia y sugerencias de código",
+      "Integración con API de LLM local",
+      "Integración fluida con el IDE",
+      "Características enfocadas en desarrolladores"
+    ]
+  },
+  "features": [
+    "Integración VS Code: extensión nativa ejecutándose dentro del IDE",
+    "Interfaz de chat: chat potenciado por IA accesible desde el editor",
+    "Asistencia de código: obtén ayuda con preguntas relacionadas con código",
+    "Integración API: se conecta al sistema de inferencia de modelos locales",
+    "Flujo de trabajo del desarrollador: diseñado para encajar en los procesos de desarrollo existentes",
+    "Arquitectura de extensión: construida usando las APIs de extensión de VS Code"
+  ],
+  "technical": {
+    "frontendStack": [
+      "TypeScript",
+      "API de Extensión de VS Code",
+      "React para componentes UI",
+      "API Webview de VS Code"
+    ],
+    "projectStructure": [
+      "Manifiesto y configuración de extensión de VS Code",
+      "Activación y gestión del ciclo de vida de la extensión",
+      "Componentes UI de Webview",
+      "Capa de comunicación API",
+      "Integración con APIs de VS Code",
+      "Empaquetado y distribución de extensión"
+    ],
+    "deployment": [
+      "Paquete de extensión de VS Code",
+      "Distribución vía marketplace de VS Code o repositorio privado",
+      "Instalación y actualizaciones de extensión"
+    ]
+  },
+  "personalExperience": "También trabajé en una aplicación similar a la anterior (EdgenChat), pero esta necesitaba ejecutarse como una extensión de Visual Studio, de lo cual no tenía experiencia. Después de revisar la documentación de VS y algunos proyectos de código abierto en GitHub, pude entender cómo codificar una extensión de VS funcional y producir una aplicación que cumpliera nuestro propósito.\n\nEste proyecto fue particularmente desafiante porque tuve que aprender la arquitectura de extensiones de VS Code desde cero. Entender cómo funcionan las extensiones, cómo crear webviews y cómo integrar con la API de VS Code fue una curva de aprendizaje pronunciada. Sin embargo, fue muy gratificante ver la extensión funcionando dentro del IDE y proporcionando valor a los desarrolladores."
+}

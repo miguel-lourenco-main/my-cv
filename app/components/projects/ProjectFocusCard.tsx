@@ -5,7 +5,8 @@ import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
-import { MoreHorizontalIcon } from "lucide-react";
+import { Briefcase, User } from "lucide-react";
+import { CompanyClientCircles } from "./CompanyClientCircles";
 
 /**
  * Project card component with hover effects and focus blur.
@@ -130,17 +131,24 @@ export function ProjectFocusCard({
         </div>
       )}
 
-      <button
-        className="absolute right-3 top-3 z-10 bg-transparent hover:bg-slate-800 text-white rounded-full p-2"
-        aria-label={`Open ${getProjectString(project, 'title')} website`}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick(project)
-        }}
-      >
-        {/* external link icon */}
-        <MoreHorizontalIcon className="size-5" />
-      </button>
+      {/* Project type badge and company/client circles - always visible */}
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 flex-wrap">        
+
+        {/* Company and client circles */}
+        {project.type === "professional" ? (
+          <CompanyClientCircles
+            company={project.company}
+            clients={project.clients}
+            size={24}
+          />
+        ) : (
+          <div className={cn(
+            "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-purple-500/90 text-white"
+          )}>
+            <User className="size-3" />
+          </div>
+        )}
+      </div>
 
       <div
         className={cn(

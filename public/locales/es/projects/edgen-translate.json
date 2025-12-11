@@ -1,0 +1,49 @@
+{
+  "title": "EdgenTranslate",
+  "description": "Aplicación de traducción de documentos potenciada por LLM para archivos DOCX y PDF.",
+  "subtitle": "Sistema de Traducción de Documentos con IA",
+  "overview": "Una aplicación que utiliza un LLM para traducir documentos en formatos DOCX y PDF de cualquier idioma a cualquier idioma. El sistema maneja el desafío significativo de extraer y reemplazar contenido traducido mientras mantiene el formato del documento, especialmente cuando se trata de idiomas que tienen oraciones significativamente más pequeñas o más grandes que el idioma de origen.",
+  "coreConcept": {
+    "summary": "Sistema de traducción de documentos usando LLM con preservación de formato.",
+    "bullets": [
+      "Soporte multi-formato: DOCX y PDF",
+      "Traducción multi-idioma",
+      "Preservación de formato",
+      "Traducción potenciada por LLM",
+      "Adaptación de longitud de oraciones",
+      "Salida de alta calidad para idiomas específicos"
+    ]
+  },
+  "features": [
+    "Formatos de documento: soporte para archivos DOCX y PDF",
+    "Soporte de idiomas: traduce entre cualquier par de idiomas",
+    "Preservación de formato: mantiene la estructura y formato del documento",
+    "Traducción LLM: traducciones de alta calidad usando modelos de lenguaje",
+    "Extracción de contenido: extracción inteligente de texto de documentos",
+    "Reemplazo de contenido: reemplazo inteligente manteniendo la integridad del documento",
+    "Enfoque en calidad: optimizado para idiomas objetivo específicos que requieren alta calidad"
+  ],
+  "technical": {
+    "frontendStack": [
+      "React con TypeScript",
+      "Tailwind CSS",
+      "UI de carga y procesamiento de archivos",
+      "Componentes de vista previa de documentos"
+    ],
+    "projectStructure": [
+      "Análisis de documentos: extracción de texto de DOCX y PDF",
+      "Pipeline de traducción: integración LLM para traducción",
+      "Preservación de formato: mantener la estructura del documento",
+      "Reemplazo de contenido: reemplazo inteligente de texto",
+      "Manejo de longitud de oraciones: adaptarse a diferentes longitudes de oraciones de idiomas",
+      "Optimización de calidad: manejo especializado para idiomas objetivo"
+    ],
+    "deployment": [
+      "Despliegue de aplicación web",
+      "Backend de procesamiento de archivos",
+      "Integración API LLM",
+      "Almacenamiento y recuperación de documentos"
+    ]
+  },
+  "personalExperience": "Después de los proyectos anteriores, trabajé en una aplicación que utilizaría un LLM para traducir documentos en formatos DOCX y PDF, de cualquier idioma a cualquier idioma. Esto presenta un desafío significativo cuando se trata de extraer y reemplazar el contenido traducido, ya que diferentes idiomas pueden tener oraciones significativamente más pequeñas o más grandes. En nuestro caso, nos enfocamos en generar documentos de alta calidad para idiomas específicos para los cuales necesitábamos que los resultados fueran especialmente buenos.\n\nEste proyecto me enseñó mucho sobre procesamiento de documentos, extracción de texto y las complejidades de mantener el formato de documentos en diferentes idiomas. Manejar las diferentes longitudes de oraciones y asegurar que el contenido traducido encaje correctamente dentro de la estructura del documento fue un desafío único que requirió ingeniería cuidadosa."
+}

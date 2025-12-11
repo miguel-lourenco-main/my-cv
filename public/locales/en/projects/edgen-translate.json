@@ -1,0 +1,49 @@
+{
+  "title": "EdgenTranslate",
+  "description": "LLM-powered document translation application for DOCX and PDF files.",
+  "subtitle": "AI-Powered Document Translation System",
+  "overview": "An application that uses an LLM to translate documents in DOCX and PDF formats from any language to any language. The system handles the significant challenge of extracting and replacing translated content while maintaining document formatting, especially when dealing with languages that have sentences significantly smaller or larger than the source language.",
+  "coreConcept": {
+    "summary": "Document translation system using LLM with formatting preservation.",
+    "bullets": [
+      "Multi-format support: DOCX and PDF",
+      "Multi-language translation",
+      "Format preservation",
+      "LLM-powered translation",
+      "Sentence length adaptation",
+      "High-quality output for specific languages"
+    ]
+  },
+  "features": [
+    "Document formats: support for DOCX and PDF files",
+    "Language support: translate between any language pair",
+    "Format preservation: maintain document structure and formatting",
+    "LLM translation: high-quality translations using language models",
+    "Content extraction: intelligent extraction of text from documents",
+    "Content replacement: smart replacement maintaining document integrity",
+    "Quality focus: optimized for specific target languages requiring high quality"
+  ],
+  "technical": {
+    "frontendStack": [
+      "React with TypeScript",
+      "Tailwind CSS",
+      "File upload and processing UI",
+      "Document preview components"
+    ],
+    "projectStructure": [
+      "Document parsing: extract text from DOCX and PDF",
+      "Translation pipeline: LLM integration for translation",
+      "Format preservation: maintain document structure",
+      "Content replacement: intelligent text replacement",
+      "Sentence length handling: adapt to different language sentence lengths",
+      "Quality optimization: specialized handling for target languages"
+    ],
+    "deployment": [
+      "Web application deployment",
+      "File processing backend",
+      "LLM API integration",
+      "Document storage and retrieval"
+    ]
+  },
+  "personalExperience": "After the previous projects, I went on to work on an application that would use an LLM to translate documents in DOCX and PDF formats, from any language to any language. This presents a significant challenge when it comes to extracting and replacing the translated content, since different languages can have sentences significantly smaller or bigger. In our case, we focused on generating high quality documents for specific languages for which we needed the results to be especially good.\n\nThis project taught me a lot about document processing, text extraction, and the complexities of maintaining document formatting across different languages. Handling the varying sentence lengths and ensuring the translated content fits properly within the document structure was a unique challenge that required careful engineering."
+}

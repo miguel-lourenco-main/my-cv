@@ -1,0 +1,49 @@
+{
+  "title": "EdgenTranslate",
+  "description": "Aplicação de tradução de documentos alimentada por LLM para arquivos DOCX e PDF.",
+  "subtitle": "Sistema de Tradução de Documentos com IA",
+  "overview": "Uma aplicação que usa um LLM para traduzir documentos nos formatos DOCX e PDF de qualquer idioma para qualquer idioma. O sistema lida com o desafio significativo de extrair e substituir conteúdo traduzido mantendo a formatação do documento, especialmente ao lidar com idiomas que têm frases significativamente menores ou maiores que o idioma de origem.",
+  "coreConcept": {
+    "summary": "Sistema de tradução de documentos usando LLM com preservação de formatação.",
+    "bullets": [
+      "Suporte multi-formato: DOCX e PDF",
+      "Tradução multi-idioma",
+      "Preservação de formatação",
+      "Tradução alimentada por LLM",
+      "Adaptação de comprimento de frases",
+      "Saída de alta qualidade para idiomas específicos"
+    ]
+  },
+  "features": [
+    "Formatos de documento: suporte para arquivos DOCX e PDF",
+    "Suporte de idiomas: traduz entre qualquer par de idiomas",
+    "Preservação de formatação: mantém a estrutura e formatação do documento",
+    "Tradução LLM: traduções de alta qualidade usando modelos de linguagem",
+    "Extração de conteúdo: extração inteligente de texto de documentos",
+    "Substituição de conteúdo: substituição inteligente mantendo a integridade do documento",
+    "Foco em qualidade: otimizado para idiomas-alvo específicos que requerem alta qualidade"
+  ],
+  "technical": {
+    "frontendStack": [
+      "React com TypeScript",
+      "Tailwind CSS",
+      "UI de upload e processamento de arquivos",
+      "Componentes de visualização de documentos"
+    ],
+    "projectStructure": [
+      "Análise de documentos: extração de texto de DOCX e PDF",
+      "Pipeline de tradução: integração LLM para tradução",
+      "Preservação de formatação: manter a estrutura do documento",
+      "Substituição de conteúdo: substituição inteligente de texto",
+      "Gerenciamento de comprimento de frases: adaptar-se a diferentes comprimentos de frases de idiomas",
+      "Otimização de qualidade: tratamento especializado para idiomas-alvo"
+    ],
+    "deployment": [
+      "Implantação de aplicação web",
+      "Backend de processamento de arquivos",
+      "Integração API LLM",
+      "Armazenamento e recuperação de documentos"
+    ]
+  },
+  "personalExperience": "Após os projetos anteriores, trabalhei em uma aplicação que usaria um LLM para traduzir documentos nos formatos DOCX e PDF, de qualquer idioma para qualquer idioma. Isso apresenta um desafio significativo quando se trata de extrair e substituir o conteúdo traduzido, já que diferentes idiomas podem ter frases significativamente menores ou maiores. No nosso caso, nos concentramos em gerar documentos de alta qualidade para idiomas específicos para os quais precisávamos que os resultados fossem especialmente bons.\n\nEste projeto me ensinou muito sobre processamento de documentos, extração de texto e as complexidades de manter a formatação de documentos em diferentes idiomas. Lidar com os diferentes comprimentos de frases e garantir que o conteúdo traduzido se encaixe corretamente na estrutura do documento foi um desafio único que exigiu engenharia cuidadosa."
+}

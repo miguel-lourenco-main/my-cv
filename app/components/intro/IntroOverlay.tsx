@@ -124,14 +124,6 @@ export default function IntroOverlay({
               />
               <NameBadge layoutId="intro-name" variant="intro" greeting={greeting} />
             </motion.div>
-
-            {/* Skip button - accessible and minimal */}
-            <button
-              onClick={handleSkip}
-              className="absolute right-4 top-4 rounded-md bg-secondary/60 px-3 py-1.5 text-sm text-foreground/80 backdrop-blur hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              Skip
-            </button>
           </div>
         </motion.div>
       )}

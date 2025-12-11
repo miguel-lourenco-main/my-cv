@@ -73,6 +73,33 @@ export type ProjectExperience = {
 };
 
 /**
+ * Client information for professional projects.
+ */
+export type ProjectClient = {
+  /** Client name */
+  name: string;
+  /** Path to client logo/icon, e.g. '/logos/client-logo.svg' */
+  icon: string;
+  /** Optional client website URL */
+  url?: string;
+};
+
+/**
+ * Company information for professional projects.
+ * Can be either a string (legacy format) or an object with details.
+ */
+export type ProjectCompany = 
+  | string
+  | {
+      /** Company name */
+      name: string;
+      /** Path to company logo/icon, e.g. '/logos/company-logo.svg' */
+      icon: string;
+      /** Company website URL */
+      url: string;
+    };
+
+/**
  * Project data structure.
  * Supports both direct strings and i18n keys for internationalization.
  */
@@ -95,6 +122,12 @@ export type Project = {
   gitlabUrl: string;
   /** Technologies used in the project */
   technologies: ProjectTechnology[];
+  /** Project type: personal or professional */
+  type: 'personal' | 'professional';
+  /** Company information (required for professional projects) - can be string or object */
+  company?: ProjectCompany;
+  /** Array of clients that use/bought the app (for professional projects) */
+  clients?: ProjectClient[];
   /** Optional detailed project information */
   details?: ProjectDetails;
   /** Optional experience/work context */
