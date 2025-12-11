@@ -5,7 +5,7 @@ import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
-import { Briefcase, User } from "lucide-react";
+import { User } from "lucide-react";
 import { CompanyClientCircles } from "./CompanyClientCircles";
 
 /**
@@ -100,7 +100,7 @@ export function ProjectFocusCard({
       onMouseLeave={handleMouseLeave}
       className={cn(
         "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out cursor-pointer",
-        hovered !== null && hovered !== index && "blur-sm scale-[0.98]"
+        hovered !== null && hovered !== index && "scale-[0.98]"
       )}
       onClick={() => onClick(project)}
     >
@@ -109,6 +109,15 @@ export function ProjectFocusCard({
         alt={getProjectString(project, 'title')}
         className="object-cover absolute inset-0 w-full h-full"
       />
+
+      {/* 
+        De-emphasize non-hovered cards without using CSS `filter: blur()` on the
+        whole card (which can cause Brave to drop SVG rendering when combined
+        with descendant `backdrop-filter` elements).
+      */}
+      {hovered !== null && hovered !== index ? (
+        <div className="absolute inset-0 pointer-events-none z-[5] backdrop-blur-sm bg-white/10 dark:bg-black/10" />
+      ) : null}
 
       {/* Water ripple effect - animated circles expanding from mouse position */}
       {hovered === index && mousePosition && (
@@ -132,22 +141,26 @@ export function ProjectFocusCard({
       )}
 
       {/* Project type badge and company/client circles - always visible */}
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 flex-wrap">        
-
-        {/* Company and client circles */}
-        {project.type === "professional" ? (
-          <CompanyClientCircles
-            company={project.company}
-            clients={project.clients}
-            size={24}
-          />
-        ) : (
-          <div className={cn(
-            "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-purple-500/90 text-white"
-          )}>
-            <User className="size-3" />
-          </div>
-        )}
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 flex-wrap">
+        <CompanyClientCircles
+          leadingCircles={
+            project.type === "personal" || project.type === "hybrid"
+              ? [
+                  {
+                    name: "Personal",
+                    iconNode: <User className="text-black" size={14} />,
+                    tooltipText:
+                      project.type === "hybrid"
+                        ? "Project personal continuation"
+                        : "Personal project",
+                  },
+                ]
+              : []
+          }
+          company={project.type === "professional" || project.type === "hybrid" ? project.company : undefined}
+          clients={project.type === "professional" || project.type === "hybrid" ? project.clients : undefined}
+          size={28}
+        />
       </div>
 
       <div

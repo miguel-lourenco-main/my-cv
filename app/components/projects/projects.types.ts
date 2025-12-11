@@ -95,8 +95,16 @@ export type ProjectCompany =
       name: string;
       /** Path to company logo/icon, e.g. '/logos/company-logo.svg' */
       icon: string;
+      /**
+       * Relationship of this company to the project.
+       * - employer: you built this while employed at the company
+       * - client: you built this for the company as a freelance/contract project
+       *
+       * Defaults to 'employer' when omitted (especially for legacy data).
+       */
+      relationship?: "employer" | "client";
       /** Company website URL */
-      url: string;
+      url?: string;
     };
 
 /**
@@ -122,8 +130,8 @@ export type Project = {
   gitlabUrl: string;
   /** Technologies used in the project */
   technologies: ProjectTechnology[];
-  /** Project type: personal or professional */
-  type: 'personal' | 'professional';
+  /** Project type: personal, professional, or hybrid (started professional, continued privately) */
+  type: 'personal' | 'professional' | 'hybrid';
   /** Company information (required for professional projects) - can be string or object */
   company?: ProjectCompany;
   /** Array of clients that use/bought the app (for professional projects) */

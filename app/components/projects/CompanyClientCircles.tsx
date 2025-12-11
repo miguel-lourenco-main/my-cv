@@ -11,6 +11,16 @@ import type { ProjectClient, ProjectCompany } from "./projects.types";
  * Props for CompanyClientCircles component.
  */
 type CompanyClientCirclesProps = {
+  /**
+   * Optional circles to render before the company/client circles.
+   * Useful for showing a "personal" marker using a React icon (e.g. lucide User).
+   */
+  leadingCircles?: Array<{
+    name: string;
+    iconNode: React.ReactNode;
+    tooltipText: string;
+    url?: string;
+  }>;
   /** Company information - can be string or object */
   company?: ProjectCompany;
   /** Array of client information */
@@ -19,6 +29,17 @@ type CompanyClientCirclesProps = {
   size?: number;
   /** Additional CSS classes */
   className?: string;
+};
+
+type CompanyRelationship = "employer" | "client";
+
+type CircleEntity = {
+  name: string;
+  icon: string | null;
+  iconNode?: React.ReactNode;
+  url?: string;
+  isCompany: boolean;
+  tooltipText?: string;
 };
 
 /**
@@ -38,6 +59,7 @@ type CompanyClientCirclesProps = {
  * ```
  */
 export function CompanyClientCircles({
+  leadingCircles = [],
   company,
   clients = [],
   size = 32,
@@ -45,28 +67,56 @@ export function CompanyClientCircles({
 }: CompanyClientCirclesProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // Build array of all entities (company + clients)
-  const entities: Array<{ name: string; icon: string | null; url?: string; isCompany: boolean }> = [];
+  // Normalize company for consistent tooltip + rendering
+  const normalizedCompany:
+    | {
+        name: string;
+        icon: string | null;
+        url?: string;
+        relationship: CompanyRelationship;
+      }
+    | null = (() => {
+    if (!company) return null;
+
+    if (typeof company === "string") {
+      return {
+        name: company,
+        icon: `/logos/${company.toLowerCase()}-logo.svg`,
+        relationship: "employer",
+      };
+    }
+
+    return {
+      name: company.name,
+      icon: company.icon,
+      url: company.url,
+      relationship: company.relationship ?? "employer",
+    };
+  })();
+
+  // Build array of all entities (leading + company + clients)
+  const entities: CircleEntity[] = [];
+
+  // Add leading circles first (e.g. personal marker)
+  leadingCircles.forEach((circle) => {
+    entities.push({
+      name: circle.name,
+      icon: null,
+      iconNode: circle.iconNode,
+      url: circle.url,
+      isCompany: false,
+      tooltipText: circle.tooltipText,
+    });
+  });
 
   // Add company if available
-  if (company) {
-    if (typeof company === "string") {
-      // Legacy format: company is just a string
-      const companyIcon = `/logos/${company.toLowerCase()}-logo.svg`;
-      entities.push({
-        name: company,
-        icon: companyIcon,
-        isCompany: true,
-      });
-    } else {
-      // New format: company is an object with name, icon, and url
-      entities.push({
-        name: company.name,
-        icon: company.icon,
-        url: company.url,
-        isCompany: true,
-      });
-    }
+  if (normalizedCompany) {
+    entities.push({
+      name: normalizedCompany.name,
+      icon: normalizedCompany.icon,
+      url: normalizedCompany.url,
+      isCompany: true,
+    });
   }
 
   // Add clients
@@ -105,12 +155,27 @@ export function CompanyClientCircles({
             ? entities.length + nextCircleIndex + 10 // High enough to be above next circle
             : baseZIndex;
 
+          const tooltipText = entity.tooltipText ?? (() => {
+            // Company circle: tooltip depends on whether it's an employer or a client
+            if (entity.isCompany) {
+              if (!normalizedCompany) return "Made while working at freelance";
+              return normalizedCompany.relationship === "employer"
+                ? `Made while working at ${normalizedCompany.name}`
+                : `Made for ${normalizedCompany.name}`;
+            }
+
+            // Client circles: always "Made for {client}"
+            return `Made for ${entity.name}`;
+          })();
+
           return (
             <CompanyCircle
               key={`${entity.name}-${idx}`}
               name={entity.name}
               icon={entity.icon}
+              iconNode={entity.iconNode}
               url={entity.url}
+              tooltipText={tooltipText}
               size={size}
               marginLeft={marginLeft}
               zIndex={zIndex}
@@ -130,7 +195,9 @@ export function CompanyClientCircles({
 function CompanyCircle({
   name,
   icon,
+  iconNode,
   url,
+  tooltipText,
   size,
   marginLeft,
   zIndex,
@@ -139,7 +206,9 @@ function CompanyCircle({
 }: {
   name: string;
   icon: string | null;
+  iconNode?: React.ReactNode;
   url?: string;
+  tooltipText: string;
   size: number;
   marginLeft: number;
   zIndex: number;
@@ -148,11 +217,11 @@ function CompanyCircle({
 }) {
   const [imageError, setImageError] = useState(false);
 
-  const showBriefcase = !icon || imageError;
+  const showBriefcase = (!icon || imageError) && !iconNode;
 
   const circleContent = (
     <motion.div
-      className="relative rounded-full bg-white dark:bg-neutral-800 border-2 border-white dark:border-neutral-700 shadow-md flex items-center justify-center overflow-hidden cursor-pointer"
+      className="relative rounded-full bg-white border-2 border-neutral-700 dark:border-neutral-200 shadow-md flex items-center justify-center overflow-hidden cursor-pointer"
       style={{
         width: size,
         height: size,
@@ -162,12 +231,19 @@ function CompanyCircle({
       whileHover={{ scale: 1.30 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
-      {showBriefcase ? (
+      {iconNode ? (
+        <div
+          className="flex items-center justify-center"
+          style={{ width: size * 0.6, height: size * 0.6 }}
+        >
+          {iconNode}
+        </div>
+      ) : showBriefcase ? (
         <Briefcase
           className="text-neutral-600 dark:text-neutral-400"
           size={size * 0.5}
         />
-      ) : (
+      ) : icon ? (
         <img
           src={icon}
           alt={name}
@@ -178,7 +254,7 @@ function CompanyCircle({
           loading="lazy"
           decoding="async"
         />
-      )}
+      ) : null}
     </motion.div>
   );
 
@@ -208,7 +284,7 @@ function CompanyCircle({
             sideOffset={6}
             className="rounded bg-black text-white px-2 py-1 text-xs shadow z-50"
           >
-            {name}
+            {tooltipText}
             <Tooltip.Arrow className="fill-black" />
           </Tooltip.Content>
         </Tooltip.Portal>

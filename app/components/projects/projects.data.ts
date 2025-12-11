@@ -153,7 +153,7 @@ export const projects: Project[] = [
   },
   {
     id: "sonora",
-    type: "professional",
+    type: "hybrid",
     company: {
       name: "Edgen",
       icon: "/logos/edgen-logo.svg",
@@ -198,7 +198,7 @@ export const projects: Project[] = [
   },
   {
     id: "agentic-hub",
-    type: "professional",
+    type: "hybrid",
     company: "Edgen",
     clients: [], // Add client icons here when provided
     titleKey: "title",

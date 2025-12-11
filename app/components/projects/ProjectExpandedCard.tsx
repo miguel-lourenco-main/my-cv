@@ -99,19 +99,38 @@ export function ProjectExpandedCard({
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="flex items-center gap-2 text-2xl font-bold text-neutral-800 dark:text-neutral-100">
                     {getProjectString(project, "title")}
-                    {project.type === "professional" ? (
-                      <CompanyClientCircles
-                        company={project.company}
-                        clients={project.clients}
-                        size={30}
-                      />
-                    ) : (
-                      <div title="Personal" className={cn(
-                        "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-purple-500/90 text-white"
-                      )}>
-                        <User className="size-3" />
-                      </div>
-                    )}
+                    <CompanyClientCircles
+                      leadingCircles={
+                        project.type === "personal" || project.type === "hybrid"
+                          ? [
+                              {
+                                name: "Personal",
+                                iconNode: (
+                                  <User
+                                    className="text-black"
+                                    size={14}
+                                  />
+                                ),
+                                tooltipText:
+                                  project.type === "hybrid"
+                                    ? "Project personal continuation"
+                                    : "Personal project",
+                              },
+                            ]
+                          : []
+                      }
+                      company={
+                        project.type === "professional" || project.type === "hybrid"
+                          ? project.company
+                          : undefined
+                      }
+                      clients={
+                        project.type === "professional" || project.type === "hybrid"
+                          ? project.clients
+                          : undefined
+                      }
+                      size={30}
+                    />
                   </h3>
                 </div>
                 {project.details?.subtitle || project.details?.subtitleKey ? (
