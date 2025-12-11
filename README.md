@@ -26,6 +26,7 @@ The site is designed as a **production-ready personal brand hub**: focused on cl
 - 📱 **Responsive & Device-Aware**: Optimized for mobile, tablet, and desktop
 - 🔍 **SEO-Ready**: Structured metadata, Open Graph, and localized routes
 
+
 ---
 
 ## 📄 License
