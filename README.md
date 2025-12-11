@@ -11,6 +11,8 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.17-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![Playwright](https://img.shields.io/badge/Playwright-Testing-green?style=flat-square&logo=playwright)](https://playwright.dev/)
 
+---
+
 ## 🚀 Project Overview
 
 This repository powers Miguel Lourenço’s personal portfolio and CV website. It showcases professional experience, selected projects, and technical skills in a **fast, animated, multilingual** interface built on top of modern React and Next.js tooling.
@@ -23,6 +25,8 @@ The site is designed as a **production-ready personal brand hub**: focused on cl
 - 🎬 **Rich Micro-Interactions**: Smooth scroll, parallax, and reveal animations
 - 📱 **Responsive & Device-Aware**: Optimized for mobile, tablet, and desktop
 - 🔍 **SEO-Ready**: Structured metadata, Open Graph, and localized routes
+
+---
 
 ## 📄 License
 
