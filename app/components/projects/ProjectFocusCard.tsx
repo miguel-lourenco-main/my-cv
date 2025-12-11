@@ -116,7 +116,7 @@ export function ProjectFocusCard({
         with descendant `backdrop-filter` elements).
       */}
       {hovered !== null && hovered !== index ? (
-        <div className="absolute inset-0 pointer-events-none z-[5] backdrop-blur-sm bg-white/10 dark:bg-black/10" />
+        <div className="absolute inset-0 pointer-events-none z-10 backdrop-blur-sm bg-white/10 dark:bg-black/10" />
       ) : null}
 
       {/* Water ripple effect - animated circles expanding from mouse position */}
@@ -141,7 +141,7 @@ export function ProjectFocusCard({
       )}
 
       {/* Project type badge and company/client circles - always visible */}
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 flex-wrap">
+      <div className="absolute top-3 left-3 z-[5] flex items-center gap-2 flex-wrap">
         <CompanyClientCircles
           leadingCircles={
             project.type === "personal" || project.type === "hybrid"
