@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "motion/react";
+import { cn } from "@/app/lib/utils";
 
 /**
  * Props for the NameBadge component.
@@ -49,7 +50,7 @@ export default function NameBadge({
       : "text-4xl sm:text-6xl font-bold text-slate-900 dark:text-white";
 
   return (
-    <Comp layoutId={layoutId} className={className}>
+    <Comp layoutId={layoutId} className={cn(className, "text-center")}>
       <h1 className={titleClasses}>
         {greeting || ' '} {""}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">

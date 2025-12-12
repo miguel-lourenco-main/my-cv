@@ -109,7 +109,7 @@ export default function IntroOverlay({
           {/* Centered identity */}
           <div className="relative h-full w-full flex items-center justify-center">
             <motion.div
-              className="flex flex-col items-center gap-y-24"
+              className="flex flex-col items-center gap-y-24 px-4"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
