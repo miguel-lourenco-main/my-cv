@@ -81,7 +81,7 @@ export function ProjectExpandedCard({
           <motion.div
             ref={ref}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
-            className="relative w-full max-w-[900px] h-full md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden shadow-lg z-50"
+            className="relative w-full max-w-[900px] h-full md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-scroll shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
@@ -89,79 +89,63 @@ export function ProjectExpandedCard({
             {/* X button for screens smaller than xl */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 xl:hidden flex items-center justify-center size-7 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="absolute top-2 right-2 xl:hidden flex items-center justify-center size-7 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               aria-label="Close"
             >
               <X className="size-4 text-gray-600 dark:text-gray-400" />
             </button>
-            <div className="flex items-center justify-between gap-4 w-full">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="flex items-center gap-2 text-2xl font-bold text-neutral-800 dark:text-neutral-100">
-                    {getProjectString(project, "title")}
-                    <CompanyClientCircles
-                      leadingCircles={
-                        project.type === "personal" || project.type === "hybrid"
-                          ? [
-                              {
-                                name: "Personal",
-                                iconNode: (
-                                  <User
-                                    className="text-black"
-                                    size={14}
-                                  />
-                                ),
-                                tooltipText:
-                                  project.type === "hybrid"
-                                    ? "Project personal continuation"
-                                    : "Personal project",
-                              },
-                            ]
-                          : []
-                      }
-                      company={
-                        project.type === "professional" || project.type === "hybrid"
-                          ? project.company
-                          : undefined
-                      }
-                      clients={
-                        project.type === "professional" || project.type === "hybrid"
-                          ? project.clients
-                          : undefined
-                      }
-                      size={30}
-                    />
-                  </h3>
-                </div>
-                {project.details?.subtitle || project.details?.subtitleKey ? (
-                  <p className="text-neutral-700 dark:text-neutral-300 font-medium">
-                    {getProjectString({ ...project.details, id: project.id }, "subtitle")}
-                  </p>
-                ) : null}
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  {getProjectString(project, "description")}
+            <div className="flex flex-col items-start gap-1 w-full">
+              <div className="flex items-center justify-between mb-3 w-full">
+                <h3 className="flex items-center gap-2 text-2xl font-bold text-neutral-800 dark:text-neutral-100">
+                  {getProjectString(project, "title")}
+                  <CompanyClientCircles
+                    leadingCircles={
+                      project.type === "personal" || project.type === "hybrid"
+                        ? [
+                            {
+                              name: "Personal",
+                              iconNode: (
+                                <User
+                                  className="text-black"
+                                  size={14}
+                                />
+                              ),
+                              tooltipText:
+                                project.type === "hybrid"
+                                  ? "Project personal continuation"
+                                  : "Personal project",
+                            },
+                          ]
+                        : []
+                    }
+                    company={
+                      project.type === "professional" || project.type === "hybrid"
+                        ? project.company
+                        : undefined
+                    }
+                    clients={
+                      project.type === "professional" || project.type === "hybrid"
+                        ? project.clients
+                        : undefined
+                    }
+                    size={30}
+                  />
+                </h3>
+                <ProjectButtons project={project} />
+              </div>
+              {project.details?.subtitle || project.details?.subtitleKey ? (
+                <p className="text-neutral-700 dark:text-neutral-300 font-medium">
+                  {getProjectString({ ...project.details, id: project.id }, "subtitle")}
                 </p>
-              </div>
-              <div className="flex w-fit shrink-0 gap-2">
-                <BaseButton
-                  href={project.websiteUrl}
-                  className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white"
-                  theme="green"
-                >
-                  Visit <GlobeIcon className="size-5" />
-                </BaseButton>
-                <GitlabButton
-                  href={project.gitlabUrl}
-                  width={20}
-                  height={20}
-                  className="bg-orange-100 rounded-full p-2 hover:bg-orange-200"
-                />
-              </div>
+              ) : null}
+              <p className="text-neutral-600 dark:text-neutral-400">
+                {getProjectString(project, "description")}
+              </p>
             </div>
 
             <ProjectCarousel images={project.images} />
 
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+            <div className="flex-1 flex flex-col gap-4 overflow-hidden min-h-[300px]">
               <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
                 <button
                   type="button"
@@ -220,5 +204,25 @@ export function ProjectExpandedCard({
         </div>
       ) : null}
     </AnimatePresence>
+  );
+}
+
+function ProjectButtons({ project }: { project: Project }) {
+  return (
+    <div className="flex w-fit shrink-0 gap-2">
+      <BaseButton
+        href={project.websiteUrl}
+        className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white"
+        theme="green"
+      >
+        Visit <GlobeIcon className="size-5" />
+      </BaseButton>
+      <GitlabButton
+        href={project.gitlabUrl}
+        width={20}
+        height={20}
+        className="bg-orange-100 rounded-full p-2 hover:bg-orange-200"
+      />
+    </div>
   );
 }
