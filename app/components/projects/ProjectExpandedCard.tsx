@@ -131,7 +131,9 @@ export function ProjectExpandedCard({
                     size={30}
                   />
                 </h3>
-                <ProjectButtons project={project} />
+                <div className="hidden sm:block">
+                  <ProjectButtons project={project} />
+                </div>
               </div>
               {project.details?.subtitle || project.details?.subtitleKey ? (
                 <p className="text-neutral-700 dark:text-neutral-300 font-medium">
@@ -141,6 +143,9 @@ export function ProjectExpandedCard({
               <p className="text-neutral-600 dark:text-neutral-400">
                 {getProjectString(project, "description")}
               </p>
+              <div className="block sm:hidden mt-3">
+                <ProjectButtons project={project} />
+              </div>
             </div>
 
             <ProjectCarousel images={project.images} />

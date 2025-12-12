@@ -21,7 +21,7 @@ export default function Contact({ isLaptop = false }: { isLaptop?: boolean }) {
   
   const sectionClasses = [
     "max-w-7xl mx-auto",
-    isLaptop ? "h-screen flex-none snap-center flex items-center justify-center py-0" : "py-20"
+    isLaptop ? "h-screen flex-none snap-center flex items-center justify-center py-0" : "pt-20 pb-48"
   ].filter(Boolean).join(" ");
 
   return (
