@@ -6,6 +6,7 @@ import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
 import { TechStackCircles } from "./TechStackCircles";
+import { GlobeIcon } from "lucide-react";
 
 /**
  * Project card component with hover effects and focus blur.
@@ -56,6 +57,13 @@ export function ProjectFocusCard({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const openProjectUrl = useMemo(() => {
+    const isValid = (url?: string) => Boolean(url && url !== "#" && url.trim().length > 0);
+    if (isValid(project.websiteUrl)) return project.websiteUrl;
+    if (isValid(project.gitlabUrl)) return project.gitlabUrl;
+    return null;
+  }, [project.gitlabUrl, project.websiteUrl]);
 
   // Select theme-appropriate cover image (light/dark variants)
   // Prevents hydration mismatch by using light theme during SSR
@@ -146,6 +154,22 @@ export function ProjectFocusCard({
           size={28}
         />
       </div>
+
+      {/* Open project icon - opposite side of the tech stack circles */}
+      {openProjectUrl ? (
+        <a
+          href={openProjectUrl}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          onMouseEnter={() => onCursorModeChange?.("default")}
+          className="absolute top-3 right-3 z-[5] inline-flex items-center justify-center size-9 rounded-full bg-black/35 hover:bg-black/55 text-white backdrop-blur-sm transition-colors"
+          aria-label="Open project"
+          title="Open project"
+        >
+          <GlobeIcon className="size-5" />
+        </a>
+      ) : null}
 
       <div
         className={cn(
