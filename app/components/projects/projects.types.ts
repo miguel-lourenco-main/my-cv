@@ -124,6 +124,8 @@ export type Project = {
   descriptionKey?: string;
   /** Array of image paths (first one is the cover image) */
   images: string[];
+  /** Optional project logo path, e.g. '/projects/logos/project-logo.svg' */
+  logo?: string;
   /** Project website URL */
   websiteUrl: string;
   /** GitLab repository URL */

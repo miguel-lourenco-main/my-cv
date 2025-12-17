@@ -171,6 +171,7 @@ export const projects: Project[] = [
     ],
     websiteUrl: "https://sonora-d09e63.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/sonora",
+    logo: "/projects/logos/sonora.svg",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
@@ -217,6 +218,7 @@ export const projects: Project[] = [
     ],
     websiteUrl: "https://agentichub-64abdc.gitlab.io",
     gitlabUrl: "https://gitlab.com/public-work4/agentichub",
+    logo: "/projects/logos/agentic_hub.svg",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
@@ -266,6 +268,7 @@ export const projects: Project[] = [
     ],
     websiteUrl: "https://o-guardanapo.site",
     gitlabUrl: "https://gitlab.com/miguel-lourenco-main/o-guardanapo",
+    logo: "/projects/logos/o_guardanapo.png",
     technologies: [
       { name: "Next.js 15.0.5", icon: "/logos/nextjs.svg" },
       { name: "TypeScript 5.7.2", icon: "/logos/typescript.svg" },
@@ -329,6 +332,7 @@ export const projects: Project[] = [
     ],
     websiteUrl: "https://ui-components-5218c2.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/ui-components",
+    logo: "/projects/logos/ui_components.svg",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
@@ -372,6 +376,7 @@ export const projects: Project[] = [
     ],
     websiteUrl: "https://cash-register-a85839.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/cash_register",
+    logo: "/projects/logos/cash_register.png",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },

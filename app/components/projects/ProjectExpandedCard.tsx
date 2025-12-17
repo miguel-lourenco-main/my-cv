@@ -97,6 +97,13 @@ export function ProjectExpandedCard({
             <div className="flex flex-col items-start gap-1 w-full">
               <div className="flex items-center justify-between mb-2 sm:mb-3 w-full">
                 <h3 className="flex flex-wrap items-center gap-2 text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
+                  {project.logo && (
+                    <img
+                      src={project.logo}
+                      alt={getProjectString(project, "title")}
+                      className="size-8 object-contain"
+                    />
+                  )}
                   {getProjectString(project, "title")}
                   <TechStackCircles
                     technologies={project.technologies}

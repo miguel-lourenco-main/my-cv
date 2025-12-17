@@ -178,7 +178,14 @@ export function ProjectFocusCard({
         )}
       >
         <div className="space-y-1">
-          <div className="text-lg md:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+          <div className="flex items-center gap-2 text-lg md:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+            {project.logo && (
+              <img
+                src={project.logo}
+                alt={getProjectString(project, 'title')}
+                className="size-6 md:size-7 object-contain"
+              />
+            )}
             {getProjectString(project, 'title')}
           </div>
           <div className="text-xs md:text-sm text-neutral-200/90">
