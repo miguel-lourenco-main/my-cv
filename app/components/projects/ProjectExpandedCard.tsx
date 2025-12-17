@@ -205,7 +205,7 @@ export function ProjectExpandedCard({
                 // Desktop keeps the existing "fill remaining space" behavior
                 "sm:flex-1 sm:gap-4",
                 // Mobile: increase size, but keep it reasonable (two panes)
-                "max-sm:min-h-[95svh]"
+                "max-sm:min-h-[90svh]"
               )}
             >
               {/* Tabs pane (mobile: 1 viewport tall) */}
@@ -249,7 +249,7 @@ export function ProjectExpandedCard({
                 className="relative flex-1 min-h-0"
               >
                 {activeTab === "info" && (
-                  <div className="flex items-center justify-center h-full overflow-y-auto pr-1 space-y-6">
+                  <div className="h-full overflow-y-auto pr-2 space-y-6 mt-8">
                     <GitlabReadmeViewer projectId={project.id} />
                   </div>
                 )}
