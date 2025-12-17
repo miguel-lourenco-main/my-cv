@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "../../lib/hooks/use-outside-click";
 import type { Project } from "./projects.types";
 import { ProjectCarousel } from "./ProjectCarousel";
-import { Briefcase, GlobeIcon, User, X } from "lucide-react";
+import { Briefcase, ChevronDown, GlobeIcon, User, X } from "lucide-react";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
 import { useI18n } from "../../lib/i18n";
@@ -41,9 +41,12 @@ export function ProjectExpandedCard({
 }) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
+  const tabContentAnchorRef = useRef<HTMLDivElement>(null);
   const { getProjectString, getProjectArray, t } = useI18n();
 
   const [activeTab, setActiveTab] = useState<"info" | "experience">("info");
+  const [showScrollToContentButton, setShowScrollToContentButton] =
+    useState<boolean>(true);
 
   // Handle keyboard navigation and prevent body scroll when modal is open
   useEffect(() => {
@@ -62,6 +65,39 @@ export function ProjectExpandedCard({
       document.body.style.overflow = "auto";
     };
   }, [project, onClose]);
+
+  // Reset mobile "scroll hint" state when opening a project
+  useEffect(() => {
+    if (!project) return;
+    setActiveTab("info");
+    setShowScrollToContentButton(true);
+  }, [project?.id]);
+
+  // Hide the scroll-to-content button once the user reaches the bottom of the modal
+  useEffect(() => {
+    if (!project) return;
+    const container = ref.current;
+    if (!container) return;
+
+    const update = () => {
+      // "Near bottom" threshold so it hides when the user is effectively done
+      const thresholdPx = 24;
+      const atBottom =
+        container.scrollTop + container.clientHeight >=
+        container.scrollHeight - thresholdPx;
+
+      setShowScrollToContentButton(!atBottom);
+    };
+
+    container.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    // Run once on mount in case we're already at bottom
+    update();
+    return () => {
+      container.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [project]);
 
   // Close modal when clicking outside
   useOutsideClick(ref, () => onClose());
@@ -94,6 +130,39 @@ export function ProjectExpandedCard({
             >
               <X className="size-4 text-gray-600 dark:text-gray-400" />
             </button>
+
+            {/* Scroll hint button (mobile only): visible immediately, doesn't trigger outside-click */}
+            {showScrollToContentButton && (
+              <div className="fixed inset-x-0 bottom-6 z-[60] flex justify-center pointer-events-none sm:hidden">
+                <motion.button
+                  type="button"
+                  className={cn(
+                    "pointer-events-auto",
+                    "inline-flex items-center justify-center size-11 rounded-full",
+                    "bg-white/90 dark:bg-neutral-900/90 hover:bg-white/95 dark:hover:bg-neutral-900/95",
+                    "border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700",
+                    "shadow-md hover:shadow-lg",
+                    "text-neutral-700 dark:text-neutral-200 hover:text-neutral-800 dark:hover:text-neutral-100"
+                  )}
+                  aria-label="Scroll to content"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  onClick={() => {
+                    // Scroll the modal to the bottom; button will auto-hide there
+                    ref.current?.scrollTo({
+                      top: ref.current.scrollHeight,
+                      behavior: "smooth",
+                    });
+                  }}
+                >
+                  <ChevronDown className="size-5" />
+                </motion.button>
+              </div>
+            )}
             <div className="flex flex-col items-start gap-1 w-full">
               <div className="flex items-center justify-between mb-2 sm:mb-3 w-full">
                 <h3 className="flex flex-wrap items-center gap-2 text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
@@ -130,40 +199,55 @@ export function ProjectExpandedCard({
             <ProjectCompanyClientInfo project={project} />
             <ProjectCarousel images={project.images} />
 
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden min-h-[300px]">
-              <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
-                <button
-                  type="button"
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium border-b-2 transition-colors",
-                    activeTab === "info"
-                      ? "border-green-500 text-neutral-900 dark:text-neutral-50"
-                      : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
-                  )}
-                  onClick={() => setActiveTab("info")}
-                >
-                  {tp("projectInfoHeading")}
-                </button>
+            <div
+              className={cn(
+                "flex flex-col overflow-hidden min-h-[300px]",
+                // Desktop keeps the existing "fill remaining space" behavior
+                "sm:flex-1 sm:gap-4",
+                // Mobile: increase size, but keep it reasonable (two panes)
+                "max-sm:min-h-[95svh]"
+              )}
+            >
+              {/* Tabs pane (mobile: 1 viewport tall) */}
+              <div className="relative flex flex-col gap-4 max-sm:h-[60svh]">
+                <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
+                  <button
+                    type="button"
+                    className={cn(
+                      "px-3 py-1.5 text-sm font-medium border-b-2 transition-colors",
+                      activeTab === "info"
+                        ? "border-green-500 text-neutral-900 dark:text-neutral-50"
+                        : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+                    )}
+                    onClick={() => setActiveTab("info")}
+                  >
+                    {tp("projectInfoHeading")}
+                  </button>
 
-                {project.details?.personalExperience &&
-                  (project.details.personalExperience.text ||
-                    project.details.personalExperience.textKey) && (
-                    <button
-                      type="button"
-                      className={cn(
-                        "px-3 py-1.5 text-sm font-medium border-b-2 transition-colors",
-                        activeTab === "experience"
-                          ? "border-green-500 text-neutral-900 dark:text-neutral-50"
-                          : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
-                      )}
-                      onClick={() => setActiveTab("experience")}
-                    >
-                      {tp("personalExperienceHeading")}
-                    </button>
-                  )}
+                  {project.details?.personalExperience &&
+                    (project.details.personalExperience.text ||
+                      project.details.personalExperience.textKey) && (
+                      <button
+                        type="button"
+                        className={cn(
+                          "px-3 py-1.5 text-sm font-medium border-b-2 transition-colors",
+                          activeTab === "experience"
+                            ? "border-green-500 text-neutral-900 dark:text-neutral-50"
+                            : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+                        )}
+                        onClick={() => setActiveTab("experience")}
+                      >
+                        {tp("personalExperienceHeading")}
+                      </button>
+                    )}
+                </div>
               </div>
 
-              <div className="relative flex-1 min-h-0">
+              {/* Content pane (mobile: 1 viewport tall) */}
+              <div
+                ref={tabContentAnchorRef}
+                className="relative max-sm:h-[60svh] sm:flex-1 sm:min-h-0"
+              >
                 {activeTab === "info" && (
                   <div className="h-full overflow-y-auto pr-1 space-y-6">
                     <GitlabReadmeViewer projectId={project.id} />
