@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "../../lib/hooks/use-outside-click";
 import type { Project } from "./projects.types";
 import { ProjectCarousel } from "./ProjectCarousel";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { Briefcase, GlobeIcon, User, X } from "lucide-react";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
@@ -13,7 +12,8 @@ import { useI18n } from "../../lib/i18n";
 import { cn } from "@/app/lib/utils";
 import { GitlabReadmeViewer } from "./GitlabReadmeViewer";
 import Image from "next/image";
-import { CompanyClientCircles } from "./CompanyClientCircles";
+import { TechStackCircles } from "./TechStackCircles";
+import { ProjectCompanyClientInfo } from "./ProjectCompanyClientInfo";
 
 /**
  * Expanded project card modal component.
@@ -81,7 +81,7 @@ export function ProjectExpandedCard({
           <motion.div
             ref={ref}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
-            className="relative w-full max-w-[900px] h-full md:max-h-[90%] p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-scroll shadow-lg z-50"
+            className="relative w-full max-w-[900px] h-full md:max-h-[90%] p-4 sm:p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-y-auto shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
@@ -95,40 +95,12 @@ export function ProjectExpandedCard({
               <X className="size-4 text-gray-600 dark:text-gray-400" />
             </button>
             <div className="flex flex-col items-start gap-1 w-full">
-              <div className="flex items-center justify-between mb-3 w-full">
-                <h3 className="flex items-center gap-2 text-2xl font-bold text-neutral-800 dark:text-neutral-100">
+              <div className="flex items-center justify-between mb-2 sm:mb-3 w-full">
+                <h3 className="flex flex-wrap items-center gap-2 text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
                   {getProjectString(project, "title")}
-                  <CompanyClientCircles
-                    leadingCircles={
-                      project.type === "personal" || project.type === "hybrid"
-                        ? [
-                            {
-                              name: "Personal",
-                              iconNode: (
-                                <User
-                                  className="text-black"
-                                  size={14}
-                                />
-                              ),
-                              tooltipText:
-                                project.type === "hybrid"
-                                  ? "Project personal continuation"
-                                  : "Personal project",
-                            },
-                          ]
-                        : []
-                    }
-                    company={
-                      project.type === "professional" || project.type === "hybrid"
-                        ? project.company
-                        : undefined
-                    }
-                    clients={
-                      project.type === "professional" || project.type === "hybrid"
-                        ? project.clients
-                        : undefined
-                    }
-                    size={30}
+                  <TechStackCircles
+                    technologies={project.technologies}
+                    size={28}
                   />
                 </h3>
                 <div className="hidden sm:block">
@@ -148,6 +120,7 @@ export function ProjectExpandedCard({
               </div>
             </div>
 
+            <ProjectCompanyClientInfo project={project} />
             <ProjectCarousel images={project.images} />
 
             <div className="flex-1 flex flex-col gap-4 overflow-hidden min-h-[300px]">

@@ -130,7 +130,6 @@ export const projects: Project[] = [
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "LLM", icon: "/logos/llm.svg" },
-      { name: "File Processing", icon: "/logos/file_processing.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -173,9 +172,10 @@ export const projects: Project[] = [
     websiteUrl: "https://sonora-d09e63.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/sonora",
     technologies: [
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -218,9 +218,10 @@ export const projects: Project[] = [
     websiteUrl: "https://agentichub-64abdc.gitlab.io",
     gitlabUrl: "https://gitlab.com/public-work4/agentichub",
     technologies: [
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -266,9 +267,12 @@ export const projects: Project[] = [
     websiteUrl: "https://o-guardanapo.site",
     gitlabUrl: "https://gitlab.com/miguel-lourenco-main/o-guardanapo",
     technologies: [
-      { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
-      { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Next.js 15.0.5", icon: "/logos/nextjs.svg" },
+      { name: "TypeScript 5.7.2", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS 3.4.16", icon: "/logos/tailwind_css.svg" },
+      { name: "Supabase 2.22.12", icon: "/logos/supabase.svg" },
+      { name: "Playwright 1.51.1", icon: "/logos/playwright.svg" },
+      { name: "Turbo 2.3.3", icon: "/logos/turborepo-logo.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -326,9 +330,12 @@ export const projects: Project[] = [
     websiteUrl: "https://ui-components-5218c2.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/ui-components",
     technologies: [
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "Monaco Editor", icon: "/logos/monaco.svg" },
+      { name: "Playwright", icon: "/logos/playwright.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -366,9 +373,11 @@ export const projects: Project[] = [
     websiteUrl: "https://cash-register-a85839.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/cash_register",
     technologies: [
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "React", icon: "/logos/react.svg" },
-      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
+      { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "Supabase", icon: "/logos/supabase.svg" },
     ],
     details: {
       subtitleKey: "subtitle",

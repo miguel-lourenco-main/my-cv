@@ -55,7 +55,8 @@ export default function HomeClient({ greeting }: { greeting: string }) {
   // Only apply scroll snap if user hasn't reduced motion
   const shouldUseScrollSnap = isLaptop && !reducedMotion;
   const containerClasses = [
-    "flex flex-col relative z-10 transition-opacity duration-300 overflow-y-auto h-screen gap-y-48 xl:gap-y-64 pb-12",
+    "flex flex-col relative z-10 transition-opacity duration-300 overflow-y-auto h-full gap-y-48 xl:gap-y-64 pb-12",
+    // "mandatory" forces snapping even when far from a snap point; "proximity" only snaps when close
     shouldUseScrollSnap && "snap-y snap-mandatory",
     isLaptop ? "" : "pt-48 xl:pt-64 2xl:pt-72",
     "px-4 sm:px-6 lg:px-8",

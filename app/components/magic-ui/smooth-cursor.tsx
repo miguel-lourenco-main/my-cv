@@ -193,6 +193,7 @@ export function SmoothCursor({
         stiffness: 400,
         damping: 30,
       }}
+      className="md:block hidden"
     >
       {cursorMode === 'default' ? <DefaultCursorSVG /> : <ViewCursorSVG />}
     </motion.div>

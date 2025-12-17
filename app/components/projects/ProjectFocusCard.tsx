@@ -5,8 +5,7 @@ import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
-import { User } from "lucide-react";
-import { CompanyClientCircles } from "./CompanyClientCircles";
+import { TechStackCircles } from "./TechStackCircles";
 
 /**
  * Project card component with hover effects and focus blur.
@@ -142,23 +141,8 @@ export function ProjectFocusCard({
 
       {/* Project type badge and company/client circles - always visible */}
       <div className="absolute top-3 left-3 z-[5] flex items-center gap-2 flex-wrap">
-        <CompanyClientCircles
-          leadingCircles={
-            project.type === "personal" || project.type === "hybrid"
-              ? [
-                  {
-                    name: "Personal",
-                    iconNode: <User className="text-black" size={14} />,
-                    tooltipText:
-                      project.type === "hybrid"
-                        ? "Project personal continuation"
-                        : "Personal project",
-                  },
-                ]
-              : []
-          }
-          company={project.type === "professional" || project.type === "hybrid" ? project.company : undefined}
-          clients={project.type === "professional" || project.type === "hybrid" ? project.clients : undefined}
+        <TechStackCircles
+          technologies={project.technologies}
           size={28}
         />
       </div>

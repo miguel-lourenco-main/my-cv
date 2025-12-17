@@ -38,7 +38,7 @@ export default function Projects({
   // Build section classes with conditional laptop styling
   const sectionClasses = [
     "max-w-[98%] xl:max-w-7xl 3xl:max-w-10xl w-full mx-auto",
-    isLaptop ? "h-screen flex-none snap-center flex flex-col" : ""
+    isLaptop ? "flex-1 snap-start flex flex-col pt-16 pb-[40rem]" : ""
   ].filter(Boolean).join(" ");
 
   return (
@@ -54,7 +54,7 @@ export default function Projects({
         </RevealStagger>
       </div>
 
-      <div className={isLaptop ? "flex-1 overflow-y-auto min-h-0" : ""}>
+      <div className={isLaptop ? "flex-1 min-h-0" : ""}>
         <Reveal type="fade">
           <ProjectGrid
             projects={projectsData}
