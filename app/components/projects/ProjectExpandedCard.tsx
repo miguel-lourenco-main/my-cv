@@ -209,7 +209,7 @@ export function ProjectExpandedCard({
               )}
             >
               {/* Tabs pane (mobile: 1 viewport tall) */}
-              <div className="relative flex flex-col gap-4 max-sm:h-[60svh]">
+              <div className="relative flex flex-col gap-4">
                 <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
                   <button
                     type="button"
@@ -246,10 +246,10 @@ export function ProjectExpandedCard({
               {/* Content pane (mobile: 1 viewport tall) */}
               <div
                 ref={tabContentAnchorRef}
-                className="relative max-sm:h-[60svh] sm:flex-1 sm:min-h-0"
+                className="relative flex-1 min-h-0"
               >
                 {activeTab === "info" && (
-                  <div className="h-full overflow-y-auto pr-1 space-y-6">
+                  <div className="flex items-center justify-center h-full overflow-y-auto pr-1 space-y-6">
                     <GitlabReadmeViewer projectId={project.id} />
                   </div>
                 )}
