@@ -1,9 +1,58 @@
 import { Project } from "./projects.types";
+import { getProjectImages } from "../../lib/get-project-images";
+
+type ProjectData = Omit<Project, "images"> & { images?: string[]; imagesFirst?: string[] };
+
+function applyImagesFirst(images: string[], imagesFirst?: string[]): string[] {
+  if (!imagesFirst || imagesFirst.length === 0) return images;
+
+  const picked: string[] = [];
+  const pickedSet = new Set<string>();
+
+  const tryPick = (wanted: string) => {
+    const normalizedWanted = wanted.startsWith("/") ? wanted : wanted.trim();
+    const match = images.find((img) => {
+      if (pickedSet.has(img)) return false;
+      if (img === normalizedWanted) return true;
+      if (!normalizedWanted.startsWith("/")) {
+        // Allow matching by filename
+        return img.endsWith(`/${normalizedWanted}`) || img.endsWith(normalizedWanted);
+      }
+      return false;
+    });
+    if (match) {
+      picked.push(match);
+      pickedSet.add(match);
+    }
+  };
+
+  imagesFirst.forEach(tryPick);
+
+  return [...picked, ...images.filter((img) => !pickedSet.has(img))];
+}
+
+/**
+ * Helper function to resolve project images.
+ * If images array is manually provided, use it. Otherwise, auto-detect from directory.
+ */
+function resolveProjectImages(project: ProjectData): string[] {
+  // Manual images array takes priority
+  const baseImages =
+    project.images && project.images.length > 0
+      ? project.images
+      : getProjectImages(project.id, project.imagesDir);
+
+  return applyImagesFirst(baseImages, project.imagesFirst);
+  }
 
 /**
  * Project data array with translatable content.
  * Uses i18n keys for internationalization - actual strings are in locale JSON files.
  * Images support theme variants with _L.png (light) and _D.png (dark) suffixes.
+ * 
+ * Images are automatically detected from /public/projects_images/{id}/ unless:
+ * - A manual images array is provided (takes priority)
+ * - A custom imagesDir is specified
  * 
  * @example
  * ```ts
@@ -11,7 +60,7 @@ import { Project } from "./projects.types";
  * <ProjectGrid projects={projects} />
  * ```
  */
-export const projects: Project[] = [
+const projectsData: ProjectData[] = [
   {
     id: "edgen-chat",
     type: "professional",
@@ -31,6 +80,8 @@ export const projects: Project[] = [
       "/projects_images/edgen-chat/main_L.png",
       "/projects_images/edgen-chat/main_D.png",
     ],
+    // Top picks (based on previous manual ordering)
+    imagesFirst: ["main_L.png", "main_D.png"],
     websiteUrl: "#",
     gitlabUrl: "#",
     technologies: [
@@ -77,6 +128,8 @@ export const projects: Project[] = [
       "/projects_images/edgen-code/main_L.png",
       "/projects_images/edgen-code/main_D.png",
     ],
+    // Top picks (based on previous manual ordering)
+    imagesFirst: ["main_L.png", "main_D.png"],
     websiteUrl: "#",
     gitlabUrl: "#",
     technologies: [
@@ -119,9 +172,15 @@ export const projects: Project[] = [
     }],
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/edgen-translate/main_L.png",
-      "/projects_images/edgen-translate/main_D.png",
+    // Images auto-detected from /public/projects_images/edgen-translate/
+    // Top 3 per theme (based on previous manual ordering)
+    imagesFirst: [
+      "edgen-translate_hero_L.png",
+      "edgen-translate_hero_dnd_L.png",
+      "edgen-translate_hero_feature_preview_L.png",
+      "edgen-translate_hero_D.png",
+      "edgen-translate_hero_dnd_D.png",
+      "edgen-translate_hero_feature_preview_D.png",
     ],
     websiteUrl: "#",
     gitlabUrl: "#",
@@ -161,13 +220,15 @@ export const projects: Project[] = [
     clients: [], // Add client icons here when provided
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/sonora/main_page_L.png",
-      "/projects_images/sonora/main_page_D.png",
-      "/projects_images/sonora/voices_page_L.png",
-      "/projects_images/sonora/voices_page_D.png",
-      "/projects_images/sonora/story_page_L.png",
-      "/projects_images/sonora/story_page_D.png",
+    // Images auto-detected from /public/projects_images/sonora/
+    // Top 3 per theme (based on previous manual ordering)
+    imagesFirst: [
+      "main_page_L.png",
+      "voices_page_L.png",
+      "story_page_L.png",
+      "main_page_D.png",
+      "voices_page_D.png",
+      "story_page_D.png",
     ],
     websiteUrl: "https://sonora-d09e63.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/sonora",
@@ -204,17 +265,15 @@ export const projects: Project[] = [
     clients: [], // Add client icons here when provided
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/agentic-hub/main_page_L.png",
-      "/projects_images/agentic-hub/main_page_D.png",
-      "/projects_images/agentic-hub/agents_list_L.png",
-      "/projects_images/agentic-hub/agents_list_D.png",
-      "/projects_images/agentic-hub/agent_info_L.png",
-      "/projects_images/agentic-hub/agent_info_D.png",
-      "/projects_images/agentic-hub/agent_hire_L.png",
-      "/projects_images/agentic-hub/agent_hire_D.png",
-      "/projects_images/agentic-hub/agent_invest_L.png",
-      "/projects_images/agentic-hub/agent_invest_D.png",
+    // Images auto-detected from /public/projects_images/agentic-hub/
+    // Top 3 per theme (based on previous manual ordering)
+    imagesFirst: [
+      "main_page_L.png",
+      "agents_list_L.png",
+      "agent_info_L.png",
+      "main_page_D.png",
+      "agents_list_D.png",
+      "agent_info_D.png",
     ],
     websiteUrl: "https://agentichub-64abdc.gitlab.io",
     gitlabUrl: "https://gitlab.com/public-work4/agentichub",
@@ -250,21 +309,15 @@ export const projects: Project[] = [
     type: "personal",
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/o-guardanapo/hero_L.png",
-      "/projects_images/o-guardanapo/hero_D.png",
-      "/projects_images/o-guardanapo/hero_menu_end_L.png",
-      "/projects_images/o-guardanapo/hero_menu_end_D.png",
-      "/projects_images/o-guardanapo/product_page_L.png",
-      "/projects_images/o-guardanapo/product_page_D.png",
-      "/projects_images/o-guardanapo/our_history_L.png",
-      "/projects_images/o-guardanapo/our_history_D.png",
-      "/projects_images/o-guardanapo/contact_us_card_L.png",
-      "/projects_images/o-guardanapo/contact_us_card_D.png",
-      "/projects_images/o-guardanapo/contact_us_page_L.png",
-      "/projects_images/o-guardanapo/contact_us_page_D.png",
-      "/projects_images/o-guardanapo/admin_menu_page_L.png",
-      "/projects_images/o-guardanapo/admin_menu_page_D.png",
+    // Images auto-detected from /public/projects_images/o-guardanapo/
+    // Top 3 per theme (based on previous manual ordering)
+    imagesFirst: [
+      "hero_L.png",
+      "hero_menu_end_L.png",
+      "product_page_L.png",
+      "hero_D.png",
+      "hero_menu_end_D.png",
+      "product_page_D.png",
     ],
     websiteUrl: "https://o-guardanapo.site",
     gitlabUrl: "https://gitlab.com/miguel-lourenco-main/o-guardanapo",
@@ -301,34 +354,15 @@ export const projects: Project[] = [
     type: "personal",
     titleKey: "title",
     descriptionKey: "description",
-    // Translation keys for this project
-    images: [
-      "/projects_images/ui-components/hero_start_L.png",
-      "/projects_images/ui-components/hero_start_D.png",
-      "/projects_images/ui-components/hero_end_L.png",
-      "/projects_images/ui-components/hero_end_D.png",
-      "/projects_images/ui-components/full_playground_L.png",
-      "/projects_images/ui-components/full_playground_D.png",
-      "/projects_images/ui-components/playground_start_L.png",
-      "/projects_images/ui-components/playground_start_D.png",
-      "/projects_images/ui-components/theme_start_L.png",
-      "/projects_images/ui-components/theme_start_D.png",
-      "/projects_images/ui-components/theme_middle_L.png",
-      "/projects_images/ui-components/theme_middle_D.png",
-      "/projects_images/ui-components/theme_end_L.png",
-      "/projects_images/ui-components/theme_end_D.png",
-      "/projects_images/ui-components/themes_grid_L.png",
-      "/projects_images/ui-components/themes_grid_D.png",
-      "/projects_images/ui-components/themes_gallery_L.png",
-      "/projects_images/ui-components/themes_gallery_D.png",
-      "/projects_images/ui-components/component_list_L.png",
-      "/projects_images/ui-components/component_list_D.png",
-      "/projects_images/ui-components/component_start_L.png",
-      "/projects_images/ui-components/component_start_D.png",
-      "/projects_images/ui-components/component_examples_L.png",
-      "/projects_images/ui-components/component_examples_D.png",
-      "/projects_images/ui-components/component_end_L.png",
-      "/projects_images/ui-components/component_end_D.png",
+    // Images auto-detected from /public/projects_images/ui-components/
+    // Top 3 per theme (based on previous manual ordering)
+    imagesFirst: [
+      "hero_start_L.png",
+      "hero_end_L.png",
+      "full_playground_L.png",
+      "hero_start_D.png",
+      "hero_end_D.png",
+      "full_playground_D.png",
     ],
     websiteUrl: "https://ui-components-5218c2.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/ui-components",
@@ -366,13 +400,15 @@ export const projects: Project[] = [
     type: "personal",
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/cash-register/register_L.png",
-      "/projects_images/cash-register/register_D.png",
-      "/projects_images/cash-register/orders_list_L.png",
-      "/projects_images/cash-register/orders_list_D.png",
-      "/projects_images/cash-register/order_info_L.png",
-      "/projects_images/cash-register/order_info_D.png",
+    // Images auto-detected from /public/projects_images/cash-register/
+    // Top 3 per theme (based on previous manual ordering)
+    imagesFirst: [
+      "register_L.png",
+      "orders_list_L.png",
+      "order_info_L.png",
+      "register_D.png",
+      "orders_list_D.png",
+      "order_info_D.png",
     ],
     websiteUrl: "https://cash-register-a85839.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/cash_register",
@@ -405,4 +441,12 @@ export const projects: Project[] = [
   },
 ];
 
+/**
+ * Processed projects with resolved images.
+ * Images are automatically detected from directories if not manually specified.
+ */
+export const projects: Project[] = projectsData.map((project) => ({
+  ...project,
+  images: resolveProjectImages(project) || [], // Ensure images is always an array
+}));
 

@@ -193,6 +193,17 @@ async function main() {
   }
 
   for (const { id, gitlabUrl } of projects) {
+    // Skip placeholder/empty GitLab URLs (common for private/NDA projects).
+    if (
+      typeof gitlabUrl !== "string" ||
+      gitlabUrl.trim().length === 0 ||
+      gitlabUrl.trim() === "#" ||
+      gitlabUrl.trim().toLowerCase() === "n/a"
+    ) {
+      console.log(`[readmes] Skipping ${id} (gitlabUrl=${JSON.stringify(gitlabUrl)})`);
+      continue;
+    }
+
     const targetPath = path.join(readmesDir, `${id}.md`);
     let newContent = null;
     let lastError = null;

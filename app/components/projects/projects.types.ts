@@ -122,8 +122,18 @@ export type Project = {
   description?: string;
   /** i18n key for description */
   descriptionKey?: string;
-  /** Array of image paths (first one is the cover image) */
+  /** Array of image paths (first one is the cover image). If not provided, images will be auto-detected from imagesDir. */
   images: string[];
+  /** Optional custom directory path for auto-detecting images (relative to /public). Defaults to /projects_images/{id}/ */
+  imagesDir?: string;
+  /**
+   * Optional list of image files/paths that should appear FIRST in the carousel, in the exact order provided.
+   * Any remaining images (auto-detected or manually provided) will appear after these.
+   *
+   * - Can be full public paths (e.g. '/projects_images/sonora/main_page_L.png')
+   * - Or just filenames (e.g. 'main_page_L.png')
+   */
+  imagesFirst?: string[];
   /** Optional project logo path, e.g. '/projects/logos/project-logo.svg' */
   logo?: string;
   /** Project website URL */
