@@ -56,6 +56,11 @@ export default function ProfileAvatar({
   alt = "Profile picture",
   imageClassName = "rounded-full",
 }: ProfileAvatarProps) {
+  // Don't render if using the placeholder image
+  if (src === "/placeholder.svg" || (typeof src === "string" && src.includes("placeholder.svg"))) {
+    return null;
+  }
+
   return (
     <motion.div layoutId={layoutId} className={className}>
       <Image

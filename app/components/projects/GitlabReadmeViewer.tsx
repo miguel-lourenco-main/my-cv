@@ -99,6 +99,9 @@ export function GitlabReadmeViewer({ projectId }: GitlabReadmeViewerProps) {
                  prose-a:text-green-600 dark:prose-a:text-green-400 prose-a:underline-offset-2 prose-a:no-underline hover:prose-a:underline
                  prose-code:text-sm prose-code:bg-neutral-100 dark:prose-code:bg-neutral-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                  prose-pre:bg-neutral-950 dark:prose-pre:bg-neutral-900
+                 prose-pre:rounded-lg prose-pre:px-4 prose-pre:py-3 prose-pre:overflow-x-auto prose-pre:shadow-sm
+                 prose-pre:text-neutral-100 dark:prose-pre:text-neutral-100
+                 [&_pre>code]:bg-transparent [&_pre>code]:p-0 [&_pre>code]:text-neutral-100 dark:[&_pre>code]:text-neutral-100 [&_pre>code]:rounded-none
                  prose-ul:list-disc prose-ol:list-decimal"
     >
       <ReactMarkdown
