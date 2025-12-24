@@ -45,10 +45,10 @@ export default function Hero({ showShared = true, greeting, isLaptop = false }: 
             imageClassName="rounded-xl object-cover"
           />
         )}
-        <div className={`flex flex-col items-center text-center ${isLaptop ? "gap-y-4" : "gap-y-6"}`}> 
+        <div className={`flex flex-col items-center text-center`}> 
           {showShared && <NameBadge layoutId="intro-name" greeting={greeting} />}
           <RevealStagger delay={2} interval={0.04}>
-            <div className={`text-xl sm:text-2xl text-slate-600 dark:text-slate-300 ${isLaptop ? "mb-6" : "mb-8"} max-w-2xl mx-auto`}>
+            <div className={`text-xl sm:text-2xl mt-24 text-slate-600 dark:text-slate-300 ${isLaptop ? "mb-6" : "mb-8"} max-w-2xl mx-auto`}>
               <p>
                 {th('intro1')}
               </p>

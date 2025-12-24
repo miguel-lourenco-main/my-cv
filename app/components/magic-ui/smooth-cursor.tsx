@@ -26,8 +26,8 @@ const RocketCursorSVG: FC<{ color?: string }> = ({ color }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="40"
-      height="40"
+      width="34"
+      height="34"
       viewBox="0 0 32 24"
       fill="none"
       stroke="currentColor"
@@ -197,8 +197,11 @@ export function SmoothCursor({
         position: "fixed",
         left: cursorX,
         top: cursorY,
-        translateX: "-58%",
-        translateY: "-65%",
+        // Anchor the mouse position to the rocket "nose" (tip) instead of the center.
+        // With a 40x40 SVG, the nose sits roughly at x=50% and y≈10%.
+        translateX: "-50%",
+        translateY: "-10%",
+        transformOrigin: "50% 10%",
         rotate: rotation,
         scale: scale,
         zIndex: 100,

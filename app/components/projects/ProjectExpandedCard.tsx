@@ -117,19 +117,13 @@ export function ProjectExpandedCard({
           <motion.div
             ref={ref}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
-            className="relative w-full max-w-[900px] h-full md:max-h-[90%] p-4 sm:p-8 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-y-auto shadow-lg z-50"
+            className="relative w-full scrollbar-none max-w-[900px] h-full md:max-h-[90%] p-4 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 md:rounded-3xl overflow-y-auto shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
           >
             {/* X button for screens smaller than xl */}
-            <button
-              onClick={onClose}
-              className="absolute top-2 right-2 xl:hidden flex items-center justify-center size-7 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Close"
-            >
-              <X className="size-4 text-gray-600 dark:text-gray-400" />
-            </button>
+            <ProjectCloseButton onClose={onClose} className="absolute top-4 right-4 md:hidden" />
             <div className="flex flex-col items-start gap-1 w-full">
               <div className="flex items-center justify-between mb-2 sm:mb-3 w-full">
                 <h3 className="flex flex-wrap items-center gap-2 text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
@@ -146,8 +140,9 @@ export function ProjectExpandedCard({
                     size={28}
                   />
                 </h3>
-                <div className="hidden xs:block">
+                <div className="flex items-center gap-4 justify-center">
                   <ProjectButtons project={project} />
+                  <ProjectCloseButton onClose={onClose} />
                 </div>
               </div>
               {project.details?.subtitle || project.details?.subtitleKey ? (
@@ -161,7 +156,7 @@ export function ProjectExpandedCard({
             </div>
 
             {/* On small screens (<500px): buttons and context side-by-side */}
-            <div className="flex xs:hidden items-center justify-center gap-3 mt-3">
+            <div className="flex md:hidden items-center justify-center gap-3 mt-3">
               <div className="flex-1 min-w-0">
                 <ProjectCompanyClientInfo project={project} />
               </div>
@@ -171,7 +166,7 @@ export function ProjectExpandedCard({
             </div>
 
             {/* On larger screens (>=500px): context appears below */}
-            <div className="hidden xs:block">
+            <div className="hidden md:block">
               <ProjectCompanyClientInfo project={project} />
             </div>
             <ProjectCarousel images={project.images} />
@@ -180,7 +175,7 @@ export function ProjectExpandedCard({
               className={cn(
                 "flex flex-col overflow-hidden min-h-[500px]",
                 // Desktop keeps the existing "fill remaining space" behavior
-                "sm:flex-1 sm:space-y-4",
+                "sm:flex-1 space-y-4",
                 // Mobile: increase size, but keep it reasonable (two panes)
                 "max-sm:min-h-[90svh]"
               )}
@@ -303,5 +298,17 @@ function ProjectButtons({ project }: { project: Project }) {
         className="bg-orange-100 rounded-full p-2 hover:bg-orange-200"
       />
     </div>
+  );
+}
+
+function ProjectCloseButton({ onClose, className }: { onClose: () => void, className?: string }) {
+  return (
+    <button
+      onClick={onClose}
+      className={cn(className, "flex items-center justify-center size-8 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-900 transition-colors")}
+      aria-label="Close"
+    >
+      <X className="size-4 text-gray-600 dark:text-gray-400" />
+    </button>
   );
 }

@@ -37,7 +37,7 @@ export function ProjectCompanyClientInfo({ project }: { project: Project }) {
   return (
     <div className="w-full">
       {/* Compact (<500px): icons/avatars only */}
-      <div className="inline-flex xs:hidden w-fit max-w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-950/30 p-3">
+      <div className="inline-flex md:hidden w-fit max-w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-950/30 p-3">
         <CompanyClientCircles
           className="justify-start"
           leadingCircles={leadingCircles}
@@ -48,7 +48,7 @@ export function ProjectCompanyClientInfo({ project }: { project: Project }) {
       </div>
 
       {/* Spacious (500px+): text + icons */}
-      <div className="hidden xs:block rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-950/30 p-4">
+      <div className="hidden md:block rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-950/30 p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <div className="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
