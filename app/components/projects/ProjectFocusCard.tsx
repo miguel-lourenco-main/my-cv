@@ -58,6 +58,31 @@ export function ProjectFocusCard({
     setMounted(true);
   }, []);
 
+  // Update fixed cursor position when card is hovered and window scrolls/resizes
+  useEffect(() => {
+    if (hovered !== index || !cardRef.current) return;
+
+    const updateFixedPosition = () => {
+      const rect = cardRef.current?.getBoundingClientRect();
+      if (rect) {
+        const bottomCenterX = rect.left + rect.width / 2;
+        const bottomCenterY = rect.bottom;
+        window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
+          detail: { x: bottomCenterX, y: bottomCenterY }
+        }));
+      }
+    };
+
+    updateFixedPosition();
+    window.addEventListener('scroll', updateFixedPosition, true);
+    window.addEventListener('resize', updateFixedPosition);
+
+    return () => {
+      window.removeEventListener('scroll', updateFixedPosition, true);
+      window.removeEventListener('resize', updateFixedPosition);
+    };
+  }, [hovered, index]);
+
   const openProjectUrl = useMemo(() => {
     const isValid = (url?: string) => Boolean(url && url !== "#" && url.trim().length > 0);
     if (isValid(project.websiteUrl)) return project.websiteUrl;
@@ -86,17 +111,39 @@ export function ProjectFocusCard({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
+    
+    // Fix cursor to bottom center of card when hovering
+    if (hovered === index) {
+      const bottomCenterX = rect.left + rect.width / 2;
+      const bottomCenterY = rect.bottom;
+      window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
+        detail: { x: bottomCenterX, y: bottomCenterY }
+      }));
+    }
   };
 
   const handleMouseEnter = () => {
     setHovered(index);
     onCursorModeChange?.('view');
+    // Calculate and set fixed position at bottom center
+    if (cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      const bottomCenterX = rect.left + rect.width / 2;
+      const bottomCenterY = rect.bottom;
+      window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
+        detail: { x: bottomCenterX, y: bottomCenterY }
+      }));
+    }
   };
 
   const handleMouseLeave = () => {
     setHovered(null);
     setMousePosition(null);
     onCursorModeChange?.('default');
+    // Clear fixed position
+    window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
+      detail: null
+    }));
   };
 
   return (

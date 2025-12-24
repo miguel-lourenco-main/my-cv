@@ -130,39 +130,6 @@ export function ProjectExpandedCard({
             >
               <X className="size-4 text-gray-600 dark:text-gray-400" />
             </button>
-
-            {/* Scroll hint button (mobile only): visible immediately, doesn't trigger outside-click */}
-            {showScrollToContentButton && (
-              <div className="fixed inset-x-0 bottom-6 z-[60] flex justify-center pointer-events-none sm:hidden">
-                <motion.button
-                  type="button"
-                  className={cn(
-                    "pointer-events-auto",
-                    "inline-flex items-center justify-center size-11 rounded-full",
-                    "bg-white/90 dark:bg-neutral-900/90 hover:bg-white/95 dark:hover:bg-neutral-900/95",
-                    "border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700",
-                    "shadow-md hover:shadow-lg",
-                    "text-neutral-700 dark:text-neutral-200 hover:text-neutral-800 dark:hover:text-neutral-100"
-                  )}
-                  aria-label="Scroll to content"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{
-                    duration: 1.2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  onClick={() => {
-                    // Scroll the modal to the bottom; button will auto-hide there
-                    ref.current?.scrollTo({
-                      top: ref.current.scrollHeight,
-                      behavior: "smooth",
-                    });
-                  }}
-                >
-                  <ChevronDown className="size-5" />
-                </motion.button>
-              </div>
-            )}
             <div className="flex flex-col items-start gap-1 w-full">
               <div className="flex items-center justify-between mb-2 sm:mb-3 w-full">
                 <h3 className="flex flex-wrap items-center gap-2 text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
@@ -279,6 +246,39 @@ export function ProjectExpandedCard({
                   )}
               </div>
             </div>
+
+            {/* Scroll hint button: pinned to the bottom of the scrollable card (not the viewport). */}
+            {showScrollToContentButton && (
+              <div className="sticky inset-x-0 bottom-6 z-[60] flex justify-center pointer-events-none">
+                <motion.button
+                  type="button"
+                  className={cn(
+                    "pointer-events-auto",
+                    "inline-flex items-center justify-center size-11 rounded-full",
+                    "bg-white/90 dark:bg-neutral-900/90 hover:bg-white/95 dark:hover:bg-neutral-900/95",
+                    "border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700",
+                    "shadow-md hover:shadow-lg",
+                    "text-neutral-700 dark:text-neutral-200 hover:text-neutral-800 dark:hover:text-neutral-100"
+                  )}
+                  aria-label="Scroll to content"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  onClick={() => {
+                    // Scroll the modal to the bottom; button will auto-hide there
+                    ref.current?.scrollTo({
+                      top: ref.current.scrollHeight,
+                      behavior: "smooth",
+                    });
+                  }}
+                >
+                  <ChevronDown className="size-5" />
+                </motion.button>
+              </div>
+            )}
           </motion.div>
         </div>
       ) : null}
