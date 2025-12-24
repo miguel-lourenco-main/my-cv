@@ -19,15 +19,10 @@ export interface SmoothCursorProps {
   cursorMode?: 'default' | 'view'
 }
 const DefaultCursorSVG: FC = () => {
-    return <RocketCursorSVG />;
-
-};
-
-const ViewCursorSVG: FC = () => {
-  return <div className="relative"><RocketCursorSVG /><EyeIcon className="absolute -bottom-2.5 right-0 size-5 transform -rotate-45" /></div>;
+  return <RocketCursorSVG />;
 };
   
-const RocketCursorSVG: FC = () => {
+const RocketCursorSVG: FC<{ color?: string }> = ({ color }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -40,9 +35,7 @@ const RocketCursorSVG: FC = () => {
       strokeLinecap="round"
       strokeLinejoin="round"
       className="lucide lucide-rocket"
-      style={{ 
-        color: 'hsl(var(--foreground))'
-      }}
+      style={{ color: color ?? "hsl(var(--foreground))" }}
     >
       {/* Rotate the rocket upright (lucide points 45deg by default) */}
       <g transform="rotate(-45 12 12)">
@@ -82,6 +75,7 @@ export function SmoothCursor({
   cursorMode = 'default',
 }: SmoothCursorProps) {
   const [isMoving, setIsMoving] = useState(false)
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
   const velocity = useRef<Position>({ x: 0, y: 0 })
   const lastUpdateTime = useRef(Date.now())
@@ -171,6 +165,31 @@ export function SmoothCursor({
       if (rafId) cancelAnimationFrame(rafId)
     }
   }, [cursorX, cursorY, rotation, scale])
+
+  // Track theme (for high-contrast cursor colors in light mode over dark images)
+  useEffect(() => {
+    const root = document.documentElement
+    const update = () => setIsDarkTheme(root.classList.contains("dark"))
+    update()
+
+    const observer = new MutationObserver(update)
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
+
+  const ViewCursorSVG: FC = () => {
+    // Light theme: cursor becomes white + shadow for contrast on dark project screenshots.
+    const viewColor = isDarkTheme ? "hsl(var(--foreground))" : "#ffffff"
+    return (
+      <div
+        className="relative"
+        style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.55))" }}
+      >
+        <RocketCursorSVG color={viewColor} />
+        <EyeIcon className="absolute -bottom-2.5 right-0 size-5 transform -rotate-45" style={{ color: viewColor }} />
+      </div>
+    )
+  }
 
   return (
     <motion.div

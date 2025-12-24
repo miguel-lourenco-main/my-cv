@@ -124,12 +124,8 @@ const projectsData: ProjectData[] = [
     }],
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/edgen-code/main_L.png",
-      "/projects_images/edgen-code/main_D.png",
-    ],
     // Top picks (based on previous manual ordering)
-    imagesFirst: ["main_L.png", "main_D.png"],
+    imagesFirst: ["sibicode_chat_L.png", "sibicode_chat_D.png"],
     websiteUrl: "#",
     gitlabUrl: "#",
     technologies: [

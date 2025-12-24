@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { cn } from "@/app/lib/utils";
 import type { ProjectClient, ProjectCompany } from "./projects.types";
+import { getInitials, resolveCompanyClientLogo } from "./company-client-logos";
 
 /**
  * Props for CompanyClientCircles component.
@@ -72,6 +73,7 @@ export function CompanyClientCircles({
     | {
         name: string;
         icon: string | null;
+        iconNode?: React.ReactNode;
         url?: string;
         relationship: CompanyRelationship;
       }
@@ -79,16 +81,32 @@ export function CompanyClientCircles({
     if (!company) return null;
 
     if (typeof company === "string") {
+      const resolved = resolveCompanyClientLogo(company);
       return {
         name: company,
-        icon: `/logos/${company.toLowerCase()}-logo.svg`,
+        icon: resolved,
+        iconNode: resolved ? undefined : (
+          <span className="text-[10px] font-semibold text-neutral-800">
+            {getInitials(company)}
+          </span>
+        ),
         relationship: "employer",
       };
     }
 
+    const resolved = resolveCompanyClientLogo(company.name);
     return {
       name: company.name,
-      icon: company.icon,
+      // Prefer registry-based icon to avoid mismatches when a wrong path is provided in data.
+      icon: resolved ?? company.icon ?? null,
+      iconNode:
+        resolved || company.icon
+          ? undefined
+          : (
+              <span className="text-[10px] font-semibold text-neutral-800">
+                {getInitials(company.name)}
+              </span>
+            ),
       url: company.url,
       relationship: company.relationship ?? "employer",
     };
@@ -114,6 +132,7 @@ export function CompanyClientCircles({
     entities.push({
       name: normalizedCompany.name,
       icon: normalizedCompany.icon,
+      iconNode: normalizedCompany.iconNode,
       url: normalizedCompany.url,
       isCompany: true,
     });
@@ -121,9 +140,18 @@ export function CompanyClientCircles({
 
   // Add clients
   clients.forEach((client) => {
+    const resolved = resolveCompanyClientLogo(client.name);
+    const icon = resolved ?? client.icon ?? null;
     entities.push({
       name: client.name,
-      icon: client.icon,
+      icon,
+      iconNode: icon
+        ? undefined
+        : (
+            <span className="text-[10px] font-semibold text-neutral-800">
+              {getInitials(client.name)}
+            </span>
+          ),
       url: client.url,
       isCompany: false,
     });

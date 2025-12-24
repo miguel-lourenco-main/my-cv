@@ -71,7 +71,7 @@ export function ProjectCarousel({ images }: { images: string[] }) {
 
   return (
     <div className="w-full">
-      <div className="relative overflow-hidden" ref={emblaRef}>
+      <div className="relative overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800" ref={emblaRef}>
         <div className="flex">
           {filteredImages.map((src, idx) => (
             <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>

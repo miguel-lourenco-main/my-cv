@@ -179,7 +179,7 @@ export function ProjectExpandedCard({
                     size={28}
                   />
                 </h3>
-                <div className="hidden sm:block">
+                <div className="hidden xs:block">
                   <ProjectButtons project={project} />
                 </div>
               </div>
@@ -191,17 +191,27 @@ export function ProjectExpandedCard({
               <p className="text-neutral-600 dark:text-neutral-400">
                 {getProjectString(project, "description")}
               </p>
-              <div className="block sm:hidden mt-3">
+            </div>
+
+            {/* On small screens (<500px): buttons and context side-by-side */}
+            <div className="flex xs:hidden items-center justify-center gap-3 mt-3">
+              <div className="flex-1 min-w-0">
+                <ProjectCompanyClientInfo project={project} />
+              </div>
+              <div className="flex-shrink-0">
                 <ProjectButtons project={project} />
               </div>
             </div>
 
-            <ProjectCompanyClientInfo project={project} />
+            {/* On larger screens (>=500px): context appears below */}
+            <div className="hidden xs:block">
+              <ProjectCompanyClientInfo project={project} />
+            </div>
             <ProjectCarousel images={project.images} />
 
             <div
               className={cn(
-                "flex flex-col overflow-hidden min-h-[300px]",
+                "flex flex-col overflow-hidden min-h-[500px]",
                 // Desktop keeps the existing "fill remaining space" behavior
                 "sm:flex-1 sm:gap-4",
                 // Mobile: increase size, but keep it reasonable (two panes)

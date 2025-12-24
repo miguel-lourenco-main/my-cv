@@ -25,6 +25,14 @@ export const projectsImagesManifest: Record<string, string[]> = {
     "/projects_images/cash-register/register_D.png",
     "/projects_images/cash-register/register_L.png"
   ],
+  "edgen-code": [
+    "/projects_images/edgen-code/sibicode_add_doc_D.png",
+    "/projects_images/edgen-code/sibicode_add_doc_L.png",
+    "/projects_images/edgen-code/sibicode_chat_D.png",
+    "/projects_images/edgen-code/sibicode_chat_L.png",
+    "/projects_images/edgen-code/sibicode_config_D.png",
+    "/projects_images/edgen-code/sibicode_config_L.png"
+  ],
   "edgen-translate": [
     "/projects_images/edgen-translate/edgen-translate_app_billing_D.png",
     "/projects_images/edgen-translate/edgen-translate_app_billing_L.png",

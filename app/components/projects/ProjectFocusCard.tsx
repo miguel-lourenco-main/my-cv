@@ -106,7 +106,7 @@ export function ProjectFocusCard({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out cursor-pointer",
+        "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-80 w-full transition-all duration-300 ease-out cursor-pointer border border-neutral-200/80 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700",
         hovered !== null && hovered !== index && "scale-[0.98]"
       )}
       onClick={() => onClick(project)}
@@ -117,13 +117,22 @@ export function ProjectFocusCard({
         className="object-cover absolute inset-0 w-full h-full"
       />
 
+      {/* Hover fade overlay (same behavior as before, but lighter in light mode) */}
+      <div
+        className={cn(
+          "absolute inset-0 pointer-events-none z-[15] transition-opacity duration-300 ease-out",
+          "bg-black/60 dark:bg-black/80",
+          hovered === index ? "opacity-100" : "opacity-0"
+        )}
+      />
+
       {/* 
         De-emphasize non-hovered cards without using CSS `filter: blur()` on the
         whole card (which can cause Brave to drop SVG rendering when combined
         with descendant `backdrop-filter` elements).
       */}
       {hovered !== null && hovered !== index ? (
-        <div className="absolute inset-0 pointer-events-none z-10 backdrop-blur-sm bg-white/10 dark:bg-black/10" />
+        <div className="absolute inset-0 pointer-events-none z-40 backdrop-blur-sm" />
       ) : null}
 
       {/* Water ripple effect - animated circles expanding from mouse position */}
@@ -148,7 +157,7 @@ export function ProjectFocusCard({
       )}
 
       {/* Project type badge and company/client circles - always visible */}
-      <div className="absolute top-3 left-3 z-[5] flex items-center gap-2 flex-wrap">
+      <div className="absolute top-3 left-3 z-30 flex items-center gap-2 flex-wrap">
         <TechStackCircles
           technologies={project.technologies}
           size={28}
@@ -163,7 +172,7 @@ export function ProjectFocusCard({
           rel="noreferrer"
           onClick={(e) => e.stopPropagation()}
           onMouseEnter={() => onCursorModeChange?.("default")}
-          className="absolute top-3 right-3 z-[5] inline-flex items-center justify-center size-9 rounded-full bg-black/35 hover:bg-black/55 text-white backdrop-blur-sm transition-colors"
+          className="absolute top-3 right-3 z-30 inline-flex items-center justify-center size-9 rounded-full bg-black/35 hover:bg-black/55 text-white backdrop-blur-sm transition-colors"
           aria-label="Open project"
           title="Open project"
         >
@@ -171,31 +180,59 @@ export function ProjectFocusCard({
         </a>
       ) : null}
 
-      <div
-        className={cn(
-          "absolute inset-0 bg-black/80 flex items-end py-6 px-4 transition-opacity duration-300",
-          hovered === index ? "opacity-100" : "opacity-0"
-        )}
-      >
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-lg md:text-xl font-medium bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
+      {/* Always-visible project title row + hover-revealed details */}
+      <div className="absolute inset-x-0 bottom-0 z-30 px-4 pb-2 pt-10 pointer-events-none">
+        {/* Bottom gradient to keep text readable on top of the cover */}
+        <div
+          className={cn(
+            "absolute inset-x-0 bottom-0 h-20",
+            // Keep the bottom area dark for longer, then fade faster near the text
+            // (improves text contrast without increasing the fade height)
+            "bg-[linear-gradient(to_top,rgba(0,0,0,0.80)_0%,rgba(0,0,0,0.80)_60%,rgba(0,0,0,0.35)_82%,rgba(0,0,0,0)_100%)]",
+            "dark:bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.85)_60%,rgba(0,0,0,0.45)_82%,rgba(0,0,0,0)_100%)]",
+            "transition-opacity duration-300 ease-out",
+            hovered === index ? "opacity-0" : "opacity-100"
+          )}
+        />
+
+        <div className="relative">
+          {/* Title row: always visible; moves up on hover */}
+          <div
+            className={cn(
+              "flex items-center gap-2 text-lg md:text-xl font-medium",
+              "bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200",
+              "transition-transform duration-300 ease-out",
+              hovered === index ? "-translate-y-2" : "translate-y-0"
+            )}
+          >
             {project.logo && (
               <img
                 src={project.logo}
-                alt={getProjectString(project, 'title')}
+                alt={getProjectString(project, "title")}
                 className="size-6 md:size-7 object-contain"
               />
             )}
-            {getProjectString(project, 'title')}
+            {getProjectString(project, "title")}
           </div>
-          <div className="text-xs md:text-sm text-neutral-200/90">
-            {getProjectString(project, 'description')}
+
+          {/* Details: hidden by default; on hover slides down into place */}
+          <div
+            className={cn(
+              "mt-1 pace-y-0.5 text-xs md:text-sm text-neutral-200/90",
+              "transition-all duration-300 ease-out",
+              hovered === index
+                ? "opacity-100 pb-2 translate-y-0 max-h-24"
+                : "opacity-0 -translate-y-3 max-h-0"
+            )}
+            aria-hidden={hovered !== index}
+          >
+            <div>{getProjectString(project, "description")}</div>
+            {project.experience ? (
+              <div>
+                {project.experience.org} • {project.experience.date}
+              </div>
+            ) : null}
           </div>
-          {project.experience ? (
-            <div className="text-xs md:text-sm text-neutral-200/90">
-              {project.experience.org} • {project.experience.date}
-            </div>
-          ) : null}
         </div>
       </div>
     </div>
