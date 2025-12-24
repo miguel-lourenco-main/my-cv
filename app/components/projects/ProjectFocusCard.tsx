@@ -218,8 +218,8 @@ export function ProjectFocusCard({
           {/* Details: hidden by default; on hover slides down into place */}
           <div
             className={cn(
-              "mt-1 pace-y-0.5 text-xs md:text-sm text-neutral-200/90",
-              "transition-all duration-300 ease-out",
+              "mt-1 space-y-0.5 text-xs md:text-sm text-neutral-200/90",
+              "transition-all duration-700 ease-in-out",
               hovered === index
                 ? "opacity-100 pb-2 translate-y-0 max-h-24"
                 : "opacity-0 -translate-y-3 max-h-0"
