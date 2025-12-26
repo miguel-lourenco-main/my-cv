@@ -117,7 +117,7 @@ export function ProjectExpandedCard({
           <motion.div
             ref={ref}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
-            className="relative w-full scrollbar-none max-w-[900px] h-full md:max-h-[90%] p-4 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 md:rounded-3xl overflow-y-auto shadow-lg z-50"
+            className="relative w-full scrollbar-none max-w-[900px] h-full md:max-h-[90%] p-6 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 md:rounded-3xl overflow-y-auto shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
@@ -173,7 +173,7 @@ export function ProjectExpandedCard({
 
             <div
               className={cn(
-                "flex flex-col overflow-hidden min-h-[500px]",
+                "flex flex-col overflow-hidden min-h-[600px]",
                 // Desktop keeps the existing "fill remaining space" behavior
                 "sm:flex-1 space-y-4",
                 // Mobile: increase size, but keep it reasonable (two panes)

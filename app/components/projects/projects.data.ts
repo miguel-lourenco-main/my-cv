@@ -76,14 +76,14 @@ const projectsData: ProjectData[] = [
     }],
     titleKey: "title",
     descriptionKey: "description",
-    images: [
-      "/projects_images/edgen-chat/main_L.png",
-      "/projects_images/edgen-chat/main_D.png",
-    ],
+
     // Top picks (based on previous manual ordering)
-    imagesFirst: ["main_L.png", "main_D.png"],
-    websiteUrl: "#",
-    gitlabUrl: "#",
+    imagesFirst: [
+      "edgen_chat_no_msg_L.png", "edgen_chat_no_msg_D.png",
+      "edgen_chat_chat_L.png", "edgen_chat_chat_D.png",
+    ],
+    websiteUrl: "https://edgenchat-d831b2.gitlab.io",
+    gitlabUrl: "https://gitlab.com/public-work4/edgenchat",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
