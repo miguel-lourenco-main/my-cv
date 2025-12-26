@@ -10,7 +10,7 @@ import { useI18n } from "../../lib/i18n";
 export default function BackendCard() {
   const { t } = useI18n();
   const title = t('categories')('backend');
-  const items = ["Node.js", "REST", "File processing", "RAG/LLM integration"];
+  const items = ["Node.js", "REST"];
 
   return (
     <CategoryCard title={title} items={items}>
@@ -35,8 +35,6 @@ export default function BackendCard() {
         width={72}
         height={72}
       />
-      <FileProcessingIcon className="size-10 text-slate-900 dark:text-white" />
-      <LLMLogo className="h-14 w-14 text-slate-900 dark:text-white [&_*]:fill-current" />
     </CategoryCard>
   );
 }

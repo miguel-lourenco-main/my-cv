@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/app/lib/utils";
-import { useTheme } from "@/app/lib/theme-provider";
 
 export type StarsBackgroundProps = {
   starDensity?: number; // stars per pixel area
@@ -38,13 +37,9 @@ export default function StarsBackground({
   maxTwinkleSpeed = 1,
   className,
 }: StarsBackgroundProps) {
-  const { theme } = useTheme();
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [stars, setStars] = useState<StarDefinition[]>([]);
-
-  // Determine if we're in dark mode
-  const isDarkMode = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   useEffect(() => {
     const element = wrapperRef.current;
@@ -102,14 +97,10 @@ export default function StarsBackground({
             : "none";
           const glowAnimation = star.willTwinkle ? `${star.glowDurationSec}s glowPulse ease-in-out ${star.glowDelaySec}s infinite alternate` : "none";
 
-          // Theme-aware colors: darker colors in light mode, lighter colors in dark mode
-          const starColor = isDarkMode ? "255,255,255" : "0,0,0";
-          const backgroundGradient = isDarkMode 
-            ? "radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0.0) 70%)"
-            : "radial-gradient(circle, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.0) 70%)";
-          const boxShadow = isDarkMode
-            ? "0 0 4px rgba(255,255,255,0.6), 0 0 8px rgba(255,255,255,0.35)"
-            : "0 0 4px rgba(0,0,0,0.6), 0 0 8px rgba(0,0,0,0.35)";
+          // App is dark-only: always render light stars on dark background.
+          const backgroundGradient =
+            "radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0.0) 70%)";
+          const boxShadow = "0 0 4px rgba(255,255,255,0.6), 0 0 8px rgba(255,255,255,0.35)";
 
           return (
             <span

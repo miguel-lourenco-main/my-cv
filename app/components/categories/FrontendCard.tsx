@@ -18,9 +18,10 @@ import { useI18n } from "../../lib/i18n";
 export default function FrontendCard() {
   const { t } = useI18n();
   const title = t('categories')('frontend');
-  const items = ["React", "Next.js (App Router)", "Tailwind CSS", "shadcn/ui", "Figma", "Vercel v0"];
+  const items = ["React", "Next.js (App Router)", "Tailwind CSS", "shadcn/ui", "Figma"];
   const iconURLs = [
     "/logos/react.svg",
+    "/logos/nextjs.svg",
     "/logos/tailwind_css.svg",
     "/logos/shadcn.png",
     "/logos/figma.svg",
@@ -31,7 +32,6 @@ export default function FrontendCard() {
       {iconURLs.map((src, idx) => (
         <IconImage key={src + idx} src={src} width={idx === 3 ? 28 : 42} height={idx === 3 ? 28 : 42} />
       ))}
-      <NextLogo className="size-12 text-slate-900 dark:text-white" />
     </CategoryCard>
   );
 }

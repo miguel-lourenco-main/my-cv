@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import { ThemeProvider } from './lib/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -50,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth dark" suppressHydrationWarning>
       <body className={`${inter.className} antialiased bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`} suppressHydrationWarning>
         {/* Disable browser scroll restoration to prevent unwanted scroll positions */}
         <Script id="disable-scroll-restoration" strategy="beforeInteractive">{`
@@ -77,9 +76,7 @@ export default function RootLayout({
             });
           })();
         `}</Script>
-        <ThemeProvider attribute="class" defaultTheme="system" storageKey="theme">
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   )

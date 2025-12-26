@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import EmailButton from './EmailButton'
 import GitlabButton from './GitlabButton'
 import LinkedInButton from './LinkedInButton'
-import ThemeToggle from './ThemeToggle'
 import LanguageSwitcher from './LanguageSwitcher'
 
 /**
@@ -121,7 +120,6 @@ export default function Navigation() {
               </div>
             </div>
             <LanguageSwitcher/>
-            <ThemeToggle />
           </div>
         </div>
       </div>

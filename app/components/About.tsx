@@ -74,8 +74,8 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
       delay={0.2}
       interval={0}
     >
+      <FrontendCard />
       <LanguagesCard />
-      <DevOpsCard />
     </ConditionalReveal>
   );
 
@@ -87,8 +87,8 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
       delay={0.6}
       interval={0}
     >
-      <FrontendCard />
       <BackendCard />
+      <DevOpsCard />
     </ConditionalReveal>
   );
 

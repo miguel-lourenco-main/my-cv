@@ -3,7 +3,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
-import { useTheme } from "../../lib/theme-provider";
 import { useI18n } from "../../lib/i18n";
 import { TechStackCircles } from "./TechStackCircles";
 import { GlobeIcon } from "lucide-react";
@@ -47,16 +46,10 @@ export function ProjectFocusCard({
   onClick: (project: Project) => void;
   onCursorModeChange?: (mode: 'default' | 'view') => void;
 }) {
-  const { resolvedTheme } = useTheme();
   const { getProjectString } = useI18n();
-  const [mounted, setMounted] = useState(false);
   // Track mouse position for ripple effect
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Update fixed cursor position when card is hovered and window scrolls/resizes
   useEffect(() => {
@@ -91,18 +84,13 @@ export function ProjectFocusCard({
   }, [project.gitlabUrl, project.websiteUrl]);
 
   // Select theme-appropriate cover image (light/dark variants)
-  // Prevents hydration mismatch by using light theme during SSR
+  // App is dark-only: always prefer dark variants when available.
   const coverImage = useMemo(() => {
-    // During SSR or before mount, always use light theme to prevent hydration mismatch
-    if (!mounted) {
-      return project.images.find((src) => src.endsWith("_L.png")) ?? project.images[0];
-    }
-    
-    const isDark = resolvedTheme === "dark";
-    const suffix = isDark ? "_D.png" : "_L.png";
-    const themed = project.images.find((src) => src.endsWith(suffix));
-    return themed ?? project.images[0];
-  }, [project.images, resolvedTheme, mounted]);
+    const dark = project.images.find((src) => src.endsWith("_D.png"));
+    if (dark) return dark;
+    const light = project.images.find((src) => src.endsWith("_L.png"));
+    return light ?? project.images[0];
+  }, [project.images]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;

@@ -20,8 +20,6 @@ export default function DevOpsCard() {
       {iconURLs.map((src, idx) => (
         <IconImage key={src + idx} src={src} width={idx === 0 ? 42 : 56} height={idx === 0 ? 42 : 56} />
       ))}
-      <CiCdIcon className="size-12 text-slate-900 dark:text-white" />
-      <EnvConfigIcon className="size-12 text-slate-900 dark:text-white" />
     </CategoryCard>
   );
 }
