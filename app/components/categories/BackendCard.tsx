@@ -10,7 +10,7 @@ import { useI18n } from "../../lib/i18n";
 export default function BackendCard() {
   const { t } = useI18n();
   const title = t('categories')('backend');
-  const items = ["Node.js", "REST"];
+  const items = ["Node.js", "PostgreSQL(Supabase)"];
 
   return (
     <CategoryCard title={title} items={items}>
@@ -29,11 +29,15 @@ export default function BackendCard() {
           className="absolute inset-0 h-full w-full object-contain opacity-90 hidden dark:block"
         />
       </div>
-      {/* REST icon */}
       <IconImage
-        src="/logos/rest.png"
-        width={72}
-        height={72}
+        src="/logos/elephant_full.png"
+        width={42}
+        height={42}
+      />
+      <IconImage
+        src="/logos/supabase.svg"
+        width={42}
+        height={42}
       />
     </CategoryCard>
   );

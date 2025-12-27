@@ -86,9 +86,10 @@ const projectsData: ProjectData[] = [
     gitlabUrl: "https://gitlab.com/public-work4/edgenchat",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
-      { name: "LLM", icon: "/logos/llm.svg" },
+      { name: "Supabase", icon: "/logos/supabase.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -130,9 +131,9 @@ const projectsData: ProjectData[] = [
     gitlabUrl: "#",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "C#", icon: "/logos/c_sharp.svg" },
-      { name: "LLM", icon: "/logos/llm.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -182,9 +183,11 @@ const projectsData: ProjectData[] = [
     gitlabUrl: "#",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
+      { name: "Next.js", icon: "/logos/nextjs.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
-      { name: "LLM", icon: "/logos/llm.svg" },
+      { name: "Supabase", icon: "/logos/supabase.svg" },
+      { name: "Playwright", icon: "/logos/playwright.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -368,7 +371,6 @@ const projectsData: ProjectData[] = [
       { name: "React", icon: "/logos/react.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
-      { name: "Monaco Editor", icon: "/logos/monaco.svg" },
       { name: "Playwright", icon: "/logos/playwright.svg" },
     ],
     details: {

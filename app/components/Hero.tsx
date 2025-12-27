@@ -27,6 +27,53 @@ export default function Hero({ showShared = true, greeting, isLaptop = false }: 
   const cvPath = locale === 'pt' ? '/cv_pt.pdf' : '/cv_en.pdf';
   const th = t('hero');
   
+  // Function to underline specific terms in text
+  const underlineText = (text: string | undefined) => {
+    // Safety check: return text as-is if undefined, null, or not a string
+    if (!text || typeof text !== 'string') {
+      return text || '';
+    }
+    
+    // Terms to underline: country and tech stack
+    const countryTerms = ['Portugal'];
+    const techStackTerms = ['TypeScript/JavaScript', 'React', 'Next.js', 'Tailwind CSS'];
+    const allTerms = [...countryTerms, ...techStackTerms];
+    
+    // Create a regex pattern that matches any of the terms (case-insensitive, word boundaries)
+    const pattern = new RegExp(
+      `(${allTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`,
+      'gi'
+    );
+    
+    // Split text and wrap matches in underline spans
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = pattern.exec(text)) !== null) {
+      // Add text before match
+      if (match.index > lastIndex) {
+        parts.push(text.substring(lastIndex, match.index));
+      }
+      
+      // Add underlined match
+      parts.push(
+        <span key={match.index} className="underline font-semibold">
+          {match[0]}
+        </span>
+      );
+      
+      lastIndex = pattern.lastIndex;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+    
+    return parts.length > 0 ? parts : text;
+  };
+  
   // Build section classes with conditional laptop styling
   const sectionClasses = [
     "flex flex-col max-w-7xl mx-auto",
@@ -50,7 +97,7 @@ export default function Hero({ showShared = true, greeting, isLaptop = false }: 
           <RevealStagger delay={2} interval={0.04}>
             <div className={`text-xl sm:text-2xl mt-24 text-slate-600 dark:text-slate-300 ${isLaptop ? "mb-6" : "mb-8"} max-w-2xl mx-auto`}>
               <p>
-                {th('intro1')}
+                {underlineText(th('intro1'))}
               </p>
               <p className={isLaptop ? "mt-6" : "mt-8"}>
                 <span className="font-bold">{th('intro2')}</span>

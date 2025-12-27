@@ -18,7 +18,7 @@ import { useI18n } from "../../lib/i18n";
 export default function FrontendCard() {
   const { t } = useI18n();
   const title = t('categories')('frontend');
-  const items = ["React", "Next.js (App Router)", "Tailwind CSS", "shadcn/ui", "Figma"];
+  const items = ["React", "Next.js (App Router)", "Tailwind CSS", "Shadcn/UI", "Figma"];
   const iconURLs = [
     "/logos/react.svg",
     "/logos/nextjs.svg",
@@ -30,7 +30,7 @@ export default function FrontendCard() {
   return (
     <CategoryCard title={title} items={items}>
       {iconURLs.map((src, idx) => (
-        <IconImage key={src + idx} src={src} width={idx === 3 ? 28 : 42} height={idx === 3 ? 28 : 42} />
+        <IconImage key={src + idx} src={src} width={idx === 4 ? 32 : 42} height={idx === 4 ? 32 : 42} />
       ))}
     </CategoryCard>
   );
