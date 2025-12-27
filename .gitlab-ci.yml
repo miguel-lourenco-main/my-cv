@@ -13,13 +13,16 @@ stages:
   - deploy
 
 variables:
+  NODE_ENV: production
   PNPM_CACHE_FOLDER: .pnpm-store
 
 before_script:
   - corepack enable
   - corepack prepare pnpm@latest --activate
   - pnpm config set store-dir .pnpm-store
-  - pnpm install --frozen-lockfile
+  # Force devDependencies install for Next.js builds (Tailwind/PostCSS/TypeScript live in devDeps).
+  # This avoids failures when NODE_ENV=production is set at the runner/project level.
+  - pnpm install --frozen-lockfile --prod=false
 
 # Detect and generate missing i18n translations using Cursor
 i18n:translate:
@@ -159,8 +162,6 @@ build:
 
 pages:
   stage: deploy
-  variables:
-    NODE_ENV: production
   script:
     - cp -r out/* public/
   artifacts:
