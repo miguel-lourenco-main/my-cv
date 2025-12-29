@@ -1,0 +1,44 @@
+{
+  "title": "OFLAT (OCamlFlat)",
+  "description": "Biblioteca em OCaml + app web no browser compilada com js_of_ocaml e publicada como site estático via GitLab Pages.",
+  "subtitle": "App Web Estática + Biblioteca OCaml (js_of_ocaml)",
+  "overview": "OFLAT é um projeto em duas partes: uma biblioteca OCaml (OCamlFlat) e uma app web compilada para JavaScript com js_of_ocaml. O pipeline de CI constrói os assets estáticos e publica no GitLab Pages, incluindo um ficheiro version.txt para identificar o commit publicado.",
+  "coreConcept": {
+    "summary": "Juntar uma biblioteca reutilizável em OCaml com uma app de browser compilada a partir de OCaml.",
+    "bullets": [
+      "Workflow em dois projetos: biblioteca OCamlFlat + app web OFLAT",
+      "App web compilada de OCaml para JS via js_of_ocaml",
+      "Saída estática (HTML/CSS/JS) pronta para GitLab Pages ou qualquer host estático",
+      "Deploy em CI com version.txt para rastreabilidade"
+    ]
+  },
+  "features": [
+    "Dependências locais e reprodutíveis com switch opam local recomendado (./_opam/)",
+    "Builds independentes: OCamlFlat (make) e OFLAT (make run)",
+    "Deploy no GitLab Pages a partir do output construído em public/",
+    "Cache-busting no CI ao reescrever URLs dos assets com ?v=$CI_COMMIT_SHA",
+    "Funcionalidades extra ligadas a Máquinas de Turing em OCaml-Flat e OFLAT"
+  ],
+  "technical": {
+    "frontendStack": [
+      "OCaml compilado para JavaScript via js_of_ocaml",
+      "Output estático em HTML/CSS/JS",
+      "Dependências geridas por opam (switch local recomendado)",
+      "Builds baseadas em Makefile para ambos os subprojetos"
+    ],
+    "projectStructure": [
+      "OCamlFlat/: biblioteca OCamlFlat (build via make)",
+      "my-oflat/: app web OFLAT compilada para JS via js_of_ocaml (build via make)",
+      "CI copia o build da web app para public/ para deploy no Pages",
+      "version.txt incluído no artefacto do Pages para identificar o commit publicado"
+    ],
+    "deployment": [
+      "GitLab CI constrói os assets estáticos e publica via GitLab Pages",
+      "O job de Pages reescreve URLs em public/index.html com parâmetros de cache-busting",
+      "O URL live fica disponível no GitLab em Deploy → Pages"
+    ]
+  },
+  "personalExperience": "OFLAT é uma variante pessoal inspirada por uma série de projetos de tese financiados pela FACTOR para promover o uso de OCaml. Como não consegui recuperar o código original, reconstruí esta versão com base no material disponível e acrescentei funcionalidades — especialmente relacionadas com Máquinas de Turing — tanto no OCaml-Flat como na web app OFLAT.\n\nFoi uma ótima experiência para consolidar um workflow limpo (biblioteca + app), manter dependências reprodutíveis com opam e automatizar um deploy totalmente estático com GitLab Pages."
+}
+
+

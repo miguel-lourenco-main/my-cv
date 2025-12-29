@@ -62,6 +62,41 @@ function resolveProjectImages(project: ProjectData): string[] {
  */
 const projectsData: ProjectData[] = [
   {
+    id: "oflat",
+    type: "personal",
+    titleKey: "title",
+    descriptionKey: "description",
+    imagesFirst: [
+      "oflat_main_L.png",
+      "oflat_main_D.png",
+    ],
+    websiteUrl: "https://oflat-ocamlflat-pages-d4fe77.gitlab.io/",
+    gitlabUrl: "https://gitlab.com/public-work4/oflat-ocamlflat-pages",
+    deployment: "gitlab_pages",
+    technologies: [
+      { name: "OCaml", icon: "/logos/ocaml.svg" },
+      { name: "JavaScript", icon: "/logos/javaScript.png" },
+    ],
+    details: {
+      subtitleKey: "subtitle",
+      overviewKey: "overview",
+      coreConcept: {
+        summaryKey: "coreConcept.summary",
+        bulletsKeys: "coreConcept.bullets",
+      },
+      featuresKeys: "features",
+      technical: {
+        frontendStackKeys: "technical.frontendStack",
+        projectStructureKeys: "technical.projectStructure",
+        deploymentKeys: "technical.deployment",
+      },
+      personalExperience: {
+        textKey: "personalExperience",
+      },
+    },
+    experience: { name: "OCamlFlat", org: "Thesis Project", date: "2025" },
+  },
+  {
     id: "edgen-chat",
     type: "professional",
     company: {

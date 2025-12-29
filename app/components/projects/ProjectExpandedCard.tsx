@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "../../lib/hooks/use-outside-click";
 import type { Project } from "./projects.types";
 import { ProjectCarousel } from "./ProjectCarousel";
-import { Briefcase, ChevronDown, GlobeIcon, User, X } from "lucide-react";
+import { Briefcase, ChevronDown, GlobeIcon, User, X, Sun, Moon } from "lucide-react";
 import GitlabButton from "../GitlabButton";
 import BaseButton from "../Button";
 import { useI18n } from "../../lib/i18n";
@@ -14,6 +14,7 @@ import { GitlabReadmeViewer } from "./GitlabReadmeViewer";
 import Image from "next/image";
 import { TechStackCircles } from "./TechStackCircles";
 import { ProjectCompanyClientInfo } from "./ProjectCompanyClientInfo";
+import type { ProjectScreenshotMode } from "./project-images";
 
 /**
  * Expanded project card modal component.
@@ -35,9 +36,13 @@ import { ProjectCompanyClientInfo } from "./ProjectCompanyClientInfo";
 export function ProjectExpandedCard({
   project,
   onClose,
+  screenshotMode = "dark",
+  onScreenshotModeChange,
 }: {
   project: Project | null;
   onClose: () => void;
+  screenshotMode?: ProjectScreenshotMode;
+  onScreenshotModeChange?: (mode: ProjectScreenshotMode) => void;
 }) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
@@ -47,6 +52,8 @@ export function ProjectExpandedCard({
   const [activeTab, setActiveTab] = useState<"info" | "experience">("info");
   const [showScrollToContentButton, setShowScrollToContentButton] =
     useState<boolean>(true);
+  // Local screenshot mode for this expanded card only (independent from global state)
+  const [localScreenshotMode, setLocalScreenshotMode] = useState<ProjectScreenshotMode>(screenshotMode);
 
   // Handle keyboard navigation and prevent body scroll when modal is open
   useEffect(() => {
@@ -71,7 +78,9 @@ export function ProjectExpandedCard({
     if (!project) return;
     setActiveTab("info");
     setShowScrollToContentButton(true);
-  }, [project?.id]);
+    // Reset local screenshot mode to global when opening a new project
+    setLocalScreenshotMode(screenshotMode);
+  }, [project?.id, screenshotMode]);
 
   // Hide the scroll-to-content button once the user reaches the bottom of the modal
   useEffect(() => {
@@ -169,7 +178,21 @@ export function ProjectExpandedCard({
             <div className="hidden md:block">
               <ProjectCompanyClientInfo project={project} />
             </div>
-            <ProjectCarousel images={project.images} />
+            <div className="w-full relative">
+              <ProjectCarousel
+                images={project.images}
+                screenshotMode={localScreenshotMode}
+              />
+              {/* Screenshot mode toggle button in top-right corner of carousel */}
+              {/* This button only affects this expanded card, not the global state */}
+              <div className="absolute top-2 right-2 z-10">
+                <ScreenshotModeButton
+                  mode={localScreenshotMode}
+                  onModeChange={setLocalScreenshotMode}
+                  tp={tp}
+                />
+              </div>
+            </div>
 
             <div
               className={cn(
@@ -309,6 +332,43 @@ function ProjectCloseButton({ onClose, className }: { onClose: () => void, class
       aria-label="Close"
     >
       <X className="size-4 text-gray-600 dark:text-gray-400" />
+    </button>
+  );
+}
+
+/**
+ * Icon button that cycles through screenshot modes: light <-> dark
+ */
+function ScreenshotModeButton({
+  mode,
+  onModeChange,
+  tp,
+}: {
+  mode: ProjectScreenshotMode;
+  onModeChange: (mode: ProjectScreenshotMode) => void;
+  tp: (key: string) => string;
+}) {
+  const cycleMode = () => {
+    onModeChange(mode === "light" ? "dark" : "light");
+  };
+
+  const getIcon = () => {
+    return mode === "light" ? <Sun className="size-5" /> : <Moon className="size-5" />;
+  };
+
+  const getTitle = () => {
+    return mode === "light" ? tp("screenshots.light") : tp("screenshots.dark");
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={cycleMode}
+      className="inline-flex items-center justify-center size-10 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm text-neutral-700 dark:text-neutral-200 hover:bg-white dark:hover:bg-neutral-900 transition-colors shadow-md"
+      title={getTitle()}
+      aria-label={getTitle()}
+    >
+      {getIcon()}
     </button>
   );
 }

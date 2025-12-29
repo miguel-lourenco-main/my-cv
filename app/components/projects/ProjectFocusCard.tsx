@@ -6,6 +6,10 @@ import type { Project } from "./projects.types";
 import { useI18n } from "../../lib/i18n";
 import { TechStackCircles } from "./TechStackCircles";
 import { GlobeIcon } from "lucide-react";
+import {
+  getProjectCoverImageByMode,
+  type ProjectScreenshotMode,
+} from "./project-images";
 
 /**
  * Project card component with hover effects and focus blur.
@@ -38,6 +42,7 @@ export function ProjectFocusCard({
   setHovered,
   onClick,
   onCursorModeChange,
+  screenshotMode = "dark",
 }: {
   project: Project;
   index: number;
@@ -45,6 +50,7 @@ export function ProjectFocusCard({
   setHovered: React.Dispatch<React.SetStateAction<number | null>>;
   onClick: (project: Project) => void;
   onCursorModeChange?: (mode: 'default' | 'view') => void;
+  screenshotMode?: ProjectScreenshotMode;
 }) {
   const { getProjectString } = useI18n();
   // Track mouse position for ripple effect
@@ -83,14 +89,13 @@ export function ProjectFocusCard({
     return null;
   }, [project.gitlabUrl, project.websiteUrl]);
 
-  // Select theme-appropriate cover image (light/dark variants)
-  // App is dark-only: always prefer dark variants when available.
+  // Select cover image based on user screenshot mode (light/dark).
   const coverImage = useMemo(() => {
-    const dark = project.images.find((src) => src.endsWith("_D.png"));
-    if (dark) return dark;
-    const light = project.images.find((src) => src.endsWith("_L.png"));
-    return light ?? project.images[0];
-  }, [project.images]);
+    return (
+      getProjectCoverImageByMode(project.images, screenshotMode) ??
+      project.images[0]
+    );
+  }, [project.images, screenshotMode]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;

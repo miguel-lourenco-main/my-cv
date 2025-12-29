@@ -10,6 +10,12 @@
   "projectStructureHeading": "Estrutura do Projeto",
   "deploymentHeading": "Deployment",
   "personalExperienceHeading": "Minha Experiência",
+  "screenshots": {
+    "label": "Capturas",
+    "auto": "Auto",
+    "light": "Claro",
+    "dark": "Escuro"
+  },
   "context": {
     "heading": "Contexto",
     "descriptionPersonal": "Este é um projeto pessoal.",

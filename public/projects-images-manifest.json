@@ -73,6 +73,18 @@
     "/projects_images/o-guardanapo/product_page_D.png",
     "/projects_images/o-guardanapo/product_page_L.png"
   ],
+  "oflat": [
+    "/projects_images/oflat/oflat_about_D.png",
+    "/projects_images/oflat/oflat_about_L.png",
+    "/projects_images/oflat/oflat_main_D.png",
+    "/projects_images/oflat/oflat_main_L.png",
+    "/projects_images/oflat/oflat_test_word_D.png",
+    "/projects_images/oflat/oflat_test_word_L.png",
+    "/projects_images/oflat/oflat_tm_D.png",
+    "/projects_images/oflat/oflat_tm_L.png",
+    "/projects_images/oflat/oflat_tm_op_D.png",
+    "/projects_images/oflat/oflat_tm_op_L.png"
+  ],
   "sonora": [
     "/projects_images/sonora/main_page_D.png",
     "/projects_images/sonora/main_page_L.png",

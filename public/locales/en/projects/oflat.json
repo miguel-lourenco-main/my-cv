@@ -1,0 +1,44 @@
+{
+  "title": "OFLAT (OCamlFlat)",
+  "description": "OCaml library + browser web app compiled with js_of_ocaml and deployed as a static site via GitLab Pages.",
+  "subtitle": "Static Web App + OCaml Library (js_of_ocaml)",
+  "overview": "OFLAT is a two-part OCaml project: an OCaml library (OCamlFlat) and a web app compiled to JavaScript with js_of_ocaml. The CI pipeline builds the static assets and publishes them to GitLab Pages, including a version.txt breadcrumb to identify the deployed commit.",
+  "coreConcept": {
+    "summary": "Combine a reusable OCaml library with a browser app compiled from OCaml.",
+    "bullets": [
+      "Two-project workflow: OCamlFlat library + OFLAT web app",
+      "Web app compiled from OCaml via js_of_ocaml",
+      "Static output (HTML/CSS/JS) ready for GitLab Pages or any static host",
+      "CI deploy includes a version.txt breadcrumb for traceability"
+    ]
+  },
+  "features": [
+    "Local, reproducible dependencies via a recommended local opam switch (./_opam/)",
+    "Independent builds: OCamlFlat (make) and OFLAT (make run)",
+    "GitLab Pages deployment from the built public/ output",
+    "Cache-busting in CI by rewriting asset URLs with ?v=$CI_COMMIT_SHA",
+    "Extra functionality added around Turing Machine support in both OCaml-Flat and OFLAT"
+  ],
+  "technical": {
+    "frontendStack": [
+      "OCaml compiled to JavaScript via js_of_ocaml",
+      "Plain HTML/CSS/JS static output",
+      "opam-managed dependencies (recommended local switch)",
+      "Makefile-based builds for both subprojects"
+    ],
+    "projectStructure": [
+      "OCamlFlat/: OCamlFlat library (built via make)",
+      "my-oflat/: OFLAT web app compiled to JS via js_of_ocaml (built via make)",
+      "CI copies the built web app into public/ for Pages deployment",
+      "version.txt emitted in the Pages artifact to identify the deployed commit"
+    ],
+    "deployment": [
+      "GitLab CI builds the static assets and publishes them via GitLab Pages",
+      "Pages job rewrites asset URLs in public/index.html with cache-busting query params",
+      "Live URL available in GitLab under Deploy → Pages"
+    ]
+  },
+  "personalExperience": "OFLAT is a personal variant inspired by a thesis project series funded by FACTOR to promote OCaml. I couldn't recover the original source code, so I rebuilt the project from available material and extended it—especially around Turing Machine functionality—across both OCaml-Flat and the OFLAT web app.\n\nThis was a great exercise in building a clean two-project workflow (library + web app), keeping dependencies reproducible with opam, and making the deployment fully static and automated through GitLab Pages."
+}
+
+

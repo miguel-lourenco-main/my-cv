@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { Project } from "./projects.types";
 import { ProjectFocusCard } from "./ProjectFocusCard";
 import { Reveal } from "../Reveal";
+import type { ProjectScreenshotMode } from "./project-images";
 
 /**
  * Grid layout component for displaying project cards.
@@ -26,10 +27,12 @@ export function ProjectGrid({
   projects,
   onCardClick,
   onCursorModeChange,
+  screenshotMode = "dark",
 }: {
   projects: Project[];
   onCardClick: (project: Project) => void;
   onCursorModeChange?: (mode: 'default' | 'view') => void;
+  screenshotMode?: ProjectScreenshotMode;
 }) {
   // Track which card is currently hovered for focus effects
   const [hovered, setHovered] = useState<number | null>(null);
@@ -45,6 +48,7 @@ export function ProjectGrid({
             setHovered={setHovered}
             onClick={onCardClick}
             onCursorModeChange={onCursorModeChange}
+            screenshotMode={screenshotMode}
           />
         </Reveal>
       ))}

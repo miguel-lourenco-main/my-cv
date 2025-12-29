@@ -2,6 +2,10 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import {
+  filterProjectImagesByMode,
+  type ProjectScreenshotMode,
+} from "./project-images";
 
 /**
  * Image carousel component for project galleries.
@@ -10,25 +14,29 @@ import useEmblaCarousel from "embla-carousel-react";
  * 
  * @param props - ProjectCarousel component props
  * @param props.images - Array of image paths (supports _L.png and _D.png suffixes for theme variants)
+ * @param props.screenshotMode - User-selected screenshot mode (light or dark)
  * 
  * @example
  * ```tsx
- * <ProjectCarousel images={project.images} />
+ * <ProjectCarousel images={project.images} screenshotMode="dark" />
  * ```
  */
-export function ProjectCarousel({ images }: { images: string[] }) {
+export function ProjectCarousel({
+  images,
+  screenshotMode = "dark",
+}: {
+  images: string[];
+  screenshotMode?: ProjectScreenshotMode;
+}) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // App is dark-only: always prefer dark variants when available.
+  // Filter images to the selected mode (light/dark), collapsing L/D pairs.
   const filteredImages = useMemo(() => {
-    const darkImages = images.filter((src) => src.endsWith("_D.png"));
-    if (darkImages.length > 0) return darkImages;
-    const lightImages = images.filter((src) => src.endsWith("_L.png"));
-    return lightImages.length > 0 ? lightImages : images;
-  }, [images]);
+    return filterProjectImagesByMode(images, screenshotMode);
+  }, [images, screenshotMode]);
 
   useEffect(() => {
     if (!emblaApi) return;

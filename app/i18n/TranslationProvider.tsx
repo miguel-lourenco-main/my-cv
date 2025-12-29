@@ -25,6 +25,7 @@ const DEFAULT_NAMESPACES = [
   'projects/agentic-hub',
   'projects/cash-register',
   'projects/o-guardanapo',
+  'projects/oflat',
   'projects/edgen-chat',
   'projects/edgen-code',
   'projects/edgen-translate',
