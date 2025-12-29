@@ -84,6 +84,7 @@ const projectsData: ProjectData[] = [
     ],
     websiteUrl: "https://edgenchat-d831b2.gitlab.io",
     gitlabUrl: "https://gitlab.com/public-work4/edgenchat",
+    deployment: "gitlab_pages",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Next.js", icon: "/logos/nextjs.svg" },
@@ -129,6 +130,7 @@ const projectsData: ProjectData[] = [
     imagesFirst: ["sibicode_chat_L.png", "sibicode_chat_D.png"],
     websiteUrl: "#",
     gitlabUrl: "#",
+    deployment: "none",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Next.js", icon: "/logos/nextjs.svg" },
@@ -179,8 +181,9 @@ const projectsData: ProjectData[] = [
       "edgen-translate_hero_dnd_D.png",
       "edgen-translate_hero_feature_preview_D.png",
     ],
-    websiteUrl: "#",
-    gitlabUrl: "#",
+    websiteUrl: "https://edgentranslate-41c1b4.gitlab.io",
+    gitlabUrl: "https://gitlab.com/public-work4/edgentranslate",
+    deployment: "gitlab_pages",
     technologies: [
       { name: "React", icon: "/logos/react.svg" },
       { name: "Next.js", icon: "/logos/nextjs.svg" },
@@ -231,6 +234,7 @@ const projectsData: ProjectData[] = [
     ],
     websiteUrl: "https://sonora-d09e63.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/sonora",
+    deployment: "gitlab_pages",
     logo: "/projects/logos/sonora.svg",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
@@ -276,6 +280,7 @@ const projectsData: ProjectData[] = [
     ],
     websiteUrl: "https://agentichub-64abdc.gitlab.io",
     gitlabUrl: "https://gitlab.com/public-work4/agentichub",
+    deployment: "gitlab_pages",
     logo: "/projects/logos/agentic_hub.svg",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
@@ -320,6 +325,7 @@ const projectsData: ProjectData[] = [
     ],
     websiteUrl: "https://o-guardanapo.site",
     gitlabUrl: "https://gitlab.com/miguel-lourenco-main/o-guardanapo",
+    deployment: "vercel",
     logo: "/projects/logos/o_guardanapo.png",
     technologies: [
       { name: "Next.js 15.0.5", icon: "/logos/nextjs.svg" },
@@ -365,6 +371,7 @@ const projectsData: ProjectData[] = [
     ],
     websiteUrl: "https://ui-components-5218c2.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/ui-components",
+    deployment: "gitlab_pages",
     logo: "/projects/logos/ui_components.svg",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },
@@ -410,6 +417,7 @@ const projectsData: ProjectData[] = [
     ],
     websiteUrl: "https://cash-register-a85839.gitlab.io/",
     gitlabUrl: "https://gitlab.com/public-work4/cash_register",
+    deployment: "gitlab_pages",
     logo: "/projects/logos/cash_register.png",
     technologies: [
       { name: "Next.js", icon: "/logos/nextjs.svg" },

@@ -95,12 +95,9 @@ export default function Hero({ showShared = true, greeting, isLaptop = false }: 
         <div className={`flex flex-col items-center text-center`}> 
           {showShared && <NameBadge layoutId="intro-name" greeting={greeting} />}
           <RevealStagger delay={2} interval={0.04}>
-            <div className={`text-xl sm:text-2xl mt-24 text-slate-600 dark:text-slate-300 ${isLaptop ? "mb-6" : "mb-8"} max-w-2xl mx-auto`}>
+            <div className={`text-xl sm:text-2xl mt-24 text-slate-600 dark:text-slate-300 ${isLaptop ? "mb-6" : "mb-16"} max-w-2xl mx-auto`}>
               <p>
                 {underlineText(th('intro1'))}
-              </p>
-              <p className={isLaptop ? "mt-6" : "mt-8"}>
-                <span className="font-bold">{th('intro2')}</span>
               </p>
             </div>
           </RevealStagger>

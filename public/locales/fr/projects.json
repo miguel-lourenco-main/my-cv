@@ -9,5 +9,21 @@
   "frontendStackHeading": "Stack Frontend",
   "projectStructureHeading": "Structure du Projet",
   "deploymentHeading": "Déploiement",
-  "personalExperienceHeading": "Mon Expérience"
+  "personalExperienceHeading": "Mon Expérience",
+  "context": {
+    "heading": "Contexte",
+    "descriptionPersonal": "C'est un projet personnel.",
+    "descriptionNonPersonal": "Où ce projet a été développé et pour qui il a été réalisé.",
+    "companyLabel": "Entreprise",
+    "clientsLabel": "Clients",
+    "deploymentLabel": "Déploiement",
+    "personalBadge": "Personnel",
+    "personalBadgeTooltipPersonal": "Projet personnel",
+    "personalBadgeTooltipHybrid": "Continuation personnelle",
+    "deployment": {
+      "gitlabPages": "GitLab Pages",
+      "vercel": "Vercel",
+      "none": "Non déployé"
+    }
+  }
 }

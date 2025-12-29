@@ -9,6 +9,11 @@ export type ProjectTechnology = {
 };
 
 /**
+ * Where the project is deployed/hosted.
+ */
+export type ProjectDeployment = "gitlab_pages" | "vercel" | "none";
+
+/**
  * Detailed project information with translatable content.
  * Supports both direct strings and i18n keys for translations.
  */
@@ -140,6 +145,8 @@ export type Project = {
   websiteUrl: string;
   /** GitLab repository URL */
   gitlabUrl: string;
+  /** Where the project is deployed/hosted */
+  deployment?: ProjectDeployment;
   /** Technologies used in the project */
   technologies: ProjectTechnology[];
   /** Project type: personal, professional, or hybrid (started professional, continued privately) */
