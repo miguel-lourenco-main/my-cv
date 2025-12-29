@@ -140,7 +140,7 @@ export function ProjectExpandedCard({
                     size={28}
                   />
                 </h3>
-                <div className="flex items-center gap-4 justify-center">
+                <div className="hidden md:flex items-center gap-4 justify-center">
                   <ProjectButtons project={project} />
                   <ProjectCloseButton onClose={onClose} />
                 </div>

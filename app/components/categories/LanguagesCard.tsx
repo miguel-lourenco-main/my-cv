@@ -3,6 +3,7 @@
 import React from "react";
 import CategoryCard from "./CategoryCard";
 import IconImage from "./IconImage";
+import { useI18n } from "@/app/lib/i18n";
 
 /**
  * Languages category card component.
@@ -14,7 +15,8 @@ import IconImage from "./IconImage";
  * ```
  */
 export default function LanguagesCard() {
-  const title = "Languages";
+  const { t } = useI18n();
+  const title = t("categories")("languages");
   const items = ["TypeScript/JavaScript", "HTML/CSS", "C#", "SQL"];
   const iconURLs = [
     "/logos/typescript.svg",
