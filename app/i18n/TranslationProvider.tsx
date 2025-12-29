@@ -31,6 +31,38 @@ const DEFAULT_NAMESPACES = [
 ]
 
 /**
+ * Get the base path for translation files.
+ * Detects basePath from Next.js __NEXT_DATA__ or window location.
+ */
+function getBasePath(): string {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+  
+  // Try to get basePath from Next.js __NEXT_DATA__
+  if ((window as any).__NEXT_DATA__?.assetPrefix) {
+    return (window as any).__NEXT_DATA__.assetPrefix
+  }
+  
+  // Fallback: detect from pathname structure
+  // For GitLab Pages or similar, basePath might be in the path
+  // This is a heuristic - if pathname doesn't start with a locale, there might be a basePath
+  const pathname = window.location.pathname
+  const localePattern = /^\/(en|pt|fr|es)(\/|$)/
+  
+  if (!localePattern.test(pathname)) {
+    // Pathname doesn't start with a locale, might have basePath
+    // Extract potential basePath (everything before the first locale match)
+    const match = pathname.match(/^(.+?)\/(en|pt|fr|es)(\/|$)/)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+  
+  return ''
+}
+
+/**
  * Initialize i18next if not already initialized, or change language if needed.
  * 
  * @param locale - Locale code to initialize with
@@ -38,6 +70,10 @@ const DEFAULT_NAMESPACES = [
  */
 function ensureI18nInitialized(locale: string, namespaces: string[]) {
   if (!initialized) {
+    // Get basePath and construct absolute load path
+    const basePath = getBasePath()
+    const loadPath = `${basePath}/locales/{{lng}}/{{ns}}.json`
+    
     i18next
       .use(initReactI18next)
       .use(HttpBackend)
@@ -48,7 +84,7 @@ function ensureI18nInitialized(locale: string, namespaces: string[]) {
         ns: Array.from(new Set([...(namespaces || []), ...DEFAULT_NAMESPACES])),
         defaultNS: 'projects',
         interpolation: { escapeValue: false },
-        backend: { loadPath: '../locales/{{lng}}/{{ns}}.json' },
+        backend: { loadPath },
         react: { useSuspense: false },
         returnEmptyString: false,
       })
