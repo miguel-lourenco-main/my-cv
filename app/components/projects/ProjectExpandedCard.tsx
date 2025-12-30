@@ -198,7 +198,7 @@ export function ProjectExpandedCard({
               className={cn(
                 "flex flex-col overflow-hidden min-h-[600px]",
                 // Desktop keeps the existing "fill remaining space" behavior
-                "sm:flex-1 space-y-4",
+                "sm:flex-1 space-y-8",
                 // Mobile: increase size, but keep it reasonable (two panes)
                 "max-sm:min-h-[90svh]"
               )}
