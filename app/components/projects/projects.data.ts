@@ -94,7 +94,7 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "OCamlFlat", org: "Thesis Project", date: "2025" },
+    experience: { name: "OCamlFlat", org: "Thesis Project", date: "2023" },
   },
   {
     id: "edgen-chat",
