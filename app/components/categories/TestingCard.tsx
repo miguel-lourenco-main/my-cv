@@ -19,7 +19,6 @@ export default function TestingCard() {
   return (
     <CategoryCard title={title} items={items}>
       <IconImage src="/logos/playwright.svg" width={56} height={56} />
-      <IconImage src="/logos/gitlab-logo-500.svg" width={42} height={42} />
     </CategoryCard>
   );
 }

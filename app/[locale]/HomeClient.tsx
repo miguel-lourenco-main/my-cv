@@ -33,6 +33,8 @@ export default function HomeClient({ greeting }: { greeting: string }) {
   const [showIntro, setShowIntro] = useState(true);
   // Cursor mode for custom cursor effects
   const [cursorMode, setCursorMode] = useState<'default' | 'view'>('default');
+  // Hide smooth cursor when interacting with native PDF viewer (prevents double-cursor)
+  const [cursorHidden, setCursorHidden] = useState(false);
   const isLaptop = useIsLaptop();
 
   // Check for reduced motion preference
@@ -58,19 +60,24 @@ export default function HomeClient({ greeting }: { greeting: string }) {
     "flex flex-col relative z-10 transition-opacity duration-300 overflow-y-auto h-full gap-y-48 xl:gap-y-64 pb-12",
     // "mandatory" forces snapping even when far from a snap point; "proximity" only snaps when close
     shouldUseScrollSnap && "snap-y snap-mandatory",
-    isLaptop ? "" : "pt-48 xl:pt-64 2xl:pt-72",
+    isLaptop ? "" : "pt-40 xl:pt-52 2xl:pt-64",
     "px-4 sm:px-6 lg:px-8",
     showIntro ? "opacity-0 pointer-events-none" : "opacity-100"
   ].filter(Boolean).join(" ");
 
   return (
     <div className="relative h-screen bg-background overflow-hidden">
-      <SmoothCursor springConfig={{
-        damping: 900,
-        stiffness: 9000,
-        mass: 0.011,
-        restDelta: 0.9,
-      }} cursorMode={cursorMode}/>
+      {!cursorHidden ? (
+        <SmoothCursor
+          springConfig={{
+            damping: 900,
+            stiffness: 9000,
+            mass: 0.011,
+            restDelta: 0.9,
+          }}
+          cursorMode={cursorMode}
+        />
+      ) : null}
       <LayoutGroup id="root-shared">
         <IntroOverlay show={showIntro} onDone={handleIntroDone} greeting={greeting} />
         <ParallaxRoot>
@@ -80,7 +87,13 @@ export default function HomeClient({ greeting }: { greeting: string }) {
           <div id="page-scroll-container" className={containerClasses}>
             {!isLaptop && <Navigation />}
             {isLaptop && <div className="fixed top-0 left-0 right-0 z-50"><Navigation /></div>}
-            <Hero showShared={!showIntro} greeting={greeting} isLaptop={isLaptop} />
+            <Hero
+              showShared={!showIntro}
+              greeting={greeting}
+              isLaptop={isLaptop}
+              onCursorModeChange={setCursorMode}
+              onCursorVisibilityChange={setCursorHidden}
+            />
             <About isLaptop={isLaptop} />
             <Projects isLaptop={isLaptop} onCursorModeChange={setCursorMode} />
             <Contact isLaptop={isLaptop} />

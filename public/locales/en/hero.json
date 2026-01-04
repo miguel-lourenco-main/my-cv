@@ -1,6 +1,7 @@
 {
   "intro1": "I'm a developer from Portugal who specializes in frontend development, working with the most widely used languages and tools in modern web development. I focus on TypeScript/JavaScript, React, Next.js, Tailwind CSS, and other cutting-edge frontend technologies to build intuitive and performant user interfaces.",
   "intro2": "I'm an engineer who thrives on building systems and has hands-on experience across all aspects of the development process, from architecting repositories and shaping user experience flows to building intuitive UIs and implementing core backend features.",
-  "ctaDownloadCv": "Download CV"
+  "ctaDownloadCv": "Download CV",
+  "ctaViewCv": "View CV"
 }
 

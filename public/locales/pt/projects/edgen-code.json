@@ -19,7 +19,7 @@
     "Interface de chat: chat alimentado por IA acessível do editor",
     "Assistência de código: obtenha ajuda com perguntas relacionadas ao código",
     "Integração API: conecta-se ao sistema de inferência de modelos locais",
-    "Fluxo de trabalho do desenvolvedor: projetado para se encaixar nos processos de desenvolvimento existentes",
+    "Fluxo de trabalho de developer: projetado para se encaixar nos processos de desenvolvimento existentes",
     "Arquitetura de extensão: construída usando as APIs de extensão do VS Code"
   ],
   "technical": {

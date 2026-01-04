@@ -111,7 +111,7 @@ export function Reveal(props: RevealProps & any) {
 /**
  * Props for the RevealStagger component.
  */
-type StaggerProps = {
+type RevealStaggerProps = {
   /** Children to animate with staggered timing */
   children: React.ReactNode;
   /** Base delay before first animation starts */
@@ -124,8 +124,10 @@ type StaggerProps = {
   type?: "fade" | "slide" | "zoom";
   /** Distance in pixels for slide animations */
   distance?: number;
-  /** Additional CSS classes */
+  /** Additional CSS classes for the container */
   className?: string;
+  /** Additional CSS classes for the reveal items */
+  revealClassName?: string;
 };
 
 /**
@@ -153,7 +155,8 @@ export function RevealStagger({
   type = "slide",
   distance = 20,
   className,
-}: StaggerProps) {
+  revealClassName,
+}: RevealStaggerProps) {
   const items = React.Children.toArray(children);
   return (
     <div className={className}>
@@ -165,6 +168,7 @@ export function RevealStagger({
           direction={direction}
           type={type}
           distance={distance}
+          className={revealClassName}
         >
           {child}
         </Reveal>
