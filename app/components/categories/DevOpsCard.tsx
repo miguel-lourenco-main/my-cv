@@ -3,23 +3,39 @@
 import React from "react";
 import CategoryCard from "./CategoryCard";
 import IconImage from "./IconImage";
-import CiCdIcon from "@/public/logos/ci_cd.svg";
-import EnvConfigIcon from "@/public/logos/environment_config.svg";
 import { useI18n } from "../../lib/i18n";
 
 export default function DevOpsCard() {
   const { t } = useI18n();
   const title = t('categories')('devops');
-  const items = ["GitLab", "CI/CD pipelines", "GitLab Pages", "Environment/config management", "Unit test automation"];
-  const iconURLs = [
-    "/logos/gitlab-logo-500.svg",
-    "/logos/playwright.svg",
+
+  const items = [
+    "GitLab",
+    "CI/CD pipelines",
+    "GitLab Pages",
+    "Vercel",
+    "Environment/config management",
   ];
+
   return (
     <CategoryCard title={title} items={items}>
-      {iconURLs.map((src, idx) => (
-        <IconImage key={src + idx} src={src} width={idx === 0 ? 42 : 56} height={idx === 0 ? 42 : 56} />
-      ))}
+      <IconImage src="/logos/gitlab-logo-500.svg" width={42} height={42} />
+
+      {/* Vercel: swap icon based on theme */}
+      <div className="relative w-[40px] h-[40px]">
+        <IconImage
+          src="/logos/vercel-icon-light.svg"
+          width={42}
+          height={42}
+          className="absolute inset-0 h-full w-full object-contain opacity-90 dark:hidden"
+        />
+        <IconImage
+          src="/logos/vercel-icon-dark.svg"
+          width={42}
+          height={42}
+          className="absolute inset-0 h-full w-full object-contain opacity-90 hidden dark:block"
+        />
+      </div>
     </CategoryCard>
   );
 }

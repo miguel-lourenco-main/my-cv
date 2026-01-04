@@ -15,6 +15,7 @@ import Image from "next/image";
 import { TechStackCircles } from "./TechStackCircles";
 import { ProjectCompanyClientInfo } from "./ProjectCompanyClientInfo";
 import type { ProjectScreenshotMode } from "./project-images";
+import { getOfficialTechUrl } from "./tech-links";
 
 /**
  * Expanded project card modal component.
@@ -52,13 +53,19 @@ export function ProjectExpandedCard({
   const [activeTab, setActiveTab] = useState<"info" | "experience">("info");
   const [showScrollToContentButton, setShowScrollToContentButton] =
     useState<boolean>(true);
+  const [isTechStackFocused, setIsTechStackFocused] = useState(false);
   // Local screenshot mode for this expanded card only (independent from global state)
   const [localScreenshotMode, setLocalScreenshotMode] = useState<ProjectScreenshotMode>(screenshotMode);
 
   // Handle keyboard navigation and prevent body scroll when modal is open
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key !== "Escape") return;
+      if (isTechStackFocused) {
+        setIsTechStackFocused(false);
+        return;
+      }
+      onClose();
     }
     // Prevent body scroll when modal is open
     if (project) {
@@ -71,16 +78,17 @@ export function ProjectExpandedCard({
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "auto";
     };
-  }, [project, onClose]);
+  }, [project, onClose, isTechStackFocused]);
 
   // Reset mobile "scroll hint" state when opening a project
   useEffect(() => {
     if (!project) return;
     setActiveTab("info");
     setShowScrollToContentButton(true);
+    setIsTechStackFocused(false);
     // Reset local screenshot mode to global when opening a new project
     setLocalScreenshotMode(screenshotMode);
-  }, [project?.id, screenshotMode]);
+  }, [project, screenshotMode]);
 
   // Hide the scroll-to-content button once the user reaches the bottom of the modal
   useEffect(() => {
@@ -131,8 +139,46 @@ export function ProjectExpandedCard({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
           >
+            {/* Tech stack focus overlay (inside modal card) */}
+            <AnimatePresence>
+              {isTechStackFocused ? (
+                <motion.div
+                  key="tech-stack-focus-overlay"
+                  className="absolute inset-0 z-[70]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {/* Dim layer (dismiss) */}
+                  <button
+                    type="button"
+                    aria-label="Close tech stack focus"
+                    className="absolute inset-0 bg-black/35 backdrop-blur-[1px] cursor-pointer"
+                    onClick={() => setIsTechStackFocused(false)}
+                  />
+
+                  {/* Centered row */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <motion.div
+                      layoutId={`tech-row-${project.id}-${id}`}
+                      className="pointer-events-auto"
+                      transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                    >
+                      <TechStackCircles
+                        technologies={project.technologies}
+                        size={60}
+                        linksEnabled
+                        getTechUrl={getOfficialTechUrl}
+                        className="rounded-full px-5 py-4 bg-white/90 dark:bg-neutral-950/80 border border-neutral-200 dark:border-neutral-800 shadow-xl"
+                      />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+
             {/* X button for screens smaller than xl */}
-            <ProjectCloseButton onClose={onClose} className="absolute top-4 right-4 md:hidden" />
+            <ProjectCloseButton onClose={onClose} className="absolute top-4 right-4 md:hidden z-[90]" />
             <div className="flex flex-col items-start gap-1 w-full">
               <div className="flex items-center justify-between mb-2 sm:mb-3 w-full">
                 <h3 className="flex flex-wrap items-center gap-2 text-xl sm:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
@@ -144,10 +190,19 @@ export function ProjectExpandedCard({
                     />
                   )}
                   {getProjectString(project, "title")}
-                  <TechStackCircles
-                    technologies={project.technologies}
-                    size={28}
-                  />
+                  {!isTechStackFocused ? (
+                    <motion.div
+                      layoutId={`tech-row-${project.id}-${id}`}
+                      transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                    >
+                      <TechStackCircles
+                        technologies={project.technologies}
+                        size={28}
+                        linksEnabled={false}
+                        onCircleClick={() => setIsTechStackFocused(true)}
+                      />
+                    </motion.div>
+                  ) : null}
                 </h3>
                 <div className="hidden md:flex items-center gap-4 justify-center">
                   <ProjectButtons project={project} />

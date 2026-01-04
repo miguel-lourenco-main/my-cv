@@ -134,11 +134,11 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
 
   return (
     <Reveal type="fade" 
-      className={`group flex flex-col gap-y-8 items-center justify-center h-full p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md transition-shadow duration-300 ease-in-out overflow-hidden ${
+      className={`group flex flex-col items-center gap-y-12 2xl:gap-y-0 justify-start h-full min-h-[300px] p-7 sm:p-10 lg:p-10 xl:p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md transition-shadow duration-300 ease-in-out overflow-hidden ${
         isPhone ? '' : 'hover:shadow-lg'
       }`}
     >
-      <RevealStagger className="flex flex-col items-center text-center" delay={0.05} interval={0.06}>
+      <RevealStagger className="flex-1 flex flex-col items-center text-center" delay={0.05} interval={0.06}>
         <h3 
           ref={titleRef}
           className="text-xl font-semibold text-slate-900 dark:text-white mb-2"
@@ -147,7 +147,7 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
         </h3>
         <p className="text-slate-600 dark:text-slate-300">{items.join(', ')}</p>
       </RevealStagger>
-      <div ref={iconsContainerRef} className="mt-6 flex flex-wrap items-center justify-center gap-6 group-hover:scale-110 transition-transform duration-300 ease-in-out">
+      <div ref={iconsContainerRef} className="flex-1 flex flex-wrap items-center justify-center gap-6 group-hover:scale-110 transition-transform duration-300 ease-in-out">
         {React.Children.map(children, (child, idx) => (
           <Reveal key={idx} type="slide" direction="up" delay={0.1 + idx * 0.06}>
             <div

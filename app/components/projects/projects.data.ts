@@ -276,6 +276,11 @@ const projectsData: ProjectData[] = [
       { name: "React", icon: "/logos/react.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "n8n", icon: "/logos/n8n_pink+black_logo.svg" },
+      { name: "Supabase", icon: "/logos/supabase.svg" },
+      { name: "ElevenLabs", icon: "/logos/elevenlabs-logo-black.svg" },
+      { name: "OpenAI", icon: "/logos/openai.svg" },
+
     ],
     details: {
       subtitleKey: "subtitle",
@@ -322,6 +327,7 @@ const projectsData: ProjectData[] = [
       { name: "React", icon: "/logos/react.svg" },
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
+      { name: "n8n", icon: "/logos/n8n_pink+black_logo.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -414,6 +420,7 @@ const projectsData: ProjectData[] = [
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "Playwright", icon: "/logos/playwright.svg" },
+      { name: "n8n", icon: "/logos/n8n_pink+black_logo.svg" },
     ],
     details: {
       subtitleKey: "subtitle",
@@ -460,6 +467,7 @@ const projectsData: ProjectData[] = [
       { name: "TypeScript", icon: "/logos/typescript.svg" },
       { name: "Tailwind CSS", icon: "/logos/tailwind_css.svg" },
       { name: "Supabase", icon: "/logos/supabase.svg" },
+      { name: "n8n", icon: "/logos/n8n_pink+black_logo.svg" },
     ],
     details: {
       subtitleKey: "subtitle",

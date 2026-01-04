@@ -3,5 +3,8 @@
   "frontend": "Frontend",
   "backend": "Backend",
   "devops": "DevOps",
-  "tooling": "Ferramentas"
+  "tooling": "Ferramentas",
+  "testing": "Testes",
+  "automation": "Automação",
+  "ai": "IA"
 }

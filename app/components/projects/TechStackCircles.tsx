@@ -17,6 +17,15 @@ type TechStackCirclesProps = {
   }>;
   /** Technologies to display as overlapping circles. */
   technologies?: ProjectTechnology[];
+  /**
+   * Whether circle links should be enabled (default: true).
+   * When false, circles are still clickable via `onCircleClick`, but will not navigate.
+   */
+  linksEnabled?: boolean;
+  /** Optional URL resolver for technology circles. Used only when `linksEnabled` is true. */
+  getTechUrl?: (techName: string) => string | undefined;
+  /** Called when a circle is clicked (both for tech and leading circles). */
+  onCircleClick?: (args: { name: string; url?: string }) => void;
   /** Size of each circle in pixels (default: 32). */
   size?: number;
   /** Additional CSS classes. */
@@ -34,6 +43,9 @@ type CircleEntity = {
 export function TechStackCircles({
   leadingCircles = [],
   technologies = [],
+  linksEnabled = true,
+  getTechUrl,
+  onCircleClick,
   size = 32,
   className,
 }: TechStackCirclesProps) {
@@ -55,6 +67,7 @@ export function TechStackCircles({
     entities.push({
       name: tech.name,
       icon: tech.icon,
+      url: linksEnabled ? getTechUrl?.(tech.name) : undefined,
       tooltipText: `Built with ${tech.name}`,
     });
   });
@@ -88,6 +101,8 @@ export function TechStackCircles({
               iconNode={entity.iconNode}
               url={entity.url}
               tooltipText={entity.tooltipText}
+              linksEnabled={linksEnabled}
+              onCircleClick={onCircleClick}
               size={size}
               marginLeft={marginLeft}
               zIndex={zIndex}
@@ -107,6 +122,8 @@ function TechCircle({
   iconNode,
   url,
   tooltipText,
+  linksEnabled,
+  onCircleClick,
   size,
   marginLeft,
   zIndex,
@@ -118,6 +135,8 @@ function TechCircle({
   iconNode?: React.ReactNode;
   url?: string;
   tooltipText: string;
+  linksEnabled: boolean;
+  onCircleClick?: (args: { name: string; url?: string }) => void;
   size: number;
   marginLeft: number;
   zIndex: number;
@@ -127,6 +146,12 @@ function TechCircle({
   const [imageError, setImageError] = useState(false);
 
   const showFallback = (!icon || imageError) && !iconNode;
+  const canNavigate = Boolean(url && linksEnabled);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCircleClick?.({ name, url });
+  };
 
   const circleContent = (
     <motion.div
@@ -165,21 +190,31 @@ function TechCircle({
     <Tooltip.Provider delayDuration={150}>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
-          {url ? (
+          {canNavigate ? (
             <a
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCircleClick?.({ name, url });
+              }}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
             >
               {circleContent}
             </a>
           ) : (
-            <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+            <button
+              type="button"
+              className="bg-transparent p-0 border-0"
+              onClick={handleClick}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              aria-label={tooltipText}
+            >
               {circleContent}
-            </div>
+            </button>
           )}
         </Tooltip.Trigger>
         <Tooltip.Portal>

@@ -1,7 +1,11 @@
-import LanguagesCard from "./categories/LanguagesCard";
+"use client";
+
 import FrontendCard from "./categories/FrontendCard";
 import BackendCard from "./categories/BackendCard";
 import DevOpsCard from "./categories/DevOpsCard";
+import TestingCard from "./categories/TestingCard";
+import AutomationCard from "./categories/AutomationCard";
+import AICard from "./categories/AICard";
 import ConditionalReveal from "./ConditionalReveal";
 import { useI18n } from "../lib/i18n";
 import { useMobileDetection } from "../lib/use-mobile-detection";
@@ -27,15 +31,17 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
   const ta = t('about');
   // Category cards configuration
   const categories = [
-    { key: "languages", component: <LanguagesCard /> },
     { key: "frontend", component: <FrontendCard /> },
     { key: "backend", component: <BackendCard /> },
     { key: "devops", component: <DevOpsCard /> },
+    { key: "testing", component: <TestingCard /> },
+    { key: "automation", component: <AutomationCard /> },
+    { key: "ai", component: <AICard /> },
   ];
 
   // Build section classes with conditional laptop styling
   const sectionClasses = getSectionClasses(
-    "max-w-9xl mx-auto",
+    "flex flex-col items-center justify-center max-w-9xl mx-auto",
     isLaptop,
     "h-screen flex-none snap-center flex flex-col justify-center"
   );
@@ -61,34 +67,22 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
       interval={0.06}
     >
       {categories.map((c) => (
-        <div key={c.key}>{c.component}</div>
+        <div className="size-full" key={c.key}>{c.component}</div>
       ))}
     </ConditionalReveal>
   );
 
-  // Desktop: First row with Languages and DevOps
-  const desktopFirstRow = (
+  // Desktop: 3-column grid
+  const desktopGrid = (
     <ConditionalReveal
       isMobile={isMobile}
-      className={getGridClassesWithMargin()}
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
       delay={0.2}
       interval={0}
     >
-      <FrontendCard />
-      <LanguagesCard />
-    </ConditionalReveal>
-  );
-
-  // Desktop: Second row with Frontend and Backend
-  const desktopSecondRow = (
-    <ConditionalReveal
-      isMobile={isMobile}
-      className={getGridClassesWithMargin()}
-      delay={0.6}
-      interval={0}
-    >
-      <BackendCard />
-      <DevOpsCard />
+      {categories.map((c) => (
+        <div className="size-full" key={c.key}>{c.component}</div>
+      ))}
     </ConditionalReveal>
   );
 
@@ -96,10 +90,9 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
     <section id="technical-skills" className={sectionClasses}>
       {titleWrapper}
       {mobileGrid}
-      <div className="lg:block hidden w-[90%] sm:w-[85%] lg:w-[80%] xl:w-[75%] 2xl:w-[70%] mx-auto">
-        {desktopFirstRow}
-        {desktopSecondRow}
+      <div className="lg:block hidden w-full sm:w-[95%] lg:w-[90%] xl:w-[85%] 2xl:w-[90%]">
+        {desktopGrid}
       </div>
     </section>
-  )
+  );
 }
