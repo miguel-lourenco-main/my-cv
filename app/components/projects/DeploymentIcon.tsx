@@ -3,6 +3,7 @@
 import React from "react";
 import { cn } from "@/app/lib/utils";
 import type { ProjectDeployment } from "./projects.types";
+import VercelLogoWithCircle from "../categories/VercelLogoWithCircle";
 
 /**
  * Props for DeploymentIcon component.
@@ -49,22 +50,7 @@ export function DeploymentIcon({
   }
 
   if (deployment === "vercel") {
-    return (
-      <>
-        <img
-          src="/logos/vercel-icon-light.svg"
-          alt="Vercel"
-          className={cn("object-contain dark:hidden", className)}
-          style={{ width: size, height: size }}
-        />
-        <img
-          src="/logos/vercel-icon-dark.svg"
-          alt="Vercel"
-          className={cn("hidden object-contain dark:block", className)}
-          style={{ width: size, height: size }}
-        />
-      </>
-    );
+    return <VercelLogoWithCircle size={size} className={className} />;
   }
 
   return null;

@@ -3,7 +3,7 @@
 import React from "react";
 import CategoryCard from "./CategoryCard";
 import IconImage from "./IconImage";
-import VercelLogo from "@/public/logos/vercel.svg";
+import VercelLogoWithCircle from "./VercelLogoWithCircle";
 import { useI18n } from "../../lib/i18n";
 
 export default function ToolingCard() {
@@ -20,7 +20,7 @@ export default function ToolingCard() {
       {iconURLs.map((src, idx) => (
         <IconImage key={src + idx} src={src} />
       ))}
-      <VercelLogo className="size-24 text-slate-900 dark:text-white [&_*]:fill-current" />
+      <VercelLogoWithCircle size={96} />
     </CategoryCard>
   );
 }

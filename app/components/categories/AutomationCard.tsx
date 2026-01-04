@@ -23,7 +23,7 @@ export default function AutomationCard() {
           src="/logos/n8n_pink+white_logo.svg"
           width={576}
           height={160}
-          className="absolute inset-0 h-full w-full object-contain opacity-90"
+          className="absolute inset-0 h-full w-full object-contain "
         />
       </div>
     </CategoryCard>

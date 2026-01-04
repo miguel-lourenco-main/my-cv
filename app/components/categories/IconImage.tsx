@@ -28,7 +28,7 @@ interface IconImageProps {
  * @param props.width - Image width (default: 42px)
  * @param props.height - Image height (default: 42px)
  * @param props.alt - Alt text (default: empty string, aria-hidden used)
- * @param props.className - Additional CSS classes (default: "opacity-90")
+ * @param props.className - Additional CSS classes (default: "")
  * 
  * @example
  * ```tsx
@@ -40,7 +40,7 @@ export default function IconImage({
   width = 42,
   height = 42,
   alt = "",
-  className = "opacity-90",
+  className = "",
 }: IconImageProps) {
   return (
     <img

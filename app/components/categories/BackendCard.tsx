@@ -18,7 +18,7 @@ export default function BackendCard() {
           src="/logos/nodejsDark.svg"
           width={72}
           height={72}
-          className="absolute inset-0 h-full w-full object-contain opacity-90"
+          className="absolute inset-0 h-full w-full object-contain "
         />
       </div>
       <IconImage

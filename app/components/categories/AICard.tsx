@@ -18,12 +18,12 @@ export default function AICard() {
 
   return (
     <CategoryCard title={title} items={items}>
-      <IconImage src="/logos/openai.svg" width={48} height={48} className="opacity-90 dark:invert" />
+      <IconImage src="/logos/openai.svg" width={48} height={48} className=" dark:invert" />
       <IconImage
         src="/logos/elevenlabs-logo-black.svg"
         width={42}
         height={42}
-        className="opacity-90 dark:invert"
+        className=" dark:invert"
       />
     </CategoryCard>
   );
