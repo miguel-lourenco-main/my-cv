@@ -56,10 +56,24 @@ export default function Hero({
       return text || '';
     }
     
-    // Terms to underline: country and tech stack
-    const countryTerms = ['Portugal'];
-    const techStackTerms = ['TypeScript/JavaScript', 'React', 'Next.js', 'Tailwind CSS'];
-    const allTerms = [...countryTerms, ...techStackTerms];
+    // Terms to underline: country + tools/languages mentioned in hero copy (keep in sync with i18n strings)
+    const countryTerms = ["Portugal"];
+    const techAndToolTerms = [
+      "TypeScript/JavaScript",
+      "TypeScript",
+      "JavaScript",
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "Node.js",
+      "SQL/Postgres",
+      "SQL",
+      "Postgres",
+      "REST APIs",
+      "REST API",
+      "APIs REST",
+    ];
+    const allTerms = [...countryTerms, ...techAndToolTerms];
     
     // Create a regex pattern that matches any of the terms (case-insensitive, word boundaries)
     const pattern = new RegExp(
@@ -179,7 +193,7 @@ export default function Hero({
               </Button>
             </RevealStagger>
           </div>
-          <RevealStagger delay={1.9} interval={0.04} className="w-full block lg:hidden" revealClassName="flex justify-center w-full">
+          <RevealStagger delay={1.9} interval={0.04} className="w-full block lg:hidden flex justify-center">
             <CvPreview className="block lg:hidden" cvEmbedSrc={cvEmbedSrc} onCursorModeChange={onCursorModeChange} onCursorVisibilityChange={onCursorVisibilityChange} setIsFocusOpen={setIsFocusOpen} th={th} />
           </RevealStagger>
         </div>
