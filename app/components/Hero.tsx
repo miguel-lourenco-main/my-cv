@@ -213,8 +213,12 @@ function CvPreview({ className, cvEmbedSrc, onCursorModeChange, onCursorVisibili
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
-    setIsSmallScreen(window.innerHeight < 1000);
-  }, [window.innerHeight]);
+    if (typeof window === 'undefined') return;
+    const update = () => setIsSmallScreen(window.innerHeight < 1000);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   return (
     <div
