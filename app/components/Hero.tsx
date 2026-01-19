@@ -113,7 +113,7 @@ export default function Hero({
   // Build section classes with conditional laptop styling
   const sectionClasses = [
     "flex flex-col max-w-7xl mx-auto",
-    isLaptop ? "h-screen flex-none snap-center justify-center" : "gap-y-12"
+    isLaptop ? "h-screen snap-center justify-center" : "gap-y-12"
   ].filter(Boolean).join(" ");
 
   const handleDownload = () => {
@@ -210,6 +210,12 @@ export default function Hero({
 } 
 
 function CvPreview({ className, cvEmbedSrc, onCursorModeChange, onCursorVisibilityChange, setIsFocusOpen, th }: { className: string, cvEmbedSrc: string, onCursorModeChange?: (mode: "default" | "view") => void, onCursorVisibilityChange?: (hidden: boolean) => void, setIsFocusOpen: (open: boolean) => void, th: (key: string) => string }) {
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    setIsSmallScreen(window.innerHeight < 1000);
+  }, [window.innerHeight]);
+
   return (
     <div
       className={["relative isolate overflow-hidden size-full max-w-xl rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 shadow-sm", className].join(" ")}
@@ -218,7 +224,7 @@ function CvPreview({ className, cvEmbedSrc, onCursorModeChange, onCursorVisibili
       onPointerEnter={() => onCursorVisibilityChange?.(true)}
       onPointerLeave={() => onCursorVisibilityChange?.(false)}
     >
-      <div className="relative z-0 w-full h-[600px]">
+      <div className={["relative z-0 w-full ", isSmallScreen ? "h-[400px]" : "h-[600px]"].join(" ")}>
         <iframe
           title="CV preview"
           src={cvEmbedSrc}
