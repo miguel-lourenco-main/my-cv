@@ -11,9 +11,7 @@ export default function TestingCard() {
 
   const items = [
     "Playwright (E2E)",
-    "Regression checks",
     "Test automation in CI",
-    "Stable, repeatable QA flows",
   ];
 
   return (

@@ -8,7 +8,7 @@ import { useI18n } from "../../lib/i18n";
 export default function BackendCard() {
   const { t } = useI18n();
   const title = t('categories')('backend');
-  const items = ["Node.js", "PostgreSQL(Supabase)", "n8n"];
+  const items = ["Node.js", "PostgreSQL(Supabase)"];
 
   return (
     <CategoryCard title={title} items={items}>
