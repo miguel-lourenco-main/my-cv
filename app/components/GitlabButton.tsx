@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import BaseButton from "./Button";
+import { useI18n } from "../lib/i18n";
 
 /**
  * GitLab button component with GitLab logo.
@@ -29,8 +30,15 @@ export default function GitlabButton({
   height: number;
   href?: string;
 }) {
+  const { t } = useI18n();
   return (
-    <BaseButton href={href} className={className} theme="orange">
+    <BaseButton
+      href={href}
+      className={className}
+      theme="orange"
+      aria-label={t("navigation")("githubAlt")}
+      data-contact="gitlab"
+    >
       <Image 
         src="/logos/gitlab-logo-500.svg" 
         alt="GitLab" 

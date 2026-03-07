@@ -48,9 +48,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const personJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Miguel Lourenço',
+    jobTitle: 'Full Stack Developer',
+    url: 'https://miguel-lourenco-main.gitlab.io/my-cv/',
+    email: 'migasoulou@gmail.com',
+    sameAs: [
+      'https://gitlab.com/miguel-lourenco-main',
+      'https://www.linkedin.com/in/miguel-louren%C3%A7o-395335355/',
+    ],
+  };
+
   return (
     <html lang="en" className="scroll-smooth dark" suppressHydrationWarning>
       <body className={`${inter.className} antialiased bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`} suppressHydrationWarning>
+        {/* JSON-LD Person schema for scrapers, SEO, and AI agents (e.g. browser-use) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
         {/* Disable browser scroll restoration to prevent unwanted scroll positions */}
         <Script id="disable-scroll-restoration" strategy="beforeInteractive">{`
           (function(){
