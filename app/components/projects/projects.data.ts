@@ -100,7 +100,7 @@ const projectsData: ProjectData[] = [
     id: "edgen-chat",
     type: "professional",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -144,13 +144,13 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "EdgenChat", org: "Edgen", date: "2024" },
+    experience: { name: "EdgenChat", org: "EdgenAI", date: "2024" },
   },
   {
     id: "edgen-code",
     type: "professional",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -189,13 +189,13 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "EdgenCode", org: "Edgen", date: "2024" },
+    experience: { name: "EdgenCode", org: "EdgenAI", date: "2024" },
   },
   {
     id: "edgen-translate",
     type: "professional",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -244,13 +244,13 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "EdgenTranslate", org: "Edgen", date: "2024" },
+    experience: { name: "EdgenTranslate", org: "EdgenAI", date: "2024" },
   },
   {
     id: "sonora",
     type: "hybrid",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -299,12 +299,12 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "Sonora", org: "Edgen", date: "2024-2025" }
+    experience: { name: "Sonora", org: "EdgenAI", date: "2024-2025" }
   },
   {
     id: "agentic-hub",
     type: "hybrid",
-    company: "Edgen",
+    company: "EdgenAI",
     clients: [], // Add client icons here when provided
     titleKey: "title",
     descriptionKey: "description",
@@ -346,7 +346,7 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "Agentic Hub", org: "Edgen", date: "2024" },
+    experience: { name: "Agentic Hub", org: "EdgenAI", date: "2024" },
     
   },
   {

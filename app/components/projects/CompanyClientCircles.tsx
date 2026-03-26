@@ -54,7 +54,7 @@ type CircleEntity = {
  * @example
  * ```tsx
  * <CompanyClientCircles 
- *   company="Edgen" 
+ *   company="EdgenAI" 
  *   clients={[{ name: "Client 1", icon: "/logos/client1.svg" }]} 
  * />
  * ```

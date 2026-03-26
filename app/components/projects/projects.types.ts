@@ -72,7 +72,7 @@ export type ProjectExperience = {
   /** Client/team/initiative name */
   name: string;
   /** Organization where project was done */
-  org: 'Edgen' | 'Freelance' | string;
+  org: 'EdgenAI' | 'Freelance' | string;
   /** Free-form date or range, e.g., '2024' or '2023–2024' */
   date: string;
 };
