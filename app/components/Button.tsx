@@ -33,6 +33,10 @@ export interface BaseButtonProps {
   target?: string;
   /** Link rel attribute */
   rel?: string;
+  /** Accessible label for screen readers and scrapers */
+  "aria-label"?: string;
+  /** Machine-readable contact type for scrapers (e.g. gitlab, linkedin, email) */
+  "data-contact"?: string;
 }
 
 /**
@@ -105,6 +109,8 @@ export default function BaseButton({
   onClick,
   target = "_blank",
   rel = "noopener noreferrer",
+  "aria-label": ariaLabel,
+  "data-contact": dataContact,
 }: BaseButtonProps) {
   // Track click state for visual feedback
   const [isClicked, setIsClicked] = useState(false);
@@ -124,6 +130,8 @@ export default function BaseButton({
   return (
     <a
       href={href}
+      aria-label={ariaLabel}
+      data-contact={dataContact}
       className={cn(
         "flex items-center rounded-md px-4 py-2 space-x-2 transition-all duration-200 hover:scale-125 active:scale-95",
         themeStyle.base,

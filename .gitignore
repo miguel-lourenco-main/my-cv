@@ -13,6 +13,8 @@
 # Production
 /build
 
+/cover-letters
+
 # Misc
 .DS_Store
 *.pem

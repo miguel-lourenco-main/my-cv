@@ -2,6 +2,7 @@
 
 import BaseButton from "./Button";
 import { cn } from "../lib/utils";
+import { useI18n } from "../lib/i18n";
 
 /**
  * LinkedIn button component with LinkedIn logo.
@@ -26,11 +27,14 @@ export default function LinkedInButton({
   width?: number;
   height?: number;
 }) {
+  const { t } = useI18n();
   return (
-    <BaseButton 
+    <BaseButton
       href="https://www.linkedin.com/in/miguel-louren%C3%A7o-395335355/"
-      className={cn("group", className)} 
+      className={cn("group", className)}
       theme="blue"
+      aria-label={t("navigation")("linkedinAlt")}
+      data-contact="linkedin"
     >
       <svg 
         width={width} 

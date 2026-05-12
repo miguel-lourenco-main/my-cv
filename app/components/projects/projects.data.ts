@@ -64,6 +64,8 @@ const projectsData: ProjectData[] = [
   {
     id: "oflat",
     type: "personal",
+    startDate: "2023-02-01",
+    endDate: "2023-09-30",
     titleKey: "title",
     descriptionKey: "description",
     imagesFirst: [
@@ -99,8 +101,10 @@ const projectsData: ProjectData[] = [
   {
     id: "edgen-chat",
     type: "professional",
+    startDate: "2024-02-01",
+    endDate: "2024-12-31",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -144,13 +148,15 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "EdgenChat", org: "Edgen", date: "2024" },
+    experience: { name: "EdgenChat", org: "EdgenAI", date: "2024" },
   },
   {
     id: "edgen-code",
     type: "professional",
+    startDate: "2024-04-01",
+    endDate: "2024-11-30",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -189,13 +195,15 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "EdgenCode", org: "Edgen", date: "2024" },
+    experience: { name: "EdgenCode", org: "EdgenAI", date: "2024" },
   },
   {
     id: "edgen-translate",
     type: "professional",
+    startDate: "2024-03-01",
+    endDate: "2024-12-31",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -244,13 +252,14 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "EdgenTranslate", org: "Edgen", date: "2024" },
+    experience: { name: "EdgenTranslate", org: "EdgenAI", date: "2024" },
   },
   {
     id: "sonora",
     type: "hybrid",
+    startDate: "2024-06-01",
     company: {
-      name: "Edgen",
+      name: "EdgenAI",
       icon: "/logos/edgen-logo.svg",
       url: "https://edgen.co",
     },
@@ -299,12 +308,18 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "Sonora", org: "Edgen", date: "2024-2025" }
+    experience: { name: "Sonora", org: "EdgenAI", date: "2024-2025" }
   },
   {
     id: "agentic-hub",
     type: "hybrid",
-    company: "Edgen",
+    startDate: "2024-07-01",
+    endDate: "2024-12-31",
+    company: {
+      name: "EdgenAI",
+      icon: "/logos/edgen-logo.svg",
+      url: "https://edgen.co",
+    },
     clients: [], // Add client icons here when provided
     titleKey: "title",
     descriptionKey: "description",
@@ -346,12 +361,13 @@ const projectsData: ProjectData[] = [
         textKey: "personalExperience",
       },
     },
-    experience: { name: "Agentic Hub", org: "Edgen", date: "2024" },
+    experience: { name: "Agentic Hub", org: "EdgenAI", date: "2024" },
     
   },
   {
     id: "o-guardanapo",
     type: "personal",
+    startDate: "2025-01-15",
     titleKey: "title",
     descriptionKey: "description",
     // Images auto-detected from /public/projects_images/o-guardanapo/
@@ -398,6 +414,7 @@ const projectsData: ProjectData[] = [
   {
     id: "ui-components",
     type: "personal",
+    startDate: "2025-02-01",
     titleKey: "title",
     descriptionKey: "description",
     // Images auto-detected from /public/projects_images/ui-components/
@@ -445,6 +462,7 @@ const projectsData: ProjectData[] = [
   {
     id: "cash-register",
     type: "personal",
+    startDate: "2025-03-01",
     titleKey: "title",
     descriptionKey: "description",
     // Images auto-detected from /public/projects_images/cash-register/

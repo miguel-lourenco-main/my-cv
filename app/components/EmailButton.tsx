@@ -2,6 +2,7 @@
 
 import BaseButton from "./Button";
 import { cn } from "../lib/utils";
+import { useI18n } from "../lib/i18n";
 
 /**
  * Email button component with mailto link.
@@ -26,13 +27,16 @@ export default function EmailButton({
   width?: number;
   height?: number;
 }) {
+  const { t } = useI18n();
   return (
-    <BaseButton 
+    <BaseButton
       href="mailto:migasoulou@gmail.com"
-      className={cn("group", className)} 
+      className={cn("group", className)}
       theme="green"
       target="_self"
       rel=""
+      aria-label={t("navigation")("emailAlt")}
+      data-contact="email"
     >
       <svg 
         width={width} 

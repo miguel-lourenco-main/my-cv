@@ -72,7 +72,7 @@ export type ProjectExperience = {
   /** Client/team/initiative name */
   name: string;
   /** Organization where project was done */
-  org: 'Edgen' | 'Freelance' | string;
+  org: 'EdgenAI' | 'Freelance' | string;
   /** Free-form date or range, e.g., '2024' or '2023–2024' */
   date: string;
 };
@@ -151,7 +151,19 @@ export type Project = {
   technologies: ProjectTechnology[];
   /** Project type: personal, professional, or hybrid (started professional, continued privately) */
   type: 'personal' | 'professional' | 'hybrid';
-  /** Company information (required for professional projects) - can be string or object */
+  /**
+   * ISO calendar date `YYYY-MM-DD` — when work started (used with {@link Project.endDate} for browse sorting).
+   */
+  startDate: string;
+  /**
+   * ISO calendar date `YYYY-MM-DD` — when work ended. Omit for ongoing projects (sorts as most recent when browsing by end date).
+   */
+  endDate?: string;
+  /**
+   * Company information (required for professional projects) — string or object.
+   * Browse filters: distinct employer chips use names that include a logo on at least one project;
+   * {@link Project.type} drives the personal-only chip.
+   */
   company?: ProjectCompany;
   /** Array of clients that use/bought the app (for professional projects) */
   clients?: ProjectClient[];
