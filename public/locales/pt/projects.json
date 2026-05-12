@@ -10,6 +10,17 @@
   "projectStructureHeading": "Estrutura do Projeto",
   "deploymentHeading": "Deployment",
   "personalExperienceHeading": "Minha Experiência",
+  "filters": {
+    "sortGroupLabel": "Ordenar projetos por data",
+    "sortRecent": "Mais recentes primeiro",
+    "sortOldest": "Mais antigas primeiro",
+    "groupLabel": "Filtrar projetos",
+    "all": "Todos os projetos",
+    "personalChip": "Projetos pessoais e híbridos",
+    "companyChip": "Mostrar projetos em {{company}}",
+    "empty": "Nenhum projeto corresponde a estes filtros.",
+    "resetBrowse": "Repor filtros"
+  },
   "screenshots": {
     "label": "Capturas",
     "auto": "Auto",

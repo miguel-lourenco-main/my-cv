@@ -10,6 +10,17 @@
   "projectStructureHeading": "Project Structure",
   "deploymentHeading": "Deployment",
   "personalExperienceHeading": "My Experience",
+  "filters": {
+    "sortGroupLabel": "Sort projects by date",
+    "sortRecent": "Recent first",
+    "sortOldest": "Oldest first",
+    "groupLabel": "Filter projects",
+    "all": "All projects",
+    "personalChip": "Personal and hybrid projects",
+    "companyChip": "Show projects at {{company}}",
+    "empty": "No projects match these filters.",
+    "resetBrowse": "Reset filters"
+  },
   "screenshots": {
     "label": "Screenshots",
     "auto": "Auto",

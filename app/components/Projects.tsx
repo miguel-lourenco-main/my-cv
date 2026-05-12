@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { AnimatePresence } from 'motion/react'
 import { ProjectGrid } from './projects/ProjectGrid'
 import { projects as projectsData } from './projects/projects.data'
 import type { Project } from './projects/projects.types'
@@ -10,6 +10,14 @@ import { Reveal, RevealStagger } from './Reveal'
 import { useI18n } from '../lib/i18n'
 import type { ProjectScreenshotMode } from './projects/project-images'
 import { Sun, Moon } from 'lucide-react'
+import { ProjectBrowseBar } from './projects/ProjectBrowseBar'
+import {
+  AFFILIATION_ALL,
+  filterProjectsByAffiliation,
+  sortProjects,
+  type AffiliationFilterValue,
+  type ProjectSortMode,
+} from './projects/project-browse'
 
 /**
  * Projects section component displaying a grid of project cards.
@@ -34,10 +42,23 @@ export default function Projects({
 }) {
   const { t } = useI18n()
   const tp = t('projects')
-  // Track which project card is currently expanded
   const [activeProject, setActiveProject] = useState<Project | null>(null)
   const [screenshotMode, setScreenshotMode] =
     useState<ProjectScreenshotMode>("dark");
+  const [affiliationFilter, setAffiliationFilter] =
+    useState<AffiliationFilterValue>(AFFILIATION_ALL);
+  const [sortMode, setSortMode] = useState<ProjectSortMode>("recent");
+
+  const displayedProjects = useMemo(() => {
+    const filtered = filterProjectsByAffiliation(projectsData, affiliationFilter)
+    return sortProjects(filtered, sortMode)
+  }, [affiliationFilter, sortMode]);
+
+  const browseReset = () => {
+    setAffiliationFilter(AFFILIATION_ALL)
+    setSortMode("recent")
+    setActiveProject(null)
+  }
 
   // Persist screenshot mode across sessions.
   useEffect(() => {
@@ -63,7 +84,6 @@ export default function Projects({
     }
   }, [screenshotMode]);
 
-  // Build section classes with conditional laptop styling
   const sectionClasses = [
     "max-w-[98%] xl:max-w-7xl 3xl:max-w-10xl w-full mx-auto",
     isLaptop ? "flex-1 snap-start flex flex-col pt-16 pb-[40rem]" : ""
@@ -79,11 +99,26 @@ export default function Projects({
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
             {tp('subtitle')}
           </p>
-          <div className="mt-5 flex items-center justify-center">
-            <ScreenshotModeButton
-              mode={screenshotMode}
-              onModeChange={setScreenshotMode}
-              t={t}
+          <div className="mt-5 flex flex-col items-center justify-center gap-0">
+            <div className="flex items-center justify-center">
+              <ScreenshotModeButton
+                mode={screenshotMode}
+                onModeChange={setScreenshotMode}
+                t={t}
+              />
+            </div>
+            <ProjectBrowseBar
+              projects={projectsData}
+              affiliation={affiliationFilter}
+              onAffiliationChange={(next) => {
+                setAffiliationFilter(next)
+                setActiveProject(null)
+              }}
+              sortMode={sortMode}
+              onSortModeChange={(mode) => {
+                setSortMode(mode)
+                setActiveProject(null)
+              }}
             />
           </div>
         </RevealStagger>
@@ -91,16 +126,29 @@ export default function Projects({
 
       <div className={isLaptop ? "flex-1 min-h-0" : ""}>
         <Reveal type="fade">
-          <ProjectGrid
-            projects={projectsData}
-            onCardClick={(project) => setActiveProject(project)}
-            onCursorModeChange={onCursorModeChange}
-            screenshotMode={screenshotMode}
-          />
+          {displayedProjects.length === 0 ? (
+            <p className="mx-auto max-w-md text-center text-slate-600 dark:text-slate-400">
+              {tp("filters.empty")}
+              {" "}
+              <button
+                type="button"
+                onClick={browseReset}
+                className="font-medium text-slate-900 underline decoration-slate-400 underline-offset-2 hover:decoration-slate-600 dark:text-white dark:decoration-slate-500 dark:hover:decoration-slate-300"
+              >
+                {tp("filters.resetBrowse")}
+              </button>
+            </p>
+          ) : (
+            <ProjectGrid
+              projects={displayedProjects}
+              onCardClick={(project) => setActiveProject(project)}
+              onCursorModeChange={onCursorModeChange}
+              screenshotMode={screenshotMode}
+            />
+          )}
         </Reveal>
       </div>
 
-      {/* Animated modal for expanded project details */}
       <AnimatePresence>
         {activeProject ? (
           <ProjectExpandedCard
@@ -114,9 +162,6 @@ export default function Projects({
   )
 }
 
-/**
- * Icon button that cycles through screenshot modes: light <-> dark
- */
 function ScreenshotModeButton({
   mode,
   onModeChange,
