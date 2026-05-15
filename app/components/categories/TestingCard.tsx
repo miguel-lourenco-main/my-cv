@@ -15,7 +15,7 @@ export default function TestingCard() {
   ];
 
   return (
-    <CategoryCard title={title} items={items}>
+    <CategoryCard title={title} items={items} demoCardId="testing">
       <IconImage src="/logos/playwright.svg" width={56} height={56} />
     </CategoryCard>
   );

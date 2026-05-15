@@ -7,6 +7,7 @@ import TestingCard from "./categories/TestingCard";
 import AutomationCard from "./categories/AutomationCard";
 import AICard from "./categories/AICard";
 import ConditionalReveal from "./ConditionalReveal";
+import { TechStackDemoProvider } from "./TechStackDemo";
 import { useI18n } from "../lib/i18n";
 import { useMobileDetection } from "../lib/use-mobile-detection";
 import { getGridClasses, getGridClassesWithMargin } from "../lib/grid-utils";
@@ -87,12 +88,14 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
   );
 
   return (
-    <section id="technical-skills" className={sectionClasses}>
-      {titleWrapper}
-      {mobileGrid}
-      <div className="lg:block hidden w-full sm:w-[95%] lg:w-[90%] xl:w-[85%] 2xl:w-[90%]">
-        {desktopGrid}
-      </div>
-    </section>
+    <TechStackDemoProvider>
+      <section id="technical-skills" className={sectionClasses}>
+        {titleWrapper}
+        {mobileGrid}
+        <div className="lg:block hidden w-full sm:w-[95%] lg:w-[90%] xl:w-[85%] 2xl:w-[90%]">
+          {desktopGrid}
+        </div>
+      </section>
+    </TechStackDemoProvider>
   );
 }

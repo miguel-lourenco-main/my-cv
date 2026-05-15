@@ -4,6 +4,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { RevealStagger } from "../Reveal";
 import { Reveal } from "../Reveal";
 import { useIsPhone } from "@/app/lib/use-mobile-detection";
+import {
+  useTechStackDemo,
+  type TechStackDemoCardId,
+} from "@/app/components/TechStackDemo";
 
 /**
  * Props for the CategoryCard component.
@@ -15,6 +19,8 @@ type CategoryCardProps = {
   items: string[];
   /** Icon elements to display */
   children: React.ReactNode;
+  /** When set, this card can receive the scheduled Tech Stack demo hover highlight. */
+  demoCardId?: TechStackDemoCardId;
 };
 
 /**
@@ -34,11 +40,25 @@ type CategoryCardProps = {
  * </CategoryCard>
  * ```
  */
-export default function CategoryCard({ title, items, children }: CategoryCardProps) {
+export default function CategoryCard({
+  title,
+  items,
+  children,
+  demoCardId,
+}: CategoryCardProps) {
   const iconsContainerRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [isActive, setIsActive] = useState(false);
   const isPhone = useIsPhone();
+  const {
+    activeDemoCardId,
+    userHoveredCardId,
+    beginUserDemoHover,
+    scheduleUserDemoHoverEnd,
+  } = useTechStackDemo();
+  const isDemoActive =
+    Boolean(demoCardId) &&
+    (activeDemoCardId === demoCardId || userHoveredCardId === demoCardId);
 
   // Intersection observer for scroll-based triggering on phones
   useEffect(() => {
@@ -133,9 +153,21 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
   }, [children]);
 
   return (
-    <Reveal type="fade" 
-      className={`group flex flex-col items-center gap-y-12 2xl:gap-y-0 justify-start h-full min-h-[300px] p-7 sm:p-10 lg:p-10 xl:p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md transition-shadow duration-300 ease-in-out overflow-hidden ${
-        isPhone ? '' : 'hover:shadow-lg'
+    <Reveal
+      type="fade"
+      data-demo-active={isDemoActive ? "true" : undefined}
+      onPointerEnter={
+        demoCardId
+          ? () => {
+              beginUserDemoHover(demoCardId);
+            }
+          : undefined
+      }
+      onPointerLeave={demoCardId ? scheduleUserDemoHoverEnd : undefined}
+      className={`group flex flex-col items-center gap-y-12 2xl:gap-y-0 justify-start h-full min-h-[300px] p-7 sm:p-10 lg:p-10 xl:p-12 bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden transition-[background-color,box-shadow] duration-700 ease-in-out data-[demo-active=true]:bg-sky-100/95 dark:data-[demo-active=true]:bg-indigo-950/55 ${
+        isPhone
+          ? ""
+          : "hover:shadow-lg data-[demo-active=true]:shadow-xl data-[demo-active=true]:ring-2 data-[demo-active=true]:ring-sky-400/55 dark:data-[demo-active=true]:ring-sky-300/35"
       }`}
     >
       <RevealStagger className="flex-1 flex flex-col items-center text-center" delay={0.05} interval={0.06}>
@@ -147,12 +179,15 @@ export default function CategoryCard({ title, items, children }: CategoryCardPro
         </h3>
         <p className="text-slate-600 dark:text-slate-300">{items.join(', ')}</p>
       </RevealStagger>
-      <div ref={iconsContainerRef} className="flex-1 flex flex-wrap items-center justify-center gap-6 group-hover:scale-110 transition-transform duration-300 ease-in-out">
+      <div
+        ref={iconsContainerRef}
+        className="flex-1 flex flex-wrap items-center justify-center gap-6 transition-transform duration-[900ms] ease-in-out motion-reduce:transition-none motion-reduce:transform-none group-hover:scale-110 group-data-[demo-active=true]:scale-110"
+      >
         {React.Children.map(children, (child, idx) => (
           <Reveal key={idx} type="slide" direction="up" delay={0.1 + idx * 0.06}>
             <div
               data-icon-item="true"
-              className="transform transition-transform duration-300 ease-in-out group-hover:translate-y-[calc(var(--dist-ratio,0)*8px)]"
+              className="transform transition-transform duration-[900ms] ease-in-out motion-reduce:transition-none motion-reduce:transform-none group-hover:translate-y-[calc(var(--dist-ratio,0)*8px)] group-data-[demo-active=true]:translate-y-[calc(var(--dist-ratio,0)*8px)]"
             >
               {child}
             </div>

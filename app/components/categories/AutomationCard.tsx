@@ -17,7 +17,7 @@ export default function AutomationCard() {
   ];
 
   return (
-    <CategoryCard title={title} items={items}>
+    <CategoryCard title={title} items={items} demoCardId="automation">
       <div className="relative w-[120px] h-[33px]">
         <IconImage
           src="/logos/n8n_pink+white_logo.svg"

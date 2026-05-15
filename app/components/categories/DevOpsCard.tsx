@@ -19,7 +19,7 @@ export default function DevOpsCard() {
   ];
 
   return (
-    <CategoryCard title={title} items={items}>
+    <CategoryCard title={title} items={items} demoCardId="devops">
       <IconImage src="/logos/gitlab-logo-500.svg" width={42} height={42} />
       <VercelLogoWithCircle size={42} />
     </CategoryCard>

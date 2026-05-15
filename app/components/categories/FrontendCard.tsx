@@ -28,7 +28,7 @@ export default function FrontendCard() {
   ];
   
   return (
-    <CategoryCard title={title} items={items}>
+    <CategoryCard title={title} items={items} demoCardId="frontend">
       {iconURLs.map((src, idx) => (
         <IconImage key={src + idx} src={src} width={idx === 4 ? 32 : 42} height={idx === 4 ? 32 : 42} />
       ))}

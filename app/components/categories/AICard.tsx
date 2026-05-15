@@ -17,7 +17,7 @@ export default function AICard() {
   ];
 
   return (
-    <CategoryCard title={title} items={items}>
+    <CategoryCard title={title} items={items} demoCardId="ai">
       <IconImage src="/logos/openai.svg" width={48} height={48} className=" dark:invert" />
       <IconImage
         src="/logos/elevenlabs-logo-black.svg"

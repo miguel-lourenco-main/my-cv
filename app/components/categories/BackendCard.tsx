@@ -11,7 +11,7 @@ export default function BackendCard() {
   const items = ["Node.js", "PostgreSQL(Supabase)"];
 
   return (
-    <CategoryCard title={title} items={items}>
+    <CategoryCard title={title} items={items} demoCardId="backend">
       {/* Node.js logo - unify into one slot to keep spacing/transform consistent */}
       <div className="relative w-[72px] h-[72px]">
         <IconImage
