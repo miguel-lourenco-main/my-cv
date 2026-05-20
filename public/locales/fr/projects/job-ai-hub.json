@@ -1,0 +1,61 @@
+{
+  "title": "Job AI Hub",
+  "description": "Centre de commande pour la recherche d'emploi augmentée par l'IA — pipeline, documents et préparation d'entretiens dans un seul espace.",
+  "subtitle": "Le centre de commande de votre recherche d'emploi, surpuissant",
+  "overview": "Un espace de travail personnel full-stack pour les chercheurs d'emploi actifs. Suivez les candidatures dans un pipeline Kanban, adaptez CV et lettres de motivation avec une IA contextuelle, préparez les entretiens avec des banques de questions et des sessions simulées, et gérez tout depuis un écosystème lié à un profil unique — avec support BYOK (bring your own key) pour OpenAI, Anthropic et Google.",
+  "coreConcept": {
+    "summary": "Un système connecté pour le suivi du pipeline, les flux documentaires IA et la préparation d'entretiens.",
+    "bullets": [
+      "Espace centré sur la candidature — chaque poste a lettres, entretiens, Q&R, CV et notes",
+      "IA qui lit votre profil, offres scrapées et recherches entreprise — pas de prompts génériques isolés",
+      "Assistant chat actionnable avec plus de 40 outils pour créer et mettre à jour les enregistrements",
+      "Boîte d'offres avec scraping d'URL avant de créer une candidature",
+      "Analyseur de CV, éditeur structuré et génération de lettres avec historique des versions",
+      "Sets d'entretien, simulations, feedback IA par rubrique et questions code avec exécution de tests",
+      "Export/import JSON complet pour la portabilité des données"
+    ]
+  },
+  "features": [
+    "Tableau de bord : stats pipeline, candidatures récentes, activité hebdo, santé du CV et actions rapides",
+    "Candidatures : pipeline Kanban (Enregistré → Postulé → En entretien → Offre → Refusé → Retiré)",
+    "Onglets par candidature : Lettre, Entretiens, Q&R, CV, Notes",
+    "Offres : scraper les annonces depuis des URLs, revoir les détails extraits, convertir en candidatures",
+    "Entreprises : dossiers enrichis par IA (culture, secteur, focus entretien)",
+    "CV : éditeur structuré, analyse PDF, copies traduites, packs de modèles",
+    "Lettres de motivation : génération IA liée au contexte candidature et offre",
+    "Entretiens : banques de questions, sets multi-tours, simulations et feedback automatisé",
+    "Chat IA : assistant conversationnel qui crée candidatures, lettres et plans d'entretien",
+    "Import de profil : extraire des données structurées depuis des PDF de CV",
+    "BYOK : clés API fournies par l'utilisateur — pas de markup de modèles intégrés",
+    "Site marketing avec accès MVP sur invitation uniquement"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 16 (App Router) avec React 19 et TypeScript 5.7",
+      "Tailwind CSS avec composants Radix UI / style shadcn",
+      "Fumadocs pour la documentation in-app",
+      "tldraw pour les surfaces d'édition en canvas",
+      "Monaco Editor pour la pratique des questions code",
+      "Vercel AI SDK avec fournisseurs OpenAI, Anthropic et Google"
+    ],
+    "projectStructure": [
+      "Monolithe Next.js : pages App Router + route handlers /app/api/*",
+      "Supabase : Postgres, Auth (cookies SSR) et Storage",
+      "Couche IA : chat tool-calling, contrats de sortie structurée et génération contextuelle",
+      "Pipelines de scraping d'offres et de recherche entreprise",
+      "Flux CV/lettre avec génération PDF (pdf-lib, html2pdf)",
+      "Moteur d'entretiens avec runners Piston et Playwright pour l'exécution de code",
+      "Rate limiting via Upstash Redis ; monitoring via Sentry",
+      "Tests : Vitest (unit/integration/component) + Playwright e2e + stress tests k6",
+      "GitLab CI avec orchestration automatique fix/retry"
+    ],
+    "deployment": [
+      "Production sur Vercel (job-hunting.vercel.app)",
+      "Supabase cloud pour base de données, auth et stockage fichiers",
+      "Config marketing pilotée par l'environnement (email contact, URL vidéo démo)",
+      "Sentry pour erreurs et monitoring de performance",
+      "Dev local avec Supabase CLI et Docker"
+    ]
+  },
+  "personalExperience": "Job AI Hub a commencé comme un prototype v0 et est devenu un produit que je voulais vraiment utiliser pendant ma propre recherche d'emploi. Le plus dur n'était pas une fonction isolée — c'était de garder profil, entreprise, offre, candidature et artefacts connectés pour que la génération IA ait toujours le bon contexte.\n\nConstruire le chat actionnable (40+ outils), l'espace candidature avec cinq onglets liés et le pipeline d'exécution de code en entretien m'a fait traverser tout le stack : tenancy Supabase, sorties IA structurées, parsing PDF/CV et une suite de tests de l'unitaire au Playwright e2e et à la charge k6.\n\nJe le traite comme un MVP à accès sur invitation pendant que j'itère sur le site marketing et les flux principaux. Le modèle BYOK était un choix délibéré — je voulais une IA puissante sans enfermer les utilisateurs dans des tarifs groupés."
+}

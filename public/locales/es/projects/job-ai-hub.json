@@ -1,0 +1,61 @@
+{
+  "title": "Job AI Hub",
+  "description": "Centro de mando para la búsqueda de empleo potenciado por IA — pipeline, documentos y preparación de entrevistas en un solo espacio.",
+  "subtitle": "El centro de mando de tu búsqueda de empleo, potenciado",
+  "overview": "Un espacio de trabajo personal full-stack para quienes buscan empleo activamente. Haz seguimiento de candidaturas en un pipeline Kanban, adapta currículums y cartas de presentación con IA consciente del contexto, prepárate para entrevistas con bancos de preguntas y sesiones simuladas, y gestiona todo desde un ecosistema vinculado a un único perfil — con soporte BYOK (bring your own key) para OpenAI, Anthropic y Google.",
+  "coreConcept": {
+    "summary": "Un sistema conectado para seguimiento del pipeline, flujos documentales con IA y preparación de entrevistas.",
+    "bullets": [
+      "Espacio centrado en la candidatura — cada puesto tiene cartas, entrevistas, Q&A, currículums y notas",
+      "IA que lee tu perfil, ofertas scrapeadas y research de empresas — no prompts genéricos sueltos",
+      "Asistente de chat con acciones y más de 40 herramientas para crear y actualizar registros en la app",
+      "Bandeja de ofertas con scraping por URL antes de convertir en candidatura",
+      "Analizador de CV, editor estructurado y generación de cartas con historial de versiones",
+      "Sets de entrevista, simulacros, feedback con IA basado en rúbricas y preguntas de código con ejecución de tests",
+      "Exportación/importación JSON completa para portabilidad de datos"
+    ]
+  },
+  "features": [
+    "Dashboard: estadísticas del pipeline, candidaturas recientes, actividad semanal, salud del CV y acciones rápidas",
+    "Candidaturas: pipeline Kanban (Guardado → Aplicado → En entrevista → Oferta → Rechazado → Retirado)",
+    "Pestañas por candidatura: Carta, Entrevistas, Q&A, Currículum, Notas",
+    "Ofertas: scrapear listados desde URLs, revisar detalles extraídos, convertir en candidaturas",
+    "Empresas: dossiers enriquecidos con IA (cultura, sector, foco de entrevista)",
+    "Currículums: editor estructurado, análisis PDF, copias traducidas, packs de plantillas",
+    "Cartas de presentación: generación con IA vinculada al contexto de candidatura y oferta",
+    "Entrevistas: bancos de preguntas, sets multi-ronda, simulacros y feedback automatizado",
+    "Chat IA: asistente conversacional que crea candidaturas, cartas y planes de entrevista",
+    "Importación de perfil: extraer datos estructurados desde PDFs de currículum",
+    "BYOK: claves API del usuario — sin markup de modelos empaquetados",
+    "Sitio de marketing con acceso MVP solo por invitación"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 16 (App Router) con React 19 y TypeScript 5.7",
+      "Tailwind CSS con componentes Radix UI / estilo shadcn",
+      "Fumadocs para documentación in-app",
+      "tldraw para superficies de edición en canvas",
+      "Monaco Editor para práctica de preguntas de código",
+      "Vercel AI SDK con proveedores OpenAI, Anthropic y Google"
+    ],
+    "projectStructure": [
+      "Monolito Next.js: páginas App Router + route handlers en /app/api/*",
+      "Supabase: Postgres, Auth (cookies SSR) y Storage",
+      "Capa IA: chat con tool-calling, contratos de salida estructurada y generación con contexto",
+      "Pipelines de scraping de ofertas y research de empresas",
+      "Flujos de currículum/carta con generación PDF (pdf-lib, html2pdf)",
+      "Motor de entrevistas con runners Piston y Playwright para ejecución de código",
+      "Rate limiting con Upstash Redis; monitorización con Sentry",
+      "Tests: Vitest (unit/integration/component) + Playwright e2e + stress tests k6",
+      "GitLab CI con orquestación automática de fix/retry"
+    ],
+    "deployment": [
+      "Producción en Vercel (job-hunting.vercel.app)",
+      "Supabase cloud para base de datos, auth y almacenamiento de archivos",
+      "Config de marketing por entorno (email de contacto, URL de vídeo demo)",
+      "Sentry para errores y monitorización de rendimiento",
+      "Desarrollo local con Supabase CLI y Docker"
+    ]
+  },
+  "personalExperience": "Job AI Hub empezó como un prototipo v0 y creció hasta convertirse en un producto que yo mismo quería usar durante mi búsqueda de empleo. Lo más difícil no fue ninguna función aislada — fue mantener conectados perfil, empresa, oferta, candidatura y artefactos para que la generación con IA siempre tuviera el contexto correcto.\n\nConstruir el chat con acciones (más de 40 herramientas), el espacio de candidatura con cinco pestañas enlazadas y el pipeline de ejecución de código en entrevistas me llevó por todo el stack: tenancy en Supabase, salidas estructuradas de IA, parsing PDF/CV y una batería de tests que va de unitarios a Playwright e2e y carga con k6.\n\nLo trato como MVP con acceso solo por invitación mientras itero el sitio de marketing y los flujos principales. El modelo BYOK fue una decisión deliberada — quería IA potente sin encerrar a los usuarios en precios empaquetados."
+}

@@ -22,6 +22,7 @@ module.exports = {
     'projects/edgen-chat',
     'projects/edgen-code',
     'projects/edgen-translate',
+    'projects/job-ai-hub',
   ],
   defaultNS: 'projects',
   fallbackLng: 'en',

@@ -57,6 +57,28 @@
     "/projects_images/edgen-translate/edgen-translate_supported_langs_D.png",
     "/projects_images/edgen-translate/edgen-translate_supported_langs_L.png"
   ],
+  "job-ai-hub": [
+    "/projects_images/job-ai-hub/ai_chat_D.png",
+    "/projects_images/job-ai-hub/ai_chat_L.png",
+    "/projects_images/job-ai-hub/dashboard_D.png",
+    "/projects_images/job-ai-hub/dashboard_L.png",
+    "/projects_images/job-ai-hub/hero_D.png",
+    "/projects_images/job-ai-hub/hero_L.png",
+    "/projects_images/job-ai-hub/id_job_application_D.png",
+    "/projects_images/job-ai-hub/id_job_application_L.png",
+    "/projects_images/job-ai-hub/interview_D.png",
+    "/projects_images/job-ai-hub/interview_L.png",
+    "/projects_images/job-ai-hub/job_applications_D.png",
+    "/projects_images/job-ai-hub/job_applications_L.png",
+    "/projects_images/job-ai-hub/more_features_D.png",
+    "/projects_images/job-ai-hub/more_features_L.png",
+    "/projects_images/job-ai-hub/pillars_D.png",
+    "/projects_images/job-ai-hub/pillars_L.png",
+    "/projects_images/job-ai-hub/resume_editor_D.png",
+    "/projects_images/job-ai-hub/resume_editor_L.png",
+    "/projects_images/job-ai-hub/user_profile_D.png",
+    "/projects_images/job-ai-hub/user_profile_L.png"
+  ],
   "o-guardanapo": [
     "/projects_images/o-guardanapo/admin_menu_page_D.png",
     "/projects_images/o-guardanapo/admin_menu_page_L.png",
