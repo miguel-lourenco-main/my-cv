@@ -29,6 +29,7 @@ const DEFAULT_NAMESPACES = [
   'projects/edgen-chat',
   'projects/edgen-code',
   'projects/edgen-translate',
+  'projects/job-ai-hub',
 ]
 
 /**

@@ -1,0 +1,61 @@
+{
+  "title": "Job AI Hub",
+  "description": "AI-augmented job hunting command center — pipeline, documents, and interview prep in one workspace.",
+  "subtitle": "The command center for your job hunt, supercharged",
+  "overview": "A full-stack personal workspace for active job seekers. Track applications in a Kanban pipeline, tailor resumes and cover letters with context-aware AI, prep for interviews with question banks and mock sessions, and manage everything from a single profile-linked ecosystem — with bring-your-own-key support for OpenAI, Anthropic, and Google.",
+  "coreConcept": {
+    "summary": "One connected system for pipeline tracking, AI document workflows, and interview preparation.",
+    "bullets": [
+      "Application-centric workspace — each role gets cover letters, interviews, Q&A, resumes, and notes",
+      "AI that reads your profile, scraped job posts, and company research — not generic one-off prompts",
+      "Action-taking chat assistant with 40+ tools to create and update records across the app",
+      "Job post inbox with URL scraping before committing to an application",
+      "Resume analyzer, structured resume editor, and cover letter generation with version history",
+      "Interview sets, mock sessions, rubric-based AI feedback, and code questions with test execution",
+      "Full JSON export/import for data portability"
+    ]
+  },
+  "features": [
+    "Dashboard: pipeline stats, recent applications, weekly activity, resume health, and quick actions",
+    "Applications: Kanban pipeline (Saved → Applied → Interviewing → Offer → Rejected → Withdrawn)",
+    "Per-application tabs: Cover Letter, Interviews, Q&A, Resume, Notes",
+    "Job posts: scrape listings from URLs, review extracted details, convert to applications",
+    "Companies: AI-enriched dossiers (culture, industry, interview focus)",
+    "Resumes: structured editor, PDF analysis, translation copies, template packs",
+    "Cover letters: AI generation linked to application and job profile context",
+    "Interviews: question banks, multi-round sets, mock runs, and automated feedback",
+    "AI chat: conversational assistant that creates applications, letters, and interview plans",
+    "Profile import: extract structured data from resume PDFs",
+    "BYOK: user-supplied API keys — no bundled model markup",
+    "Marketing site with invite-only MVP access flow"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Next.js 16 (App Router) with React 19 and TypeScript 5.7",
+      "Tailwind CSS with Radix UI / shadcn-style components",
+      "Fumadocs for in-app documentation",
+      "tldraw for canvas-based editing surfaces",
+      "Monaco Editor for code question practice",
+      "Vercel AI SDK with OpenAI, Anthropic, and Google providers"
+    ],
+    "projectStructure": [
+      "Next.js monolith: App Router pages + /app/api/* route handlers",
+      "Supabase: Postgres, Auth (SSR cookies), and Storage",
+      "AI layer: tool-calling chat, structured output contracts, and context-aware generation",
+      "Job post scraping and company research pipelines",
+      "Resume/cover letter document workflows with PDF generation (pdf-lib, html2pdf)",
+      "Interview engine with Piston and Playwright code execution runners",
+      "Rate limiting via Upstash Redis; monitoring via Sentry",
+      "Testing: Vitest (unit/integration/component) + Playwright e2e + k6 stress tests",
+      "GitLab CI with automated fix/retry orchestration"
+    ],
+    "deployment": [
+      "Production on Vercel (job-hunting.vercel.app)",
+      "Supabase cloud for database, auth, and file storage",
+      "Environment-driven marketing config (contact email, demo video URL)",
+      "Sentry for error tracking and performance monitoring",
+      "Local dev with Supabase CLI and Docker"
+    ]
+  },
+  "personalExperience": "Job AI Hub started as a v0 prototype and grew into a product I actually wanted to use during my own job search. The hardest part wasn't any single feature — it was keeping profile, company, job post, application, and artifact data connected so AI generation always had the right context.\n\nBuilding the action-taking chat (40+ tools), the application workspace with five linked tabs, and the interview code execution pipeline pushed me across the full stack: Supabase tenancy, structured AI outputs, PDF/resume parsing, and a testing setup that spans unit tests through Playwright e2e and k6 load tests.\n\nI'm treating it as an MVP with invite-only access while I iterate on the marketing site and core workflows. The BYOK model was a deliberate choice — I wanted powerful AI without locking users into bundled pricing."
+}
