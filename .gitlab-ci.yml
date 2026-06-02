@@ -2,7 +2,7 @@
 # Pin `ref` to match: `git ls-tree HEAD infra` (update both when bumping the submodule).
 include:
   - project: public-work4/infra
-    ref: 3ac9b2ad4865ccd56f428c353cffbfaa00723369
+    ref: 8bf186306df3989788b77bfc23efb575006cea3f
     file:
       - ci/templates/fragments/toolchain-node-pnpm.gitlab-ci.yml
       - ci/templates/jobs-my-cv.gitlab-ci.yml
