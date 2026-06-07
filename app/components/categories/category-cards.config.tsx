@@ -45,7 +45,7 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
     demoCardId: "backend",
     items: ["Node.js", "PostgreSQL(Supabase)"],
     renderIcons: () => (
-      <>
+      [
         <div className="relative w-[72px] h-[72px]">
           {icon(
             "/logos/nodejsDark.svg",
@@ -53,10 +53,10 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
             72,
             "absolute inset-0 h-full w-full object-contain"
           )}
-        </div>
-        {icon("/logos/elephant_full.png")}
-        {icon("/logos/supabase.svg")}
-      </>
+        </div>,
+        icon("/logos/elephant_full.png"),
+        icon("/logos/supabase.svg")
+      ]
     ),
   },
   {
@@ -71,10 +71,10 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
       "Environment/config management",
     ],
     renderIcons: () => (
-      <>
-        {icon("/logos/gitlab-logo-500.svg")}
+      [
+        icon("/logos/gitlab-logo-500.svg"),
         <VercelLogoWithCircle size={42} />
-      </>
+      ]
     ),
   },
   {
@@ -111,10 +111,10 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
       "AI-assisted product flows",
     ],
     renderIcons: () => (
-      <>
-        {icon("/logos/openai.svg", 48, 48, "dark:invert")}
-        {icon("/logos/elevenlabs-logo-black.svg", 42, 42, "dark:invert")}
-      </>
+      [
+        icon("/logos/openai.svg", 48, 48, "dark:invert"),
+        icon("/logos/elevenlabs-logo-black.svg", 42, 42, "dark:invert"),
+      ]
     ),
   },
 ];
