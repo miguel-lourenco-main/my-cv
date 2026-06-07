@@ -38,5 +38,6 @@
       "Construit et publié via GitLab Pipelines",
       "Publié sur GitLab Pages"
     ]
-  }
+  },
+  "personalExperience": "Cash Register est né par nécessité lors d'un événement rural que j'ai aidé à organiser. Le défi de construire un système POS fonctionnel en moins de 8 heures a été intense mais incroyablement formateur. Travailler sous pression temporelle m'a obligé à prendre rapidement des décisions architecturales et à prioriser les fonctionnalités réellement utilisées.\n\nLe développement itératif pendant l'événement lui-même a été une expérience unique — j'ai pu voir de vrais utilisateurs interagir avec le système et apporter des améliorations en direct. La fonctionnalité de panier flottant sur mobile est le résultat direct de l'observation des difficultés des utilisateurs avec la conception initiale.\n\nCe projet m'a appris la valeur de la simplicité, de l'itération rapide et de la conception adaptée aux contraintes du monde réel. L'utilisation de Supabase pour les mises à jour en temps réel a été cruciale, et voir les commandes apparaître instantanément sur plusieurs appareils était satisfaisant. C'est un excellent exemple de la façon dont les contraintes peuvent conduire à des solutions créatives."
 }

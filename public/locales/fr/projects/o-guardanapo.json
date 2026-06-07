@@ -1,0 +1,49 @@
+{
+  "title": "O Guardanapo",
+  "description": "Application web pour le snack-bar O Guardanapo, construite comme un monorepo Turborepo avec Next.js, TypeScript, Supabase et un toolkit UI/infra partagé.",
+  "subtitle": "Application web pour le snack-bar O Guardanapo",
+  "overview": "O Guardanapo est une application web pour le snack-bar construite comme un monorepo TypeScript utilisant Next.js 15, Supabase et un toolkit UI/infra partagé. Le dépôt est organisé comme un workspace Turborepo + pnpm avec plusieurs apps (web, e2e) et des packages réutilisables pour l'UI, Supabase, le routing, le monitoring, l'i18n, les mailers et plus encore.",
+  "coreConcept": {
+    "summary": "Améliorer l'expérience de mes parents pour créer et promouvoir le menu du jour et les produits",
+    "bullets": [
+      "Faciliter la création et la promotion du menu du jour et des produits",
+      "Augmenter l'accessibilité en proposant différentes langues",
+      "Fournir des informations supplémentaires aux clients sur les produits et l'entreprise",
+      "Permettre aux clients d'interagir avec l'entreprise"
+    ]
+  },
+  "features": [
+    "Monorepo avec Turborepo + pnpm",
+    "Application web principale dans `apps/web` construite avec Next.js 15",
+    "Tests end-to-end dans `apps/e2e` utilisant Playwright",
+    "Bibliothèque de composants UI partagée dans `packages/ui` avec Tailwind CSS et Radix UI",
+    "Intégration Supabase via `packages/supabase` pour la base de données, l'auth et des utilitaires client type-safe",
+    "Packages partagés pour le routing, l'i18n, le monitoring et les mailers",
+    "Dossiers de données et scripts pour les imports CSV, le seeding et les tâches de maintenance"
+  ],
+  "technical": {
+    "frontendStack": [
+      "Turborepo",
+      "React 19",
+      "TypeScript comme langage principal",
+      "Next.js 15 pour l'application web",
+      "Tailwind CSS pour un styling utility-first",
+      "Primitives Radix UI plus une bibliothèque de composants personnalisée `@kit/ui`"
+    ],
+    "projectStructure": [
+      "Monorepo avec workspaces",
+      "`apps/web` comme application Next.js principale",
+      "`apps/e2e` pour les tests end-to-end Playwright",
+      "`packages/ui` pour les composants UI partagés et le styling",
+      "`packages/supabase` pour le client Supabase et le tooling",
+      "Packages partagés supplémentaires pour le routing, les utilitaires, l'i18n, le monitoring et les mailers",
+      "Répertoire `tooling` pour les configs centralisées ESLint, Prettier, Tailwind et TypeScript",
+      "Répertoires `data` et `scripts` pour les imports, traductions, transformations de produits et scripts de maintenance"
+    ],
+    "deployment": [
+      "Build et déploiement via GitLab Pipelines",
+      "Déployé sur Vercel"
+    ]
+  },
+  "personalExperience": "Travailler sur O Guardanapo a été une expérience profondément personnelle et formatrice pour moi. Mes parents tiennent un snack-bar au cœur de Lisbonne, et c'était la première fois que je construisais une application web complète pour de vrais utilisateurs plutôt que pour un usage personnel.\n\nJ'ai créé le site pour améliorer la façon dont ma mère crée et publie le menu du jour et pour faciliter la communication de mon père avec les clients étrangers qui ont souvent du mal à commander et finissent par jouer au « mime » au comptoir. En chemin, j'ai appris de dures leçons sur le choix des bons outils — partir d'un template surdimensionné avec Stripe, l'authentification et de nombreuses autres fonctionnalités alors que tout ce dont j'avais vraiment besoin était Supabase a ajouté beaucoup de complexité et de travail de refactorisation inutiles.\n\nLe produit final permet à ma mère de gérer un menu du jour multilingue sur la page d'accueil, les clients explorent chaque plat avec photos, ingrédients et étiquettes d'allergènes ou de régimes alimentaires, et tout le monde accède rapidement au menu via des codes QR dans le snack-bar. Avoir mes parents comme utilisateurs directs m'a donné un retour rapide et m'a poussé à réfléchir à la planification, au design UI, à l'infrastructure, au déploiement et à l'affinage itératif du point de vue du propriétaire et du client."
+}
