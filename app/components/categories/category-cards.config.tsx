@@ -13,8 +13,14 @@ type CategoryCardConfig = {
   renderIcons: () => ReactNode;
 };
 
-const icon = (src: string, width = 42, height = 42, className?: string) => (
-  <IconImage src={src} width={width} height={height} className={className} />
+const icon = (
+  src: string,
+  width = 42,
+  height = 42,
+  className?: string,
+  key?: string,
+) => (
+  <IconImage key={key} src={src} width={width} height={height} className={className} />
 );
 
 export const CATEGORY_CARDS: CategoryCardConfig[] = [
@@ -46,7 +52,7 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
     items: ["Node.js", "PostgreSQL(Supabase)"],
     renderIcons: () => (
       [
-        <div className="relative w-[72px] h-[72px]">
+        <div key="nodejs" className="relative w-[72px] h-[72px]">
           {icon(
             "/logos/nodejsDark.svg",
             72,
@@ -54,8 +60,8 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
             "absolute inset-0 h-full w-full object-contain"
           )}
         </div>,
-        icon("/logos/elephant_full.png"),
-        icon("/logos/supabase.svg")
+        icon("/logos/elephant_full.png", 42, 42, undefined, "postgresql"),
+        icon("/logos/supabase.svg", 42, 42, undefined, "supabase"),
       ]
     ),
   },
@@ -72,8 +78,8 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
     ],
     renderIcons: () => (
       [
-        icon("/logos/gitlab-logo-500.svg"),
-        <VercelLogoWithCircle size={42} />
+        icon("/logos/gitlab-logo-500.svg", 42, 42, undefined, "gitlab"),
+        <VercelLogoWithCircle key="vercel" size={42} />,
       ]
     ),
   },
@@ -112,8 +118,8 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
     ],
     renderIcons: () => (
       [
-        icon("/logos/openai.svg", 48, 48, "dark:invert"),
-        icon("/logos/elevenlabs-logo-black.svg", 42, 42, "dark:invert"),
+        icon("/logos/openai.svg", 48, 48, "dark:invert", "openai"),
+        icon("/logos/elevenlabs-logo-black.svg", 42, 42, "dark:invert", "elevenlabs"),
       ]
     ),
   },

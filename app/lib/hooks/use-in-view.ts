@@ -66,7 +66,7 @@ export function useInView(target: React.RefObject<Element | null>, options: UseI
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [target, root, margin, JSON.stringify(threshold), once]);
+  }, [target, root, margin, threshold, once]);
 
   return inView;
 }
