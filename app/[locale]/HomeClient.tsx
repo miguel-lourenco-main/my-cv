@@ -1,64 +1,48 @@
 "use client";
 
+import dynamic from 'next/dynamic'
 import Navigation from '../components/Navigation'
 import Hero from '../components/Hero'
 import About from '../components/About'
-import Projects from '../components/Projects'
 import Contact from '../components/Contact'
-import Footer from '../components/Footer'
 import ShootingStars from '../components/shadcn/shooting-stars'
-import { SmoothCursor } from '../components/magic-ui/smooth-cursor'
 import IntroOverlay from '../components/intro/IntroOverlay'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { LayoutGroup } from 'motion/react'
 import ParallaxRoot from '../components/parallax/ParallaxRoot'
 import ScrollParallaxLayer from '../components/parallax/ScrollParallaxLayer'
-import { useIsLaptop } from '../lib/use-laptop-detection'
+import { DeviceDetectionProvider, useDeviceDetectionContext } from '../lib/device-detection-context'
+import { ProjectImagesProvider, type ProjectImagesManifest } from '../lib/project-images-context'
 
-/**
- * Client-side home page component.
- * Orchestrates all main sections, intro overlay, parallax effects, and smooth cursor.
- * Handles laptop-specific layout and scroll snap behavior.
- * 
- * @param props - HomeClient component props
- * @param props.greeting - Greeting text from server-side i18n
- * 
- * @example
- * ```tsx
- * <HomeClient greeting="Hello" />
- * ```
- */
-export default function HomeClient({ greeting }: { greeting: string }) {
-  // Intro overlay visibility state
+const Projects = dynamic(() => import('../components/Projects'), { ssr: false })
+const SmoothCursor = dynamic(
+  () => import('../components/magic-ui/smooth-cursor').then((mod) => ({ default: mod.SmoothCursor })),
+  { ssr: false }
+)
+
+function HomeClientContent({ greeting }: { greeting: string }) {
   const [showIntro, setShowIntro] = useState(true);
-  // Cursor mode for custom cursor effects
   const [cursorMode, setCursorMode] = useState<'default' | 'view'>('default');
-  // Hide smooth cursor when interacting with native PDF viewer (prevents double-cursor)
   const [cursorHidden, setCursorHidden] = useState(false);
-  const isLaptop = useIsLaptop();
+  const { isLaptop } = useDeviceDetectionContext();
 
-  // Check for reduced motion preference
   const reducedMotion = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }, []);
 
-  // Skip intro if user prefers reduced motion
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (reducedMotion) setShowIntro(false);
   }, [reducedMotion]);
 
-  const handleIntroDone = () => {
+  const handleIntroDone = useCallback(() => {
     setShowIntro(false);
-  };
+  }, []);
 
-  // Build container classes conditionally
-  // Only apply scroll snap if user hasn't reduced motion
   const shouldUseScrollSnap = isLaptop && !reducedMotion;
   const containerClasses = [
     "flex flex-col relative z-10 transition-opacity duration-300 overflow-y-auto h-full pt-40 gap-y-48 xl:gap-y-64 pb-12",
-    // "mandatory" forces snapping even when far from a snap point; "proximity" only snaps when close
     shouldUseScrollSnap && "snap-y snap-mandatory",
     isLaptop ? "" : "xl:pt-52 2xl:pt-64",
     "px-4 sm:px-6 lg:px-8",
@@ -67,7 +51,7 @@ export default function HomeClient({ greeting }: { greeting: string }) {
 
   return (
     <div className="relative h-screen bg-background overflow-hidden">
-      {!cursorHidden ? (
+      {!cursorHidden && !reducedMotion ? (
         <SmoothCursor
           springConfig={{
             damping: 900,
@@ -81,7 +65,13 @@ export default function HomeClient({ greeting }: { greeting: string }) {
       <LayoutGroup id="root-shared">
         <IntroOverlay show={showIntro} onDone={handleIntroDone} greeting={greeting} />
         <ParallaxRoot>
-          <ScrollParallaxLayer className="flex absolute inset-0 z-0 pointer-events-none h-[200%]" fromY={180} toY={-180} bleed={180}>
+          <ScrollParallaxLayer
+            className="flex absolute inset-0 z-0 pointer-events-none h-[200%]"
+            fromY={180}
+            toY={-180}
+            bleed={180}
+            disabled={reducedMotion}
+          >
             <ShootingStars className='size-full' initialDelayMs={showIntro ? 1400 : 0} />
           </ScrollParallaxLayer>
           <div id="page-scroll-container" className={containerClasses}>
@@ -101,5 +91,21 @@ export default function HomeClient({ greeting }: { greeting: string }) {
         </ParallaxRoot>
       </LayoutGroup>
     </div>
+  )
+}
+
+export default function HomeClient({
+  greeting,
+  projectImagesManifest,
+}: {
+  greeting: string
+  projectImagesManifest: ProjectImagesManifest
+}) {
+  return (
+    <DeviceDetectionProvider>
+      <ProjectImagesProvider manifest={projectImagesManifest}>
+        <HomeClientContent greeting={greeting} />
+      </ProjectImagesProvider>
+    </DeviceDetectionProvider>
   )
 }

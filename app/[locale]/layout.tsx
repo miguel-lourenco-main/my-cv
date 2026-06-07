@@ -1,5 +1,6 @@
-import { locales } from '../i18n'
-import { TranslationProvider } from '../i18n/TranslationProvider'
+import { isValidLocale } from '../i18n'
+import { TranslationProvider, type InitialTranslations } from '../i18n/TranslationProvider'
+import { loadCoreTranslations } from '../lib/server-i18n'
 
 export default async function LocaleLayout({
   children,
@@ -8,16 +9,15 @@ export default async function LocaleLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
-  // Validate locale
-  if (!locales.includes(params.locale as any)) {
+  if (!isValidLocale(params.locale)) {
     return <div>Locale not found</div>
   }
 
+  const initialResources = (await loadCoreTranslations(params.locale)) as InitialTranslations
+
   return (
-    <TranslationProvider locale={params.locale}>
+    <TranslationProvider locale={params.locale} initialResources={initialResources}>
       {children}
     </TranslationProvider>
   )
 }
-
-

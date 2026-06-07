@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useRef, useState } from "react"
 import { motion, useSpring } from "motion/react"
-import { EyeIcon, ViewIcon } from "lucide-react"
+import { EyeIcon } from "lucide-react"
 
 interface Position {
   x: number
@@ -18,10 +18,7 @@ export interface SmoothCursorProps {
   }
   cursorMode?: 'default' | 'view'
 }
-const DefaultCursorSVG: FC = () => {
-  return <RocketCursorSVG />;
-};
-  
+
 const RocketCursorSVG: FC<{ color?: string }> = ({ color }) => {
   return (
     <svg
@@ -37,15 +34,12 @@ const RocketCursorSVG: FC<{ color?: string }> = ({ color }) => {
       className="lucide lucide-rocket"
       style={{ color: color ?? "hsl(var(--foreground))" }}
     >
-      {/* Rotate the rocket upright (lucide points 45deg by default) */}
       <g transform="rotate(-45 12 12)">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
         <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
         <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
         <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
       </g>
-
-      {/* Inline thrusters inside SVG, kept within 24x24 viewBox */}
       <g>
         <rect x="9.5" y="18.5" width="1.6" height="3" fill="#FF4500" rx="0.8">
           <animate attributeName="height" values="3;5;3" dur="0.33s" repeatCount="indefinite" />
@@ -63,7 +57,15 @@ const RocketCursorSVG: FC<{ color?: string }> = ({ color }) => {
     </svg>
   );
 };
-  
+
+const DefaultCursorSVG: FC = () => <RocketCursorSVG />;
+
+const ViewCursorSVG: FC<{ color: string }> = ({ color }) => (
+  <div className="relative" style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.55))" }}>
+    <RocketCursorSVG color={color} />
+    <EyeIcon className="absolute -bottom-2.5 right-0 size-5 transform -rotate-45" style={{ color }} />
+  </div>
+);
 
 export function SmoothCursor({
   springConfig = {
@@ -74,13 +76,13 @@ export function SmoothCursor({
   },
   cursorMode = 'default',
 }: SmoothCursorProps) {
-  const [isMoving, setIsMoving] = useState(false)
   const [isDarkTheme, setIsDarkTheme] = useState(false)
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
   const velocity = useRef<Position>({ x: 0, y: 0 })
   const lastUpdateTime = useRef(Date.now())
   const previousAngle = useRef(0)
   const accumulatedRotation = useRef(0)
+  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const cursorX = useSpring(0, springConfig)
   const cursorY = useSpring(0, springConfig)
@@ -135,14 +137,11 @@ export function SmoothCursor({
         previousAngle.current = currentAngle
 
         scale.set(0.95)
-        setIsMoving(true)
 
-        const timeout = setTimeout(() => {
+        if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
+        idleTimeoutRef.current = setTimeout(() => {
           scale.set(1)
-          setIsMoving(false)
         }, 150)
-
-        return () => clearTimeout(timeout)
       }
     }
 
@@ -163,13 +162,15 @@ export function SmoothCursor({
       window.removeEventListener("mousemove", throttledMouseMove)
       document.body.style.cursor = "auto"
       if (rafId) cancelAnimationFrame(rafId)
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
     }
   }, [cursorX, cursorY, rotation, scale])
 
-  // Track theme (for high-contrast cursor colors in light mode over dark images)
   useEffect(() => {
     const root = document.documentElement
-    const update = () => setIsDarkTheme(root.classList.contains("dark"))
+    const update = () => {
+      setIsDarkTheme(root.classList.contains("dark"))
+    }
     update()
 
     const observer = new MutationObserver(update)
@@ -177,19 +178,7 @@ export function SmoothCursor({
     return () => observer.disconnect()
   }, [])
 
-  const ViewCursorSVG: FC = () => {
-    // Light theme: cursor becomes white + shadow for contrast on dark project screenshots.
-    const viewColor = isDarkTheme ? "hsl(var(--foreground))" : "#ffffff"
-    return (
-      <div
-        className="relative"
-        style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.55))" }}
-      >
-        <RocketCursorSVG color={viewColor} />
-        <EyeIcon className="absolute -bottom-2.5 right-0 size-5 transform -rotate-45" style={{ color: viewColor }} />
-      </div>
-    )
-  }
+  const viewColor = isDarkTheme ? "hsl(var(--foreground))" : "#ffffff"
 
   return (
     <motion.div
@@ -197,8 +186,6 @@ export function SmoothCursor({
         position: "fixed",
         left: cursorX,
         top: cursorY,
-        // Anchor the mouse position to the rocket "nose" (tip) instead of the center.
-        // With a 40x40 SVG, the nose sits roughly at x=50% and y≈10%.
         translateX: "-50%",
         translateY: "-10%",
         transformOrigin: "50% 10%",
@@ -217,7 +204,11 @@ export function SmoothCursor({
       }}
       className="md:block hidden"
     >
-      {cursorMode === 'default' ? <DefaultCursorSVG /> : <ViewCursorSVG />}
+      {cursorMode === 'default' ? (
+        <DefaultCursorSVG />
+      ) : (
+        <ViewCursorSVG color={viewColor} />
+      )}
     </motion.div>
   )
 }

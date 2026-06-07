@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { memo, useMemo, useState } from "react";
 import { cn } from "../../lib/utils";
 import type { Project } from "./projects.types";
 import { useI18n } from "../../lib/i18n";
@@ -11,31 +11,7 @@ import {
   type ProjectScreenshotMode,
 } from "./project-images";
 
-/**
- * Project card component with hover effects and focus blur.
- * Features theme-aware cover images, water ripple effect on hover,
- * and blur effect for non-hovered cards.
- * 
- * @param props - ProjectFocusCard component props
- * @param props.project - Project data to display
- * @param props.index - Card index in the grid
- * @param props.hovered - Index of currently hovered card (null if none)
- * @param props.setHovered - Function to set hovered card index
- * @param props.onClick - Click handler function
- * @param props.onCursorModeChange - Optional callback for cursor mode changes
- * 
- * @example
- * ```tsx
- * <ProjectFocusCard
- *   project={project}
- *   index={0}
- *   hovered={hovered}
- *   setHovered={setHovered}
- *   onClick={handleClick}
- * />
- * ```
- */
-export function ProjectFocusCard({
+export const ProjectFocusCard = memo(function ProjectFocusCard({
   project,
   index,
   hovered,
@@ -47,40 +23,13 @@ export function ProjectFocusCard({
   project: Project;
   index: number;
   hovered: number | null;
-  setHovered: React.Dispatch<React.SetStateAction<number | null>>;
+  setHovered: (index: number | null) => void;
   onClick: (project: Project) => void;
   onCursorModeChange?: (mode: 'default' | 'view') => void;
   screenshotMode?: ProjectScreenshotMode;
 }) {
   const { getProjectString } = useI18n();
-  // Track mouse position for ripple effect
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // Update fixed cursor position when card is hovered and window scrolls/resizes
-  useEffect(() => {
-    if (hovered !== index || !cardRef.current) return;
-
-    const updateFixedPosition = () => {
-      const rect = cardRef.current?.getBoundingClientRect();
-      if (rect) {
-        const bottomCenterX = rect.left + rect.width / 2;
-        const bottomCenterY = rect.bottom;
-        window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
-          detail: { x: bottomCenterX, y: bottomCenterY }
-        }));
-      }
-    };
-
-    updateFixedPosition();
-    window.addEventListener('scroll', updateFixedPosition, true);
-    window.addEventListener('resize', updateFixedPosition);
-
-    return () => {
-      window.removeEventListener('scroll', updateFixedPosition, true);
-      window.removeEventListener('resize', updateFixedPosition);
-    };
-  }, [hovered, index]);
 
   const openProjectUrl = useMemo(() => {
     const isValid = (url?: string) => Boolean(url && url !== "#" && url.trim().length > 0);
@@ -89,7 +38,6 @@ export function ProjectFocusCard({
     return null;
   }, [project.gitlabUrl, project.websiteUrl]);
 
-  // Select cover image based on user screenshot mode (light/dark).
   const coverImage = useMemo(() => {
     return (
       getProjectCoverImageByMode(project.images, screenshotMode) ??
@@ -98,50 +46,26 @@ export function ProjectFocusCard({
   }, [project.images, screenshotMode]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     setMousePosition({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
-    
-    // Fix cursor to bottom center of card when hovering
-    if (hovered === index) {
-      const bottomCenterX = rect.left + rect.width / 2;
-      const bottomCenterY = rect.bottom;
-      window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
-        detail: { x: bottomCenterX, y: bottomCenterY }
-      }));
-    }
   };
 
   const handleMouseEnter = () => {
     setHovered(index);
     onCursorModeChange?.('view');
-    // Calculate and set fixed position at bottom center
-    if (cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect();
-      const bottomCenterX = rect.left + rect.width / 2;
-      const bottomCenterY = rect.bottom;
-      window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
-        detail: { x: bottomCenterX, y: bottomCenterY }
-      }));
-    }
   };
 
   const handleMouseLeave = () => {
     setHovered(null);
     setMousePosition(null);
     onCursorModeChange?.('default');
-    // Clear fixed position
-    window.dispatchEvent(new CustomEvent('cursor-fixed-position', {
-      detail: null
-    }));
   };
 
   return (
     <div
-      ref={cardRef}
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -154,10 +78,10 @@ export function ProjectFocusCard({
       <img
         src={coverImage}
         alt={getProjectString(project, 'title')}
+        loading="lazy"
         className="object-cover absolute inset-0 w-full h-full"
       />
 
-      {/* Hover fade overlay (same behavior as before, but lighter in light mode) */}
       <div
         className={cn(
           "absolute inset-0 pointer-events-none z-[15] transition-opacity duration-300 ease-out",
@@ -166,16 +90,10 @@ export function ProjectFocusCard({
         )}
       />
 
-      {/* 
-        De-emphasize non-hovered cards without using CSS `filter: blur()` on the
-        whole card (which can cause Brave to drop SVG rendering when combined
-        with descendant `backdrop-filter` elements).
-      */}
       {hovered !== null && hovered !== index ? (
         <div className="absolute inset-0 pointer-events-none z-40 backdrop-blur-sm" />
       ) : null}
 
-      {/* Water ripple effect - animated circles expanding from mouse position */}
       {hovered === index && mousePosition && (
         <div className="absolute inset-0 pointer-events-none z-20">
           {[0, 1, 2].map((rippleIndex) => (
@@ -196,15 +114,10 @@ export function ProjectFocusCard({
         </div>
       )}
 
-      {/* Project type badge and company/client circles - always visible */}
       <div className="absolute top-3 left-3 z-30 flex items-center gap-2 flex-wrap">
-        <TechStackCircles
-          technologies={project.technologies}
-          size={28}
-        />
+        <TechStackCircles technologies={project.technologies} size={28} />
       </div>
 
-      {/* Open project icon - opposite side of the tech stack circles */}
       {openProjectUrl ? (
         <a
           href={openProjectUrl}
@@ -220,14 +133,10 @@ export function ProjectFocusCard({
         </a>
       ) : null}
 
-      {/* Always-visible project title row + hover-revealed details */}
       <div className="absolute inset-x-0 bottom-0 z-30 px-4 pb-2 pt-10 pointer-events-none">
-        {/* Bottom gradient to keep text readable on top of the cover */}
         <div
           className={cn(
             "absolute inset-x-0 bottom-0 h-20",
-            // Keep the bottom area dark for longer, then fade faster near the text
-            // (improves text contrast without increasing the fade height)
             "bg-[linear-gradient(to_top,rgba(0,0,0,0.80)_0%,rgba(0,0,0,0.80)_60%,rgba(0,0,0,0.35)_82%,rgba(0,0,0,0)_100%)]",
             "dark:bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.85)_60%,rgba(0,0,0,0.45)_82%,rgba(0,0,0,0)_100%)]",
             "transition-opacity duration-300 ease-out",
@@ -236,7 +145,6 @@ export function ProjectFocusCard({
         />
 
         <div className="relative">
-          {/* Title row: always visible; moves up on hover */}
           <div
             className={cn(
               "flex items-center gap-2 text-lg md:text-xl font-medium",
@@ -249,13 +157,13 @@ export function ProjectFocusCard({
               <img
                 src={project.logo}
                 alt={getProjectString(project, "title")}
+                loading="lazy"
                 className="size-6 md:size-7 object-contain"
               />
             )}
             {getProjectString(project, "title")}
           </div>
 
-          {/* Details: hidden by default; on hover slides down into place */}
           <div
             className={cn(
               "mt-1 space-y-0.5 text-xs md:text-sm text-neutral-200/90",
@@ -277,6 +185,4 @@ export function ProjectFocusCard({
       </div>
     </div>
   );
-}
-
-
+});

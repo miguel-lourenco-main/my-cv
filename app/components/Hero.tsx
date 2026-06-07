@@ -170,11 +170,16 @@ export default function Hero({
       >
         {showShared && <NameBadge layoutId="intro-name" greeting={greeting} />}
         <div className="flex flex-col lg:flex-row size-full justify-center items-center gap-24">
-          {/* Right: PDF preview + controls */}
-          <RevealStagger delay={1.9} interval={0.04} className="w-full lg:size-full lg:block hidden">
-            <CvPreview className="lg:block hidden" cvEmbedSrc={cvEmbedSrc} onCursorModeChange={onCursorModeChange} onCursorVisibilityChange={onCursorVisibilityChange} setIsFocusOpen={setIsFocusOpen} th={th} />
+          <RevealStagger delay={1.9} interval={0.04} className="w-full flex justify-center lg:flex-[1_1_0] lg:min-w-0">
+            <CvPreview
+              cvEmbedSrc={cvEmbedSrc}
+              onCursorModeChange={onCursorModeChange}
+              onCursorVisibilityChange={onCursorVisibilityChange}
+              setIsFocusOpen={setIsFocusOpen}
+              th={th}
+            />
           </RevealStagger>
-          <div className="flex flex-col items-center text-center gap-y-12 lg:w-full w-[75%]">
+          <div className="flex flex-col items-center text-center gap-y-12 lg:flex-1 lg:min-w-0 w-[75%]">
             <RevealStagger delay={2} interval={0.04}>
               <div
                 className={[
@@ -193,9 +198,6 @@ export default function Hero({
               </Button>
             </RevealStagger>
           </div>
-          <RevealStagger delay={1.9} interval={0.04} className="w-full block lg:hidden flex justify-center">
-            <CvPreview className="block lg:hidden" cvEmbedSrc={cvEmbedSrc} onCursorModeChange={onCursorModeChange} onCursorVisibilityChange={onCursorVisibilityChange} setIsFocusOpen={setIsFocusOpen} th={th} />
-          </RevealStagger>
         </div>
       </div>
 
@@ -209,30 +211,24 @@ export default function Hero({
   )
 } 
 
-function CvPreview({ className, cvEmbedSrc, onCursorModeChange, onCursorVisibilityChange, setIsFocusOpen, th }: { className: string, cvEmbedSrc: string, onCursorModeChange?: (mode: "default" | "view") => void, onCursorVisibilityChange?: (hidden: boolean) => void, setIsFocusOpen: (open: boolean) => void, th: (key: string) => string }) {
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const update = () => setIsSmallScreen(window.innerHeight < 1000);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
+function CvPreview({ cvEmbedSrc, onCursorModeChange, onCursorVisibilityChange, setIsFocusOpen, th }: { cvEmbedSrc: string, onCursorModeChange?: (mode: "default" | "view") => void, onCursorVisibilityChange?: (hidden: boolean) => void, setIsFocusOpen: (open: boolean) => void, th: (key: string) => string }) {
   return (
     <div
-      className={["relative isolate overflow-hidden size-full max-w-xl rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 shadow-sm", className].join(" ")}
+      className="relative isolate overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 shadow-sm"
+      style={{
+        aspectRatio: "210 / 300",
+        width: "min(52vw, calc(min(70vh, 720px) * 210 / 300))",
+      }}
       onMouseEnter={() => onCursorModeChange?.("view")}
       onMouseLeave={() => onCursorModeChange?.("default")}
       onPointerEnter={() => onCursorVisibilityChange?.(true)}
       onPointerLeave={() => onCursorVisibilityChange?.(false)}
     >
-      <div className={["relative z-0 w-full ", isSmallScreen ? "h-[400px]" : "h-[600px]"].join(" ")}>
+      <div className="relative z-0 size-full">
         <iframe
           title="CV preview"
           src={cvEmbedSrc}
-          className="relative z-0 h-full w-full"
+          className="relative z-0 size-full object-contain"
         />
       </div>
       <Button

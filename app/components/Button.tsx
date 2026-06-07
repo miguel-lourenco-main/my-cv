@@ -146,30 +146,3 @@ export default function BaseButton({
     </a>
   );
 }
-
-/**
- * Legacy button component for backward compatibility.
- * Wraps BaseButton with default GitLab link and orange theme.
- * 
- * @param props - RefButton component props
- * @param props.className - Additional CSS classes
- * @param props.href - Link URL (default: GitLab profile)
- * @param props.children - Button content
- * 
- * @deprecated Use BaseButton directly instead
- */
-export function RefButton({
-  className,
-  href = "https://gitlab.com/miguel-lourenco-main",
-  children,
-}: {
-  className?: string;
-  href?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <BaseButton href={href} className={className} theme="orange">
-      {children}
-    </BaseButton>
-  );
-}

@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RevealStagger } from "../Reveal";
 import { Reveal } from "../Reveal";
-import { useIsPhone } from "@/app/lib/use-mobile-detection";
 import {
   useTechStackDemo,
   type TechStackDemoCardId,
@@ -21,6 +20,8 @@ type CategoryCardProps = {
   children: React.ReactNode;
   /** When set, this card can receive the scheduled Tech Stack demo hover highlight. */
   demoCardId?: TechStackDemoCardId;
+  /** Whether the viewport is phone-sized (from DeviceDetectionProvider). */
+  isPhone?: boolean;
 };
 
 /**
@@ -45,11 +46,11 @@ export default function CategoryCard({
   items,
   children,
   demoCardId,
+  isPhone = false,
 }: CategoryCardProps) {
   const iconsContainerRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [isActive, setIsActive] = useState(false);
-  const isPhone = useIsPhone();
   const {
     activeDemoCardId,
     userHoveredCardId,
@@ -96,7 +97,7 @@ export default function CategoryCard({
         });
       },
       {
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        threshold: [0, 0.5, 1],
         rootMargin: '-10% 0px -10% 0px'
       }
     );

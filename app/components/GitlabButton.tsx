@@ -1,24 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import BaseButton from "./Button";
-import { useI18n } from "../lib/i18n";
+import { ContactButton } from "./ContactButton";
 
-/**
- * GitLab button component with GitLab logo.
- * Uses orange theme and links to GitLab profile.
- * 
- * @param props - GitlabButton component props
- * @param props.className - Additional CSS classes
- * @param props.width - Logo width in pixels (required)
- * @param props.height - Logo height in pixels (required)
- * @param props.href - GitLab profile URL (default: personal GitLab)
- * 
- * @example
- * ```tsx
- * <GitlabButton width={22} height={22} />
- * ```
- */
 export default function GitlabButton({
   className,
   width,
@@ -30,21 +14,14 @@ export default function GitlabButton({
   height: number;
   href?: string;
 }) {
-  const { t } = useI18n();
   return (
-    <BaseButton
-      href={href}
-      className={className}
-      theme="orange"
-      aria-label={t("navigation")("githubAlt")}
-      data-contact="gitlab"
-    >
-      <Image 
-        src="/logos/gitlab-logo-500.svg" 
-        alt="GitLab" 
-        width={width} 
+    <ContactButton kind="gitlab" className={className} href={href}>
+      <Image
+        src="/logos/gitlab-logo-500.svg"
+        alt="GitLab"
+        width={width}
         height={height}
       />
-    </BaseButton>
+    </ContactButton>
   );
 }

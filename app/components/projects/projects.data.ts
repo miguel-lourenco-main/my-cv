@@ -1,5 +1,6 @@
 import { Project } from "./projects.types";
-import { getProjectImages } from "../../lib/get-project-images";
+import { getProjectImagesFromManifest } from "../../lib/resolve-project-images";
+import type { ProjectImagesManifest } from "../../lib/project-images-context";
 
 type ProjectData = Omit<Project, "images"> & { images?: string[]; imagesFirst?: string[] };
 
@@ -35,15 +36,17 @@ function applyImagesFirst(images: string[], imagesFirst?: string[]): string[] {
  * Helper function to resolve project images.
  * If images array is manually provided, use it. Otherwise, auto-detect from directory.
  */
-function resolveProjectImages(project: ProjectData): string[] {
-  // Manual images array takes priority
+function resolveProjectImages(
+  project: ProjectData,
+  manifest: ProjectImagesManifest
+): string[] {
   const baseImages =
     project.images && project.images.length > 0
       ? project.images
-      : getProjectImages(project.id, project.imagesDir);
+      : getProjectImagesFromManifest(manifest, project.id, project.imagesDir);
 
   return applyImagesFirst(baseImages, project.imagesFirst);
-  }
+}
 
 /**
  * Project data array with translatable content.
@@ -60,7 +63,10 @@ function resolveProjectImages(project: ProjectData): string[] {
  * <ProjectGrid projects={projects} />
  * ```
  */
-const projectsData: ProjectData[] = [
+/**
+ * Raw project entries without resolved image paths.
+ */
+export const projectsData: ProjectData[] = [
   {
     id: "oflat",
     type: "personal",
@@ -597,11 +603,12 @@ const projectsData: ProjectData[] = [
 ];
 
 /**
- * Processed projects with resolved images.
- * Images are automatically detected from directories if not manually specified.
+ * Resolve full project records with image paths from the build-time manifest.
  */
-export const projects: Project[] = projectsData.map((project) => ({
-  ...project,
-  images: resolveProjectImages(project) || [], // Ensure images is always an array
-}));
+export function resolveProjectsWithImages(manifest: ProjectImagesManifest): Project[] {
+  return projectsData.map((project) => ({
+    ...project,
+    images: resolveProjectImages(project, manifest) || [],
+  }));
+}
 

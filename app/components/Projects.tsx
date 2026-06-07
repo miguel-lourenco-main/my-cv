@@ -1,16 +1,17 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { AnimatePresence } from 'motion/react'
 import { ProjectGrid } from './projects/ProjectGrid'
-import { projects as projectsData } from './projects/projects.data'
+import { resolveProjectsWithImages } from './projects/projects.data'
 import type { Project } from './projects/projects.types'
-import { ProjectExpandedCard } from './projects/ProjectExpandedCard'
 import { Reveal, RevealStagger } from './Reveal'
 import { useI18n } from '../lib/i18n'
 import type { ProjectScreenshotMode } from './projects/project-images'
-import { Sun, Moon } from 'lucide-react'
 import { ProjectBrowseBar } from './projects/ProjectBrowseBar'
+import { ScreenshotModeButton } from './projects/ScreenshotModeButton'
+import { useProjectImagesManifest } from '../lib/project-images-context'
 import {
   AFFILIATION_ALL,
   filterProjectsByAffiliation,
@@ -19,29 +20,29 @@ import {
   type ProjectSortMode,
 } from './projects/project-browse'
 
-/**
- * Projects section component displaying a grid of project cards.
- * Features expandable project details modal and responsive layout.
- * Supports laptop-specific snap scrolling behavior.
- * 
- * @param props - Component props
- * @param props.isLaptop - Whether device is detected as laptop (affects layout and snap scrolling)
- * @param props.onCursorModeChange - Optional callback when cursor mode changes (for custom cursor effects)
- * 
- * @example
- * ```tsx
- * <Projects isLaptop={false} onCursorModeChange={(mode) => console.log(mode)} />
- * ```
- */
-export default function Projects({ 
+const ProjectExpandedCard = dynamic(
+  () =>
+    import('./projects/ProjectExpandedCard').then((mod) => ({
+      default: mod.ProjectExpandedCard,
+    })),
+  { ssr: false }
+)
+
+export default function Projects({
   isLaptop = false,
   onCursorModeChange,
-}: { 
+}: {
   isLaptop?: boolean;
   onCursorModeChange?: (mode: 'default' | 'view') => void;
 }) {
-  const { t } = useI18n()
+  const { t, loadProjectNamespace } = useI18n()
   const tp = t('projects')
+  const manifest = useProjectImagesManifest()
+  const allProjects = useMemo(
+    () => resolveProjectsWithImages(manifest),
+    [manifest]
+  )
+
   const [activeProject, setActiveProject] = useState<Project | null>(null)
   const [screenshotMode, setScreenshotMode] =
     useState<ProjectScreenshotMode>("dark");
@@ -50,9 +51,17 @@ export default function Projects({
   const [sortMode, setSortMode] = useState<ProjectSortMode>("recent");
 
   const displayedProjects = useMemo(() => {
-    const filtered = filterProjectsByAffiliation(projectsData, affiliationFilter)
+    const filtered = filterProjectsByAffiliation(allProjects, affiliationFilter)
     return sortProjects(filtered, sortMode)
-  }, [affiliationFilter, sortMode]);
+  }, [allProjects, affiliationFilter, sortMode]);
+
+  useEffect(() => {
+    void Promise.all(displayedProjects.map((project) => loadProjectNamespace(project.id)))
+  }, [displayedProjects, loadProjectNamespace])
+
+  const handleCardClick = useCallback((project: Project) => {
+    setActiveProject(project)
+  }, [])
 
   const browseReset = () => {
     setAffiliationFilter(AFFILIATION_ALL)
@@ -60,11 +69,9 @@ export default function Projects({
     setActiveProject(null)
   }
 
-  // Persist screenshot mode across sessions.
   useEffect(() => {
     try {
       const raw = localStorage.getItem("project-screenshot-mode");
-      // Migrate "auto" to "dark" (default theme)
       if (raw === "light" || raw === "dark") {
         setScreenshotMode(raw);
       } else if (raw === "auto") {
@@ -104,11 +111,11 @@ export default function Projects({
               <ScreenshotModeButton
                 mode={screenshotMode}
                 onModeChange={setScreenshotMode}
-                t={t}
+                getLabel={(key) => String(tp(key))}
               />
             </div>
             <ProjectBrowseBar
-              projects={projectsData}
+              projects={allProjects}
               affiliation={affiliationFilter}
               onAffiliationChange={(next) => {
                 setAffiliationFilter(next)
@@ -141,7 +148,7 @@ export default function Projects({
           ) : (
             <ProjectGrid
               projects={displayedProjects}
-              onCardClick={(project) => setActiveProject(project)}
+              onCardClick={handleCardClick}
               onCursorModeChange={onCursorModeChange}
               screenshotMode={screenshotMode}
             />
@@ -160,40 +167,4 @@ export default function Projects({
       </AnimatePresence>
     </section>
   )
-}
-
-function ScreenshotModeButton({
-  mode,
-  onModeChange,
-  t,
-}: {
-  mode: ProjectScreenshotMode;
-  onModeChange: (mode: ProjectScreenshotMode) => void;
-  t: ReturnType<typeof useI18n>['t'];
-}) {
-  const tp = t('projects');
-  
-  const cycleMode = () => {
-    onModeChange(mode === "light" ? "dark" : "light");
-  };
-
-  const getIcon = () => {
-    return mode === "light" ? <Sun className="size-5" /> : <Moon className="size-5" />;
-  };
-
-  const getTitle = () => {
-    return mode === "light" ? tp("screenshots.light") : tp("screenshots.dark");
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={cycleMode}
-      className="inline-flex items-center justify-center size-10 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-      title={getTitle()}
-      aria-label={getTitle()}
-    >
-      {getIcon()}
-    </button>
-  );
 }

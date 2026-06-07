@@ -57,6 +57,8 @@ export function ProjectCarousel({
               <img
                 src={src}
                 alt={`Slide ${idx + 1}`}
+                loading={idx === selectedIndex ? "eager" : "lazy"}
+                decoding="async"
                 className="w-full h-60 md:h-72 lg:h-80 object-cover cursor-zoom-in"
                 onClick={() => {
                   setLightboxIndex(idx);
@@ -190,7 +192,12 @@ function Lightbox({
       </button>
 
       <div className="max-h-[90vh] max-w-[95vw] md:max-w-[90vw]">
-        <img src={images[current]} alt="Expanded" className="object-contain w-full h-full" />
+        <img
+          src={images[current]}
+          alt="Expanded"
+          decoding="async"
+          className="object-contain w-full h-full"
+        />
       </div>
     </div>
   );
