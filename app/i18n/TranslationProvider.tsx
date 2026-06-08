@@ -180,6 +180,7 @@ export function TranslationProvider({
   initialResources?: InitialTranslations
 }) {
   const [currentLocale, setCurrentLocale] = useState(locale)
+  const [loadedNamespacesVersion, setLoadedNamespacesVersion] = useState(0)
   const namespaceKey = namespaces.join('|')
 
   useEffect(() => {
@@ -187,6 +188,20 @@ export function TranslationProvider({
     ensureI18nInitialized(locale, requestedNamespaces, initialResources)
     setCurrentLocale(locale)
   }, [locale, namespaceKey, initialResources])
+
+  useEffect(() => {
+    const bumpLoadedNamespaces = () => {
+      setLoadedNamespacesVersion((version) => version + 1)
+    }
+
+    i18next.on('loaded', bumpLoadedNamespaces)
+    i18next.on('languageChanged', bumpLoadedNamespaces)
+
+    return () => {
+      i18next.off('loaded', bumpLoadedNamespaces)
+      i18next.off('languageChanged', bumpLoadedNamespaces)
+    }
+  }, [])
 
   const value = useMemo<I18nCompatContext>(() => {
     const compatT = (ns: string) => (key: string, options?: Record<string, unknown>) =>
@@ -208,9 +223,10 @@ export function TranslationProvider({
         if (!(PROJECT_I18N_NAMESPACES as readonly string[]).includes(ns)) return
         if (i18next.hasResourceBundle(currentLocale, ns)) return
         await i18next.loadNamespaces(ns)
+        setLoadedNamespacesVersion((version) => version + 1)
       },
     }
-  }, [currentLocale])
+  }, [currentLocale, loadedNamespacesVersion])
 
   return <I18nCompat.Provider value={value}>{children}</I18nCompat.Provider>
 }
