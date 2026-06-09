@@ -216,8 +216,8 @@ function CvPreview({ cvEmbedSrc, onCursorModeChange, onCursorVisibilityChange, s
     <div
       className="relative isolate overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 shadow-sm"
       style={{
-        aspectRatio: "210 / 300",
-        width: "min(52vw, calc(min(70vh, 720px) * 210 / 300))",
+        aspectRatio: "210 / 276",
+        width: "min(52vw, calc(min(70vh, 720px) * 210 / 276))",
       }}
       onMouseEnter={() => onCursorModeChange?.("view")}
       onMouseLeave={() => onCursorModeChange?.("default")}
@@ -235,7 +235,7 @@ function CvPreview({ cvEmbedSrc, onCursorModeChange, onCursorVisibilityChange, s
         type="button"
         variant="outline"
         size="sm"
-        className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-30 gap-2 bg-white/90 dark:bg-slate-950/90 pointer-events-auto"
+        className="absolute bottom-8 right-8 z-30 gap-2 bg-white/90 dark:bg-slate-950/90 pointer-events-auto"
         onClick={() => setIsFocusOpen(true)}
         aria-label={th("ctaViewCv")}
       >
