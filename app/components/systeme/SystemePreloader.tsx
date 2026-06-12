@@ -12,6 +12,23 @@ const SERVICES = ['frontend', 'backend', 'devops', 'testing', 'automation', 'ai'
 let hasBootedThisSession = false
 
 /**
+ * One-shot opt-out for the next full page load. The language switcher sets
+ * this right before `location.assign`, so a locale change doesn't replay the
+ * boot sequence — while a normal visit or manual refresh still gets it.
+ */
+export const SKIP_BOOT_KEY = 'sys:skip-boot'
+
+function consumeSkipBootFlag(): boolean {
+  try {
+    if (sessionStorage.getItem(SKIP_BOOT_KEY) === '1') {
+      sessionStorage.removeItem(SKIP_BOOT_KEY)
+      return true
+    }
+  } catch {}
+  return false
+}
+
+/**
  * "System boot" preloader: a mono counter ticks 000→100 while the six skill
  * services come online, then the panel wipes up to reveal the hero. Skippable;
  * bypassed entirely on reduced-motion.
@@ -32,9 +49,8 @@ export default function SystemePreloader({ onDone }: { onDone: () => void }) {
   }
 
   useEffect(() => {
-    if (hasBootedThisSession) {
-      done.current = true
-      onDone()
+    if (hasBootedThisSession || consumeSkipBootFlag()) {
+      finish()
       return
     }
     if (reducedMotion) {

@@ -1,18 +1,17 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { LOCALE_META } from '../../i18n'
 import { useI18n } from '../../lib/i18n'
 import { useOutsideClick } from '../../lib/hooks/use-outside-click'
 import { SCROLL_RESTORE_KEY, useSmoothScroll } from '../scroll/SmoothScrollProvider'
+import { SKIP_BOOT_KEY } from './SystemePreloader'
 
 function LangSwitch() {
-  const router = useRouter()
   const pathname = usePathname()
-  const { locale, setLocale } = useI18n()
+  const { locale } = useI18n()
   const { scroller } = useSmoothScroll()
-  const [, startTransition] = useTransition()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useOutsideClick(ref, () => setOpen(false))
@@ -22,16 +21,18 @@ function LangSwitch() {
   const onSelect = (next: string) => {
     setOpen(false)
     if (next === locale) return
-    // Locale navigation remounts the page; hand the scroll position to the
-    // next SmoothScrollProvider so the switch feels in-place.
+    // Full page load on the new locale URL: a client-side transition remounts
+    // the whole composition mid-flight and breaks it. Hand the scroll position
+    // to the next mount and skip the boot preloader so the reload reads as an
+    // in-place translation swap.
     try {
       if (scroller) sessionStorage.setItem(SCROLL_RESTORE_KEY, String(scroller.scrollTop))
+      sessionStorage.setItem(SKIP_BOOT_KEY, '1')
     } catch {}
-    setLocale(next)
     const segments = pathname.split('/').filter(Boolean)
     segments[0] = next
     const target = '/' + segments.join('/') + (pathname.endsWith('/') ? '/' : '')
-    startTransition(() => router.replace(target))
+    window.location.assign(target)
   }
 
   return (
