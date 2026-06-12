@@ -3,6 +3,49 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+/* ─────────────────────────────────────────────────────────────────────────
+   BRUTALIST — terminal / tech, hard borders, monospace, minimal WebGL
+   ───────────────────────────────────────────────────────────────────────── */
+.brutalist {
+  --br-paper: #ece9e1;
+  --br-ink: #0d0d0d;
+  --br-accent: #ff3b00;
+  --br-mono: 'Space Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --br-mono-2: 'JetBrains Mono', ui-monospace, monospace;
+  background: var(--br-paper);
+  color: var(--br-ink);
+  font-family: var(--br-mono-2);
+}
+.br-mono { font-family: var(--br-mono); }
+.br-border { border: 2px solid var(--br-ink); }
+.br-border-t { border-top: 2px solid var(--br-ink); }
+.br-border-b { border-bottom: 2px solid var(--br-ink); }
+
+/* Restore native cursors (foundation forces cursor:none for the old custom cursor) */
+.brutalist, .brutalist * { cursor: auto !important; }
+.brutalist a, .brutalist button, .brutalist [role="button"], .brutalist summary { cursor: pointer !important; }
+
+/* Blinking terminal caret */
+@keyframes br-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.br-caret::after {
+  content: '_';
+  margin-left: 0.05em;
+  animation: br-blink 1s step-end infinite;
+}
+
+/* Raw engineering grid */
+.br-grid {
+  background-image:
+    linear-gradient(to right, rgba(13,13,13,0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(13,13,13,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.brutalist ::-webkit-scrollbar { width: 10px; height: 10px; }
+.brutalist ::-webkit-scrollbar-track { background: var(--br-paper); }
+.brutalist ::-webkit-scrollbar-thumb { background: var(--br-ink); border: 2px solid var(--br-paper); }
 
 /* Light theme (default) */
 :root {
