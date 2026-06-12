@@ -5,6 +5,7 @@ import { Code } from "lucide-react";
 import { motion } from "motion/react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { cn } from "@/app/lib/utils";
+import { assetPath } from "@/app/lib/asset-path";
 import type { ProjectTechnology } from "./projects.types";
 
 type TechStackCirclesProps = {
@@ -173,7 +174,7 @@ function TechCircle({
         <Code className="text-neutral-600 dark:text-neutral-400" size={size * 0.5} />
       ) : icon ? (
         <img
-          src={icon}
+          src={assetPath(icon)}
           alt={name}
           width={size * 0.6}
           height={size * 0.6}

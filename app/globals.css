@@ -3,6 +3,50 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SYSTEME — dark editorial / kinetic-blueprint art direction
+   ───────────────────────────────────────────────────────────────────────── */
+.systeme {
+  --sys-bg: #0a0b0d;
+  --sys-panel: #0f1115;
+  --sys-line: #1c2026;
+  --sys-line-2: #2a2f37;
+  --sys-text: #eceff3;
+  --sys-muted: #7c828c;
+  --sys-accent: #5cf2c4;
+  --sys-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --sys-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--sys-bg);
+  color: var(--sys-text);
+}
+.sys-display { font-family: var(--sys-display); }
+.sys-mono { font-family: var(--sys-mono); }
+.sys-accent { color: var(--sys-accent); }
+
+/* Line-mask reveal: text rises out of an overflow-hidden box */
+.sys-mask { overflow: hidden; display: block; }
+.sys-mask > * { display: block; }
+
+/* Faint blueprint grid fallback (mobile / reduced-motion, no WebGL) */
+.sys-grid-bg {
+  background-image:
+    linear-gradient(to right, var(--sys-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--sys-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Animated scan dot on the left rail */
+@keyframes sys-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.7); }
+}
+.sys-pulse { animation: sys-pulse 2.2s ease-in-out infinite; }
+
+/* Hide native scrollbar within the systeme scroll container while keeping scroll */
+.systeme ::-webkit-scrollbar { width: 0; height: 0; }
+.systeme { scrollbar-width: none; }
 
 /* Light theme (default) */
 :root {

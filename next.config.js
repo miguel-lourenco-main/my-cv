@@ -9,6 +9,11 @@ const nextConfig = {
   // Remove basePath by default - will be set via environment variable if needed
   basePath: process.env.NODE_ENV === 'production' ? process.env.BASE_PATH || '' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? process.env.BASE_PATH || '' : '',
+  // Inlined at build so client/SSG code (e.g. assetPath() for raw <img> and
+  // Three.js textures) can prefix the same base path Next uses for _next assets.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: process.env.NODE_ENV === 'production' ? process.env.BASE_PATH || '' : '',
+  },
   webpack: (config, { isServer }) => {
     // Enable SVGR for importing SVGs as React components
     config.module.rules.push({
