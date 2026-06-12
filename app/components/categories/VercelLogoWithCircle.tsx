@@ -2,6 +2,7 @@
 
 import React from "react";
 import { cn } from "@/app/lib/utils";
+import { assetPath } from "@/app/lib/asset-path";
 
 /**
  * Props for VercelLogoWithCircle component.
@@ -50,13 +51,13 @@ export default function VercelLogoWithCircle({
         }}
       >
         <img
-          src="/logos/vercel-icon-light.svg"
+          src={assetPath("/logos/vercel-icon-light.svg")}
           alt="Vercel"
           className="absolute inset-0 h-full w-full object-contain  dark:hidden"
           style={{ width: iconSize, height: iconSize }}
         />
         <img
-          src="/logos/vercel-icon-dark.svg"
+          src={assetPath("/logos/vercel-icon-dark.svg")}
           alt="Vercel"
           className="absolute inset-0 h-full w-full object-contain  hidden dark:block"
           style={{ width: iconSize, height: iconSize }}

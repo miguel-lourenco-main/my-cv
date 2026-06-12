@@ -8,6 +8,12 @@ import { localeAfterBasePathPattern, localePathPattern } from '../i18n'
  * so WebGL asset loading stays consistent with i18n JSON loading.
  */
 export function getBasePath(): string {
+  // Build-time constant (inlined by Next via next.config `env`). Available during
+  // SSG and on the client, so raw <img>/texture URLs are prefixed consistently —
+  // no hydration mismatch.
+  const fromEnv = process.env.NEXT_PUBLIC_BASE_PATH
+  if (typeof fromEnv === 'string' && fromEnv.length > 0) return fromEnv
+
   if (typeof window === 'undefined') return ''
 
   try {
