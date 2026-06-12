@@ -6,6 +6,11 @@ import { useReducedMotion } from '../../lib/use-reduced-motion'
 
 const SERVICES = ['frontend', 'backend', 'devops', 'testing', 'automation', 'ai']
 
+// Locale navigation remounts the whole page (App Router keys pages by path),
+// which would replay the boot sequence on every language switch. Module state
+// survives client-side navigations, so the boot only plays once per session.
+let hasBootedThisSession = false
+
 /**
  * "System boot" preloader: a mono counter ticks 000→100 while the six skill
  * services come online, then the panel wipes up to reveal the hero. Skippable;
@@ -15,17 +20,23 @@ export default function SystemePreloader({ onDone }: { onDone: () => void }) {
   const reducedMotion = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const counterRef = useRef<HTMLSpanElement>(null)
-  const [gone, setGone] = useState(false)
+  const [gone, setGone] = useState(hasBootedThisSession)
   const done = useRef(false)
 
   const finish = () => {
     if (done.current) return
     done.current = true
+    hasBootedThisSession = true
     onDone()
     setGone(true)
   }
 
   useEffect(() => {
+    if (hasBootedThisSession) {
+      done.current = true
+      onDone()
+      return
+    }
     if (reducedMotion) {
       finish()
       return

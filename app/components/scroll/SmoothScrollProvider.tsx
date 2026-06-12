@@ -32,6 +32,25 @@ export function useSmoothScroll(): SmoothScrollContextValue {
 let pluginRegistered = false
 
 /**
+ * One-shot scroll position handoff across page remounts (e.g. locale
+ * navigation). Written right before the navigation, consumed on the next
+ * provider mount so the user keeps their place instead of snapping to top.
+ */
+export const SCROLL_RESTORE_KEY = 'sys:scroll-restore'
+
+function consumeSavedScroll(): number | null {
+  try {
+    const raw = sessionStorage.getItem(SCROLL_RESTORE_KEY)
+    if (raw === null) return null
+    sessionStorage.removeItem(SCROLL_RESTORE_KEY)
+    const top = Number(raw)
+    return Number.isFinite(top) && top > 0 ? top : null
+  } catch {
+    return null
+  }
+}
+
+/**
  * Wraps the app in a Lenis smooth-scroll instance bound to the custom scroll
  * container (`#page-scroll-container`) and wires GSAP ScrollTrigger to it via a
  * single shared ticker. On reduced-motion, Lenis is skipped (native scroll) but
@@ -85,6 +104,8 @@ export function SmoothScrollProvider({
         }
       }
       setValue({ lenis: null, scroller: wrapper, scrollTo: nativeScrollTo })
+      const savedTop = consumeSavedScroll()
+      if (savedTop !== null) wrapper.scrollTop = savedTop
       ScrollTrigger.refresh()
       return () => {
         wrapper.removeEventListener('scroll', onScroll)
@@ -114,7 +135,12 @@ export function SmoothScrollProvider({
     })
 
     // Recalculate once content/images have settled.
-    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 200)
+    const savedTop = consumeSavedScroll()
+    if (savedTop !== null) lenis.scrollTo(savedTop, { immediate: true, force: true })
+    const refreshTimer = window.setTimeout(() => {
+      ScrollTrigger.refresh()
+      if (savedTop !== null) lenis.scrollTo(savedTop, { immediate: true, force: true })
+    }, 200)
 
     return () => {
       window.clearTimeout(refreshTimer)
