@@ -3,6 +3,49 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ORGANIC — lush WebGL shader-gradient art direction, glassmorphism UI
+   ───────────────────────────────────────────────────────────────────────── */
+.organic {
+  --org-ink: #0b0613;
+  --org-text: #f4f0ff;
+  --org-muted: #b9b1d6;
+  --org-display: 'Sora', 'Inter', system-ui, sans-serif;
+  --org-glass: rgba(255, 255, 255, 0.06);
+  --org-glass-border: rgba(255, 255, 255, 0.14);
+  background: var(--org-ink);
+  color: var(--org-text);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.org-display { font-family: var(--org-display); letter-spacing: -0.02em; }
+
+/* Frosted glass surface */
+.org-glass {
+  background: var(--org-glass);
+  border: 1px solid var(--org-glass-border);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 8px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.org-glass-hover { transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s, background 0.4s; }
+.org-glass-hover:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.09); }
+
+/* Animated CSS gradient fallback (mobile / reduced-motion, no WebGL) */
+@keyframes org-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.org-gradient-fallback {
+  background: linear-gradient(130deg, #2a0f4a, #4b1e7a, #1c4a6e, #6e1e5a, #2a0f4a);
+  background-size: 300% 300%;
+  animation: org-flow 22s ease infinite;
+}
+
+.organic ::-webkit-scrollbar { width: 0; height: 0; }
+.organic { scrollbar-width: none; }
 
 /* Light theme (default) */
 :root {
