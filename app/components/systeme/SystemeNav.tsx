@@ -1,17 +1,15 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { LOCALE_META } from '../../i18n'
 import { useI18n } from '../../lib/i18n'
 import { useOutsideClick } from '../../lib/hooks/use-outside-click'
 import { useSmoothScroll } from '../scroll/SmoothScrollProvider'
 
 function LangSwitch() {
-  const router = useRouter()
   const pathname = usePathname()
-  const { locale, setLocale } = useI18n()
-  const [, startTransition] = useTransition()
+  const { locale } = useI18n()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useOutsideClick(ref, () => setOpen(false))
@@ -21,11 +19,13 @@ function LangSwitch() {
   const onSelect = (next: string) => {
     setOpen(false)
     if (next === locale) return
-    setLocale(next)
+    // Full page load on the new locale URL: a client-side transition remounts
+    // the whole composition mid-flight and breaks it. A fresh load also
+    // replays the boot sequence from the start, like a first visit.
     const segments = pathname.split('/').filter(Boolean)
     segments[0] = next
     const target = '/' + segments.join('/') + (pathname.endsWith('/') ? '/' : '')
-    startTransition(() => router.replace(target))
+    window.location.assign(target)
   }
 
   return (
