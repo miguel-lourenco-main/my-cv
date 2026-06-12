@@ -17,15 +17,10 @@ export function useDeviceDetection<T>(
   const detectionFnRef = useRef(detectionFn);
   detectionFnRef.current = detectionFn;
 
-  const [detection, setDetection] = useState<T>(() => {
-    // Initial detection on client side
-    if (typeof window !== 'undefined') {
-      return detectionFn();
-    }
-    
-    // Default values for SSR
-    return defaultValue;
-  });
+  // Always start from the SSR default so the first client render matches the
+  // server markup exactly (no hydration mismatch). The effect below re-detects
+  // immediately after mount, so the real device values apply on the next tick.
+  const [detection, setDetection] = useState<T>(defaultValue);
 
   useEffect(() => {
     // Update detection on mount (in case of hydration mismatch)

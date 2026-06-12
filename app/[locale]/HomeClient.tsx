@@ -40,12 +40,13 @@ function HomeClientContent({ greeting }: { greeting: string }) {
     setShowIntro(false);
   }, []);
 
-  const shouldUseScrollSnap = isLaptop && !reducedMotion;
-  const containerClasses = [
-    "flex flex-col relative z-10 transition-opacity duration-300 overflow-y-auto h-full pt-40 gap-y-48 xl:gap-y-64 pb-12",
-    shouldUseScrollSnap && "snap-y snap-mandatory",
+  // CSS scroll-snap is intentionally dropped in favour of Lenis smooth scroll +
+  // GSAP-driven pinning (added per art-direction branch); the two conflict.
+  const contentClasses = [
+    "flex flex-col pt-40 gap-y-48 xl:gap-y-64 pb-12",
     isLaptop ? "" : "xl:pt-52 2xl:pt-64",
     "px-4 sm:px-6 lg:px-8",
+    "transition-opacity duration-300",
     showIntro ? "opacity-0 pointer-events-none" : "opacity-100"
   ].filter(Boolean).join(" ");
 
@@ -74,19 +75,21 @@ function HomeClientContent({ greeting }: { greeting: string }) {
           >
             <ShootingStars className='size-full' initialDelayMs={showIntro ? 1400 : 0} />
           </ScrollParallaxLayer>
-          <div id="page-scroll-container" className={containerClasses}>
-            {!isLaptop && <Navigation />}
-            {isLaptop && <div className="fixed top-0 left-0 right-0 z-50"><Navigation /></div>}
-            <Hero
-              showShared={!showIntro}
-              greeting={greeting}
-              isLaptop={isLaptop}
-              onCursorModeChange={setCursorMode}
-              onCursorVisibilityChange={setCursorHidden}
-            />
-            <About isLaptop={isLaptop} />
-            <Projects isLaptop={isLaptop} onCursorModeChange={setCursorMode} />
-            <Contact isLaptop={isLaptop} />
+          <div id="page-scroll-container" className="relative z-10 overflow-y-auto h-full">
+            <div data-lenis-content className={contentClasses}>
+              {!isLaptop && <Navigation />}
+              {isLaptop && <div className="fixed top-0 left-0 right-0 z-50"><Navigation /></div>}
+              <Hero
+                showShared={!showIntro}
+                greeting={greeting}
+                isLaptop={isLaptop}
+                onCursorModeChange={setCursorMode}
+                onCursorVisibilityChange={setCursorHidden}
+              />
+              <About isLaptop={isLaptop} />
+              <Projects isLaptop={isLaptop} onCursorModeChange={setCursorMode} />
+              <Contact isLaptop={isLaptop} />
+            </div>
           </div>
         </ParallaxRoot>
       </LayoutGroup>
