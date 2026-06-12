@@ -47,6 +47,10 @@
 .organic ::-webkit-scrollbar { width: 0; height: 0; }
 .organic { scrollbar-width: none; }
 
+/* Restore native cursors (foundation forces cursor:none for the old custom cursor) */
+.organic, .organic * { cursor: auto !important; }
+.organic a, .organic button, .organic [role="button"], .organic summary { cursor: pointer !important; }
+
 /* Light theme (default) */
 :root {
   --background: 0 0% 100%;
