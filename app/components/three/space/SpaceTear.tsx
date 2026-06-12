@@ -3,7 +3,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { AdditiveBlending, Color, DoubleSide, type ShaderMaterial } from 'three'
-import { TEAR_YAW, slotFacingRotation, sphericalToPosition } from '../camera/layout'
+import { TEAR_YAW, slotFacingQuaternion, sphericalToPosition } from '../camera/layout'
 import { BASE_VERT, TEAR_FRAG } from './glsl'
 
 const TEAR_DIST = 34
@@ -17,7 +17,7 @@ const TEAR_PITCH = 0.04
 export default function SpaceTear() {
   const mat = useRef<ShaderMaterial>(null)
   const pos = useMemo(() => sphericalToPosition(TEAR_YAW, TEAR_PITCH, TEAR_DIST), [])
-  const rot = useMemo(() => slotFacingRotation(TEAR_YAW, TEAR_PITCH), [])
+  const quat = useMemo(() => slotFacingQuaternion(TEAR_YAW, TEAR_PITCH), [])
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -32,7 +32,7 @@ export default function SpaceTear() {
   })
 
   return (
-    <mesh position={[pos.x, pos.y, pos.z]} rotation={rot}>
+    <mesh position={[pos.x, pos.y, pos.z]} quaternion={quat}>
       <planeGeometry args={[18, 30]} />
       <shaderMaterial
         ref={mat}

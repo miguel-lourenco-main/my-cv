@@ -9,6 +9,8 @@ interface SceneCanvasProps extends Omit<CanvasProps, 'children' | 'dpr'> {
   /** Upper bound for device pixel ratio (auto-degraded under load). */
   maxDpr?: number
   className?: string
+  /** Freeze the render loop (e.g. while a full-screen 2D page covers the scene). */
+  paused?: boolean
 }
 
 /**
@@ -25,6 +27,7 @@ export default function SceneCanvas({
   children,
   maxDpr = 1.75,
   className,
+  paused = false,
   ...rest
 }: SceneCanvasProps) {
   const [active, setActive] = useState(true)
@@ -46,7 +49,7 @@ export default function SceneCanvas({
     <Canvas
       className={className}
       dpr={[1, dpr]}
-      frameloop={active ? 'always' : 'never'}
+      frameloop={active && !paused ? 'always' : 'never'}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       {...rest}
     >

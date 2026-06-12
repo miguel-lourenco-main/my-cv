@@ -1,11 +1,13 @@
 /**
- * One-time, side-effect-free probe for usable WebGL. Creates a throwaway canvas
- * and also rejects software renderers (SwiftShader / llvmpipe / Mesa software),
- * which can technically run WebGL but are far too slow for the immersive scene.
+ * One-time, side-effect-free probe for usable WebGL. Creates a throwaway canvas.
+ * By default rejects software renderers (SwiftShader / llvmpipe / Mesa software),
+ * which can technically run WebGL but are far too slow for the auto experience.
+ * Pass `allowSoftware` (used by the explicit `?shell=3d` override / headless QA)
+ * to accept any working context.
  *
  * Must only be called on the client (guards for `document`).
  */
-export function hasWebGL(): boolean {
+export function hasWebGL(allowSoftware = false): boolean {
   if (typeof document === 'undefined') return false
 
   try {
@@ -15,6 +17,7 @@ export function hasWebGL(): boolean {
       canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
 
     if (!gl) return false
+    if (allowSoftware) return true
 
     // Reject obvious software rasterizers when the renderer string is exposed.
     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info')

@@ -1,35 +1,48 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Html, RoundedBox } from '@react-three/drei'
 import { damp } from 'maath/easing'
-import { Vector3, type Group, type Mesh } from 'three'
-import { slotFacingRotation, sphericalToPosition, type ScreenSlot } from '../camera/layout'
-import { useLookControls } from '../camera/LookControlsContext'
+import { Maximize2 } from 'lucide-react'
+import {
+  Vector3,
+  type Group,
+  type Mesh,
+  type MeshBasicMaterial,
+  type MeshStandardMaterial,
+} from 'three'
+import { slotFacingQuaternion, sphericalToPosition, type ScreenSlot } from '../camera/layout'
 import ScreenContextBridge, { type BridgedContexts } from '../ScreenContextBridge'
 import { RevealStaticContext } from '../../Reveal'
 import ScreenSection from './ScreenSections'
 import { useFocus } from './FocusContext'
+import { SCREEN_ACCENT } from './screen-theme'
 import {
   FOCUS_SCALE,
   PANEL_PX,
   PANEL_WORLD,
   SCREEN_DISTANCE_FACTOR,
+  focusCoverPx,
 } from './screen-size'
+
+/** Tracks the viewport size so a focused panel can be grown to cover it. */
+function useViewportSize() {
+  const [vp, setVp] = useState({ w: 1920, h: 1080 })
+  useEffect(() => {
+    const update = () => setVp({ w: window.innerWidth, h: window.innerHeight })
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return vp
+}
 
 const BEZEL_PAD = 0.14
 /** Max see-saw tilt (radians ≈ 7°). */
 const MAX_TILT = 0.12
 /** How far the panel pushes back into the scene on hover (world units). */
 const HOVER_PUSH = 0.06
-
-const ACCENT: Record<string, string> = {
-  about: '#5b8bff',
-  tech: '#36d6c3',
-  projects: '#c084fc',
-  contact: '#ffb454',
-}
 
 interface HoverState {
   hovered: boolean
@@ -63,7 +76,10 @@ export default function ScreenPlane({
   const group = useRef<Group>(null)
   const tilt = useRef<Group>(null)
   const bezel = useRef<Mesh>(null)
+  const bezelMat = useRef<MeshStandardMaterial>(null)
+  const rimMat = useRef<MeshBasicMaterial>(null)
   const scale = useRef(1)
+  const fade = useRef(1)
   const hover = useRef<HoverState>({
     hovered: false,
     tiltX: 0,
@@ -74,18 +90,24 @@ export default function ScreenPlane({
   })
   const localHit = useRef(new Vector3())
 
-  const lookRef = useLookControls()
   const { focusedId, focus } = useFocus()
   const isFocused = focusedId === slot.id
+  // When another screen is focused, fade this one out so the zoom isn't a jumble
+  // of overlapping windows.
+  const dimmed = focusedId !== null && !isFocused
   const phase = slot.yaw * 3.1 // de-sync the idle bob per screen
 
+  // Grow the focused panel to cover the whole viewport; revert when leaving.
+  const vp = useViewportSize()
+  const cover = useMemo(() => focusCoverPx(vp.w, vp.h), [vp.w, vp.h])
+  const surfacePx = isFocused ? cover : PANEL_PX
+
   const pos = sphericalToPosition(slot.yaw, slot.pitch)
-  const rot = slotFacingRotation(slot.yaw, slot.pitch)
-  const accent = ACCENT[slot.id] ?? '#5b8bff'
+  const quat = slotFacingQuaternion(slot.yaw, slot.pitch)
+  const accent = SCREEN_ACCENT[slot.id] ?? '#5b8bff'
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
-    if (lookRef.current.dragMoved) return // ignore the click that ends a drag
     if (!isFocused) focus(slot.id)
   }
 
@@ -120,6 +142,12 @@ export default function ScreenPlane({
     damp(scale, 'current', isFocused ? FOCUS_SCALE : 1, 0.18, dt)
     g.scale.setScalar(scale.current)
 
+    // Fade non-focused screens out during a focus so the zoom stays clean.
+    damp(fade, 'current', dimmed ? 0 : 1, 0.12, dt)
+    if (bezelMat.current) bezelMat.current.opacity = fade.current
+    if (rimMat.current) rimMat.current.opacity = fade.current
+    g.visible = fade.current > 0.01 || isFocused
+
     // See-saw tilt (zeroed while focused) on the inner group.
     if (isFocused) {
       h.targetTiltX = 0
@@ -140,54 +168,92 @@ export default function ScreenPlane({
   })
 
   return (
-    <group ref={group} position={[pos.x, pos.y, pos.z]} rotation={rot}>
+    <group ref={group} position={[pos.x, pos.y, pos.z]} quaternion={quat}>
       <group ref={tilt}>
-        {/* Glass bezel — also the raycast target for hover/focus. */}
+        {/* Glowing accent rim — peeks out behind the dark bezel as a neon frame. */}
+        <RoundedBox
+          args={[PANEL_WORLD.w + BEZEL_PAD + 0.07, PANEL_WORLD.h + BEZEL_PAD + 0.07, 0.05]}
+          radius={0.08}
+          smoothness={4}
+          position={[0, 0, -0.02]}
+        >
+          <meshBasicMaterial ref={rimMat} color={accent} toneMapped={false} transparent />
+        </RoundedBox>
+
+        {/* Sleek dark bezel — also the raycast target for hover/focus. */}
         <RoundedBox
           ref={bezel}
-          args={[PANEL_WORLD.w + BEZEL_PAD, PANEL_WORLD.h + BEZEL_PAD, 0.08]}
-          radius={0.06}
+          args={[PANEL_WORLD.w + BEZEL_PAD, PANEL_WORLD.h + BEZEL_PAD, 0.09]}
+          radius={0.07}
           smoothness={4}
           onClick={handleClick}
           onPointerMove={handleMove}
           onPointerOut={handleOut}
         >
           <meshStandardMaterial
-            color="#0a0e1a"
+            ref={bezelMat}
+            color="#05070d"
             emissive={accent}
-            emissiveIntensity={isFocused ? 0.5 : 0.22}
-            metalness={0.6}
-            roughness={0.35}
+            emissiveIntensity={isFocused ? 0.28 : 0.1}
+            metalness={0.85}
+            roughness={0.28}
+            transparent
           />
         </RoundedBox>
 
-        {/* Real section DOM mapped onto the screen face. */}
+        {/* Real section DOM mapped onto the screen face, in modern window chrome.
+            Non-interactive — it's the zoom-in preview; a real 2D page takes over
+            at full-screen (see FocusedPage). */}
         <Html
           transform
           distanceFactor={SCREEN_DISTANCE_FACTOR}
-          position={[0, 0, 0.06]}
+          position={[0, 0, 0.065]}
           occlude={false}
           zIndexRange={[20, 0]}
-          pointerEvents={isFocused ? 'auto' : 'none'}
+          pointerEvents="none"
         >
           <ScreenContextBridge values={bridged}>
             <RevealStaticContext.Provider value={true}>
               <div
                 data-screen={slot.id}
-                className="cv-screen-surface rounded-[10px] bg-background text-foreground"
+                className={`flex flex-col overflow-hidden bg-background text-foreground ${
+                  isFocused ? '' : 'rounded-2xl ring-1 ring-white/10'
+                }`}
                 style={{
-                  width: PANEL_PX.w,
-                  height: PANEL_PX.h,
-                  overflowY: isFocused ? 'auto' : 'hidden',
-                  overflowX: 'hidden',
+                  width: surfacePx.w,
+                  height: surfacePx.h,
+                  opacity: dimmed ? 0 : 1,
+                  transition:
+                    'width 0.5s cubic-bezier(0.22,1,0.36,1), height 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease',
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                   cursor: isFocused ? 'auto' : 'pointer',
-                  boxShadow: `0 0 60px -12px ${accent}55`,
+                  boxShadow: isFocused
+                    ? 'none'
+                    : `inset 0 0 0 1px ${accent}33, 0 24px 70px -24px ${accent}cc, 0 0 50px -16px ${accent}66`,
                 }}
               >
-                <div className="min-h-full px-2 py-6">
-                  <ScreenSection id={slot.id} greeting={greeting} />
+                {/* Window chrome header */}
+                <div
+                  className="sticky top-0 z-20 flex items-center gap-2.5 border-b border-white/10 px-5 py-3 backdrop-blur-md"
+                  style={{ background: `linear-gradient(180deg, ${accent}24, ${accent}08 60%, transparent)` }}
+                >
+                  <span
+                    className="size-2.5 rounded-full"
+                    style={{ background: accent, boxShadow: `0 0 10px ${accent}, 0 0 4px ${accent}` }}
+                  />
+                  <span className="text-sm font-semibold tracking-wide text-foreground/90">
+                    {slot.label}
+                  </span>
+                  <span className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium text-foreground/45">
+                    {isFocused ? 'Esc to close' : 'Click to open'}
+                    <Maximize2 className="size-3.5" />
+                  </span>
+                </div>
+
+                {/* Scrollable body */}
+                <div className="flex-1 overflow-hidden">
+                  <ScreenSection id={slot.id} greeting={greeting} showName={false} />
                 </div>
               </div>
             </RevealStaticContext.Provider>

@@ -243,6 +243,103 @@ html {
   display: none;
 }
 
+/* The immersive shell hides the native cursor via the app-wide `* { cursor:none }`
+   rule (above) and draws the themed reticle while steering. The full-screen 2D
+   page, however, behaves like a normal page — restore the native cursor there,
+   overriding that `* !important` with a more specific `!important` selector. */
+.cv-focus-page,
+.cv-focus-page * {
+  cursor: auto !important;
+}
+.cv-focus-page a,
+.cv-focus-page button,
+.cv-focus-page [role='button'],
+.cv-focus-page summary,
+.cv-focus-page label[for] {
+  cursor: pointer !important;
+}
+
+.cv-cursor {
+  color: #8af0ff;
+  filter: drop-shadow(0 0 3px rgba(76, 220, 255, 0.8)) drop-shadow(0 0 8px rgba(43, 184, 255, 0.4));
+  transition: opacity 0.18s ease;
+  will-change: transform;
+}
+.cv-cursor-inner {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  transition: transform 0.12s ease-out;
+}
+.cv-cursor-inner svg {
+  position: absolute;
+  inset: 0;
+}
+.cv-cursor-ring {
+  transform-origin: 50% 50%;
+  animation: cv-cursor-spin 9s linear infinite;
+}
+@keyframes cv-cursor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-cursor-ring {
+    animation: none;
+  }
+}
+
+/* Hide + neutralize the WebGL canvas (and its drei <Html> portals, which mount
+   inside it) while a full-screen 2D page covers the scene. */
+.cv-3d-hidden {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Per-window content stages (immersive shell). */
+.cv-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 46px 46px;
+}
+.cv-scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 4px);
+  animation: cv-scan 9s linear infinite;
+  opacity: 0.5;
+}
+@keyframes cv-scan {
+  from { background-position: 0 0; }
+  to { background-position: 0 240px; }
+}
+.cv-aurora-blob {
+  animation: cv-aurora 16s ease-in-out infinite;
+}
+@keyframes cv-aurora {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5%, 4%) scale(1.18); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+.cv-blink {
+  animation: cv-blink 1.1s steps(1) infinite;
+}
+@keyframes cv-blink {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-scanlines::after,
+  .cv-aurora-blob,
+  .cv-blink,
+  .cv-cursor-ring {
+    animation: none;
+  }
+}
+
 /* DOM-in-3D section screens (immersive shell): slim scrollbar when focused. */
 .cv-screen-surface {
   scrollbar-width: thin;

@@ -28,12 +28,14 @@ export function useShellMode(): ShellMode {
   const reducedMotion = useReducedMotion()
 
   const [webglOk, setWebglOk] = useState<boolean | null>(null)
+  const [webglBasic, setWebglBasic] = useState(false)
   const [override, setOverride] = useState<ShellMode | null>(null)
   const [cores, setCores] = useState<number | null>(null)
   const [memory, setMemory] = useState<number | null>(null)
 
   useEffect(() => {
     setWebglOk(hasWebGL())
+    setWebglBasic(hasWebGL(true))
 
     if (typeof navigator !== 'undefined') {
       setCores(typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : null)
@@ -62,11 +64,11 @@ export function useShellMode(): ShellMode {
     // Undecided (pre-mount / probing) → safe 2D default.
     if (webglOk === null) return '2d'
     if (override === '2d') return '2d'
+
+    // Forced on for QA — needs only a working context (software GL is fine).
+    if (override === '3d') return webglBasic ? '3d' : '2d'
+
     if (!webglOk) return '2d'
-
-    // Forced on for QA — already cleared the WebGL requirement above.
-    if (override === '3d') return '3d'
-
     if (!flagEnabled) return '2d'
     if (reducedMotion) return '2d'
     if (!isLaptop) return '2d'
@@ -79,6 +81,7 @@ export function useShellMode(): ShellMode {
     return '3d'
   }, [
     webglOk,
+    webglBasic,
     override,
     flagEnabled,
     reducedMotion,

@@ -35,7 +35,7 @@ export default function AmbientHud({
     : ''
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-10">
+    <div className="pointer-events-none fixed inset-0 z-50">
       <AnimatePresence>
         {focusedId && (
           <motion.button
@@ -67,7 +67,7 @@ export default function AmbientHud({
             className="absolute inset-x-0 bottom-8 flex justify-center"
           >
             <div className="rounded-full border border-white/10 bg-black/35 px-5 py-2 text-sm text-white/70 backdrop-blur-md">
-              Drag to look around · Click a screen to open
+              Move the cursor or use arrow keys to look · Click a screen to open
             </div>
           </motion.div>
         )}

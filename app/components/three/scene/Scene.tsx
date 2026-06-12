@@ -3,8 +3,8 @@
 import { useEffect, useRef } from 'react'
 import CameraRig from '../camera/CameraRig'
 import { LookControlsContext } from '../camera/LookControlsContext'
-import { createLookState, FOCUS_DOLLY, type LookState } from '../camera/look-state'
-import { SCREEN_LAYOUT } from '../camera/layout'
+import { createLookState, FOCUS_VIEW_DISTANCE, type LookState } from '../camera/look-state'
+import { SCREEN_LAYOUT, SCREEN_RADIUS } from '../camera/layout'
 import { FocusContext, type FocusValue } from '../screens/FocusContext'
 import ScreensGroup from '../screens/ScreensGroup'
 import SpaceEnvironment from '../space/SpaceEnvironment'
@@ -38,12 +38,15 @@ export default function Scene({
     if (focusedId) {
       const slot = SCREEN_LAYOUT.find((s) => s.id === focusedId)
       if (slot) {
-        // Rotate to the screen the short way (yaw is unbounded after spinning).
-        const k = Math.round((state.yaw - slot.yaw) / TWO_PI)
-        state.targetYaw = slot.yaw + k * TWO_PI
+        // Rig yaw is the negative of a screen's yaw (looking right reveals the
+        // +yaw screens), so aim at -slot.yaw — and take the short way around.
+        const aimYaw = -slot.yaw
+        const k = Math.round((state.yaw - aimYaw) / TWO_PI)
+        state.targetYaw = aimYaw + k * TWO_PI
         state.targetPitch = slot.pitch
       }
-      state.dolly = FOCUS_DOLLY
+      // Dolly in so the panel fills ~90% of the view.
+      state.dolly = SCREEN_RADIUS - FOCUS_VIEW_DISTANCE
       state.enabled = false
     } else {
       state.dolly = 0
