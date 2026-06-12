@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type DependencyList, type RefObject } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useSmoothScroll } from './SmoothScrollProvider'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -23,15 +24,22 @@ export function useGsap<T extends HTMLElement = HTMLDivElement>(
   deps: DependencyList = []
 ): RefObject<T> {
   const scopeRef = useRef<T>(null)
+  // Wait for SmoothScrollProvider to publish the scroller: it configures
+  // ScrollTrigger.defaults({ scroller }) in a parent effect that runs AFTER
+  // child layout effects on first mount. Creating triggers before that point
+  // binds them to the window — which never scrolls (the page scrolls inside
+  // #page-scroll-container) — so below-the-fold `gsap.from` animations never
+  // fire and their targets stay hidden in production builds.
+  const { scroller } = useSmoothScroll()
 
   useLayoutEffect(() => {
     const scope = scopeRef.current
-    if (!scope) return
+    if (!scope || !scroller) return
 
     const ctx = gsap.context((self) => setup(self, scope), scope)
     return () => ctx.revert()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
+  }, [scroller, ...deps])
 
   return scopeRef
 }
