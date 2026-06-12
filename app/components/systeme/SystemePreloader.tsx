@@ -6,28 +6,6 @@ import { useReducedMotion } from '../../lib/use-reduced-motion'
 
 const SERVICES = ['frontend', 'backend', 'devops', 'testing', 'automation', 'ai']
 
-// Locale navigation remounts the whole page (App Router keys pages by path),
-// which would replay the boot sequence on every language switch. Module state
-// survives client-side navigations, so the boot only plays once per session.
-let hasBootedThisSession = false
-
-/**
- * One-shot opt-out for the next full page load. The language switcher sets
- * this right before `location.assign`, so a locale change doesn't replay the
- * boot sequence — while a normal visit or manual refresh still gets it.
- */
-export const SKIP_BOOT_KEY = 'sys:skip-boot'
-
-function consumeSkipBootFlag(): boolean {
-  try {
-    if (sessionStorage.getItem(SKIP_BOOT_KEY) === '1') {
-      sessionStorage.removeItem(SKIP_BOOT_KEY)
-      return true
-    }
-  } catch {}
-  return false
-}
-
 /**
  * "System boot" preloader: a mono counter ticks 000→100 while the six skill
  * services come online, then the panel wipes up to reveal the hero. Skippable;
@@ -37,22 +15,17 @@ export default function SystemePreloader({ onDone }: { onDone: () => void }) {
   const reducedMotion = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const counterRef = useRef<HTMLSpanElement>(null)
-  const [gone, setGone] = useState(hasBootedThisSession)
+  const [gone, setGone] = useState(false)
   const done = useRef(false)
 
   const finish = () => {
     if (done.current) return
     done.current = true
-    hasBootedThisSession = true
     onDone()
     setGone(true)
   }
 
   useEffect(() => {
-    if (hasBootedThisSession || consumeSkipBootFlag()) {
-      finish()
-      return
-    }
     if (reducedMotion) {
       finish()
       return

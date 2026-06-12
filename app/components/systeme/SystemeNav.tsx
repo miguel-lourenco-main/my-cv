@@ -5,13 +5,11 @@ import { usePathname } from 'next/navigation'
 import { LOCALE_META } from '../../i18n'
 import { useI18n } from '../../lib/i18n'
 import { useOutsideClick } from '../../lib/hooks/use-outside-click'
-import { SCROLL_RESTORE_KEY, useSmoothScroll } from '../scroll/SmoothScrollProvider'
-import { SKIP_BOOT_KEY } from './SystemePreloader'
+import { useSmoothScroll } from '../scroll/SmoothScrollProvider'
 
 function LangSwitch() {
   const pathname = usePathname()
   const { locale } = useI18n()
-  const { scroller } = useSmoothScroll()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useOutsideClick(ref, () => setOpen(false))
@@ -22,13 +20,8 @@ function LangSwitch() {
     setOpen(false)
     if (next === locale) return
     // Full page load on the new locale URL: a client-side transition remounts
-    // the whole composition mid-flight and breaks it. Hand the scroll position
-    // to the next mount and skip the boot preloader so the reload reads as an
-    // in-place translation swap.
-    try {
-      if (scroller) sessionStorage.setItem(SCROLL_RESTORE_KEY, String(scroller.scrollTop))
-      sessionStorage.setItem(SKIP_BOOT_KEY, '1')
-    } catch {}
+    // the whole composition mid-flight and breaks it. A fresh load also
+    // replays the boot sequence from the start, like a first visit.
     const segments = pathname.split('/').filter(Boolean)
     segments[0] = next
     const target = '/' + segments.join('/') + (pathname.endsWith('/') ? '/' : '')
