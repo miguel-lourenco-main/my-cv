@@ -6,6 +6,7 @@ import {
   filterProjectImagesByMode,
   type ProjectScreenshotMode,
 } from "./project-images";
+import { assetPath } from "../../lib/asset-path";
 
 /**
  * Image carousel component for project galleries.
@@ -55,7 +56,7 @@ export function ProjectCarousel({
           {filteredImages.map((src, idx) => (
             <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>
               <img
-                src={src}
+                src={assetPath(src)}
                 alt={`Slide ${idx + 1}`}
                 loading={idx === selectedIndex ? "eager" : "lazy"}
                 decoding="async"
@@ -193,7 +194,7 @@ function Lightbox({
 
       <div className="max-h-[90vh] max-w-[95vw] md:max-w-[90vw]">
         <img
-          src={images[current]}
+          src={assetPath(images[current])}
           alt="Expanded"
           decoding="async"
           className="object-contain w-full h-full"

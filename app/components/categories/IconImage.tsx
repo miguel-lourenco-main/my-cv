@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { assetPath } from "../../lib/asset-path";
 
 /**
  * Props for the IconImage component.
@@ -44,7 +45,7 @@ export default function IconImage({
 }: IconImageProps) {
   return (
     <img
-      src={src}
+      src={assetPath(src)}
       alt={alt}
       aria-hidden="true"
       width={width}
