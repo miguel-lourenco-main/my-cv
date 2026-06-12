@@ -23,7 +23,13 @@ const KEY_SPEED = MAX_LOOK_SPEED * 0.8
  * at the origin inside a rig group: yaw is unbounded (full 360°), pitch clamped,
  * and the whole thing is damped for a heavy, settling feel.
  */
-export default function CameraRig({ lookRef }: { lookRef: MutableRefObject<LookState> }) {
+export default function CameraRig({
+  lookRef,
+  revealed = true,
+}: {
+  lookRef: MutableRefObject<LookState>
+  revealed?: boolean
+}) {
   const rig = useRef<Group>(null)
   const cam = useRef<PerspectiveCameraImpl>(null)
   const idleFactor = useRef(0)
@@ -124,10 +130,10 @@ export default function CameraRig({ lookRef }: { lookRef: MutableRefObject<LookS
     const driftYaw = idleFactor.current * Math.sin(t * 0.06) * 0.03
     const driftPitch = idleFactor.current * Math.sin(t * 0.045 + 1.3) * 0.014
 
-    // Establishing fly-in on first load: the camera starts pulled back and
-    // swung off-centre, then eases home over ~2.4s (easeOutCubic).
-    if (introStart.current === null) introStart.current = t
-    const introP = Math.min(1, (t - introStart.current) / 2.4)
+    // Establishing fly-in: held off-centre + pulled back during the intro, then
+    // eases home over ~2.4s (easeOutCubic) once the intro reveals the scene.
+    if (revealed && introStart.current === null) introStart.current = t
+    const introP = introStart.current === null ? 0 : Math.min(1, (t - introStart.current) / 2.4)
     const introRemain = Math.pow(1 - introP, 3)
     const introYaw = introRemain * 0.55
     const introPitch = introRemain * 0.24

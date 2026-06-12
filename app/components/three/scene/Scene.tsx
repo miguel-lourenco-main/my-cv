@@ -25,10 +25,13 @@ export default function Scene({
   focus,
   bridged,
   greeting,
+  revealed = true,
 }: {
   focus: FocusValue
   bridged: BridgedContexts
   greeting: string
+  /** True once the intro finishes — gates the camera fly-in. */
+  revealed?: boolean
 }) {
   const lookRef = useRef<LookState>(createLookState())
   const focusedId = focus.focusedId
@@ -67,7 +70,7 @@ export default function Scene({
   return (
     <LookControlsContext.Provider value={lookRef}>
       <FocusContext.Provider value={focus}>
-        <CameraRig lookRef={lookRef} />
+        <CameraRig lookRef={lookRef} revealed={revealed} />
 
         <ambientLight intensity={0.45} />
         <pointLight position={[0, 2.5, 2.5]} intensity={30} />

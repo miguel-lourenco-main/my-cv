@@ -1,12 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
 import SceneCanvas from './SceneCanvas'
 import Scene from './scene/Scene'
 import AmbientHud from './hud/AmbientHud'
 import SpaceCursor from './hud/SpaceCursor'
 import FocusedPage, { type SlideDir } from './hud/FocusedPage'
+import IntroSequence from './intro/IntroSequence'
 import { useI18n } from '../../lib/i18n'
 import { useProjectImagesManifest } from '../../lib/project-images-context'
 import { useDeviceDetectionContext } from '../../lib/device-detection-context'
@@ -53,6 +54,11 @@ export default function Shell3D({ greeting }: { greeting: string }) {
     () => ({ i18n, manifest, device }),
     [i18n, manifest, device]
   )
+
+  // Initial branded intro/loading sequence; the scene reveal (camera fly-in)
+  // waits until it finishes.
+  const [introDone, setIntroDone] = useState(false)
+  const handleIntroDone = useCallback(() => setIntroDone(true), [])
 
   const [focusedId, setFocusedId] = useState<ScreenId | null>(null)
   const clear = useCallback(() => setFocusedId(null), [])
@@ -138,7 +144,7 @@ export default function Shell3D({ greeting }: { greeting: string }) {
       {/* Keep the greeting in the a11y/SEO tree even in the WebGL shell. */}
       <h1 className="sr-only">{greeting}</h1>
       <SceneCanvas className={hide3D ? 'cv-3d-hidden' : ''} paused={hide3D}>
-        <Scene focus={focus} bridged={bridged} greeting={greeting} />
+        <Scene focus={focus} bridged={bridged} greeting={greeting} revealed={introDone} />
       </SceneCanvas>
 
       {/* Real 2D page takes over at full-screen; switches slide on a shared plane. */}
@@ -147,17 +153,12 @@ export default function Shell3D({ greeting }: { greeting: string }) {
       </AnimatePresence>
 
       <AmbientHud focusedId={focusedId} onBack={clear} />
-      {/* The themed reticle is for steering; on the real page use the native cursor. */}
-      {!pageId && <SpaceCursor focused={!!focusedId} />}
+      {/* The themed reticle is for steering; on the real page use the native
+          cursor, and hide it entirely during the intro. */}
+      {!pageId && introDone && <SpaceCursor focused={!!focusedId} />}
 
-      {/* Establishing fade-from-black on first arrival into the space. */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[60] bg-black"
-        initial={{ opacity: 1 }}
-        animate={{ opacity: 0 }}
-        transition={{ duration: 1.6, ease: 'easeInOut' }}
-      />
+      {/* Branded loading/intro sequence, revealing the space when it finishes. */}
+      {!introDone && <IntroSequence onDone={handleIntroDone} />}
     </div>
   )
 }
