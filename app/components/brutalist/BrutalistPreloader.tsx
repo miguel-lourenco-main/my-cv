@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useReducedMotion } from '../../lib/use-reduced-motion'
 
@@ -12,22 +12,30 @@ const LINES = [
   'rendering miguel_lourenço ',
 ]
 
+// Module-level flag: persists across React remounts (e.g. locale switches) within
+// the same JS session. Ensures the boot animation only plays once per page load.
+let preloaderShown = false
+
+export const wasPreloaderShown = () => preloaderShown
+
 /** Terminal boot preloader: types lines on a black console, then wipes away. */
 export default function BrutalistPreloader({ onDone }: { onDone: () => void }) {
   const reducedMotion = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
-  const [gone, setGone] = useState(false)
-  const done = useRef(false)
+  // Skip preloader immediately if already shown (locale switch) or reduced motion.
+  const [gone, setGone] = useState(preloaderShown)
+  const done = useRef(preloaderShown)
 
-  const finish = () => {
+  const finish = useCallback(() => {
     if (done.current) return
     done.current = true
+    preloaderShown = true
     onDone()
     setGone(true)
-  }
+  }, [onDone])
 
   useEffect(() => {
-    if (reducedMotion) {
+    if (preloaderShown || reducedMotion) {
       finish()
       return
     }
@@ -40,8 +48,7 @@ export default function BrutalistPreloader({ onDone }: { onDone: () => void }) {
         .to(root, { yPercent: -100, duration: 0.5, ease: 'steps(6)' }, '+=0.1')
     }, root)
     return () => ctx.revert()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reducedMotion])
+  }, [reducedMotion, finish])
 
   if (gone) return null
 

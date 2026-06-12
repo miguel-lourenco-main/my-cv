@@ -190,8 +190,12 @@ export function TranslationProvider({
   }, [locale, namespaceKey, initialResources])
 
   useEffect(() => {
+    // Debounce: i18next fires 'loaded' once per namespace, so a 7-namespace locale
+    // switch would trigger 7 sequential re-renders. Collapse them into one.
+    let timer: ReturnType<typeof setTimeout>
     const bumpLoadedNamespaces = () => {
-      setLoadedNamespacesVersion((version) => version + 1)
+      clearTimeout(timer)
+      timer = setTimeout(() => setLoadedNamespacesVersion((version) => version + 1), 80)
     }
 
     i18next.on('loaded', bumpLoadedNamespaces)
@@ -200,6 +204,7 @@ export function TranslationProvider({
     return () => {
       i18next.off('loaded', bumpLoadedNamespaces)
       i18next.off('languageChanged', bumpLoadedNamespaces)
+      clearTimeout(timer)
     }
   }, [])
 

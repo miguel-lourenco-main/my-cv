@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
 
 /* ─────────────────────────────────────────────────────────────────────────
    BRUTALIST — terminal / tech, hard borders, monospace, minimal WebGL
@@ -12,8 +10,8 @@
   --br-paper: #ece9e1;
   --br-ink: #0d0d0d;
   --br-accent: #ff3b00;
-  --br-mono: 'Space Mono', 'JetBrains Mono', ui-monospace, monospace;
-  --br-mono-2: 'JetBrains Mono', ui-monospace, monospace;
+  --br-mono: var(--font-space-mono), ui-monospace, monospace;
+  --br-mono-2: var(--font-jetbrains-mono), ui-monospace, monospace;
   background: var(--br-paper);
   color: var(--br-ink);
   font-family: var(--br-mono-2);

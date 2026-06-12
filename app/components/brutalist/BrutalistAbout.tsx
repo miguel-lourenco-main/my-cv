@@ -48,7 +48,7 @@ export default function BrutalistAbout() {
               </div>
             </div>
             <div className="col-span-12 flex sm:col-span-3 sm:justify-end">
-              <div className="br-border flex min-h-[60px] items-center gap-2.5 bg-[var(--br-ink)] px-3 py-2">
+              <div className="br-border flex min-h-[60px] items-center gap-2.5 bg-[rgba(13,13,13,0.5)] backdrop-blur-md px-3 py-2">
                 {c.renderIcons()}
               </div>
             </div>

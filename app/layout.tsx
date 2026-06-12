@@ -1,9 +1,23 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Space_Mono, JetBrains_Mono } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
+
+const spaceMono = Space_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-space-mono',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+})
 
 /**
  * Root layout metadata for SEO and social sharing.
@@ -50,7 +64,7 @@ export default function RootLayout({
 }) {
 
   return (
-    <html lang="en" className="scroll-smooth dark" suppressHydrationWarning>
+    <html lang="en" className={`scroll-smooth dark ${spaceMono.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <body className={`${inter.className} antialiased bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`} suppressHydrationWarning>
         {/* Disable browser scroll restoration to prevent unwanted scroll positions */}
         <Script id="disable-scroll-restoration" strategy="beforeInteractive">{`

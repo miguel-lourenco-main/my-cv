@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { AnimatePresence } from 'motion/react'
 import { useI18n } from '../../lib/i18n'
 import { useProjectImagesManifest } from '../../lib/project-images-context'
 import { resolveProjectsWithImages } from '../projects/projects.data'
@@ -17,8 +16,8 @@ import {
   sortProjects,
   type AffiliationFilterValue,
 } from '../projects/project-browse'
-import { assetPath } from '../../lib/asset-path'
 import { useGsap, gsap } from '../scroll/useGsap'
+import { previewBus, previewOpenBus } from './preview-events'
 
 const ProjectExpandedCard = dynamic(
   () => import('../projects/ProjectExpandedCard').then((m) => ({ default: m.ProjectExpandedCard })),
@@ -34,12 +33,18 @@ export default function BrutalistProjects() {
   const [screenshotMode] = useState<ProjectScreenshotMode>('light')
   const [affiliation, setAffiliation] = useState<AffiliationFilterValue>(AFFILIATION_ALL)
   const [active, setActive] = useState<Project | null>(null)
-  const [hover, setHover] = useState<string | null>(null)
 
   const companyOptions = useMemo(() => deriveCompanyFilterOptions(allProjects), [allProjects])
   const displayed = useMemo(
     () => sortProjects(filterProjectsByAffiliation(allProjects, affiliation), 'recent'),
     [allProjects, affiliation]
+  )
+
+  const coverMap = useMemo(
+    () => Object.fromEntries(
+      displayed.map((p) => [p.id, getProjectCoverImageByMode(p.images, screenshotMode)])
+    ),
+    [displayed, screenshotMode]
   )
 
   useEffect(() => {
@@ -52,6 +57,20 @@ export default function BrutalistProjects() {
       scrollTrigger: { trigger: '[data-ptable]', start: 'top 82%' },
     })
   }, [])
+
+  const onRowEnter = useCallback((id: string, cover: string | null, title: string) => {
+    if (cover) previewBus.emit({ type: 'show-ss', id, cover, title })
+  }, [])
+
+  // Preview panel clicked while showing a project → open its expanded card
+  useEffect(() => {
+    const openFromPreview = (id: string) => {
+      const project = allProjects.find((p) => p.id === id)
+      if (project) setActive(project)
+    }
+    previewOpenBus.on(openFromPreview)
+    return () => previewOpenBus.off(openFromPreview)
+  }, [allProjects])
 
   const filters: { id: AffiliationFilterValue; label: string }[] = [
     { id: AFFILIATION_ALL, label: 'all' },
@@ -85,7 +104,6 @@ export default function BrutalistProjects() {
         </div>
       </div>
 
-      {/* column header */}
       <div className="br-border-b hidden grid-cols-12 gap-3 px-4 py-2 text-[11px] uppercase opacity-50 sm:grid sm:px-6">
         <span className="col-span-1">idx</span>
         <span className="col-span-4">project</span>
@@ -99,14 +117,12 @@ export default function BrutalistProjects() {
           const company = resolveCompanyFields(p.company)
           const meta = p.experience ? `${p.experience.org} · ${p.experience.date}` : company?.name ?? ''
           const title = getProjectString(p, 'title') || p.experience?.name || p.id
-          const cover = getProjectCoverImageByMode(p.images, screenshotMode)
           return (
             <button
               key={p.id}
               data-prow
               onClick={() => onOpen(p)}
-              onMouseEnter={() => setHover(p.id)}
-              onMouseLeave={() => setHover(null)}
+              onMouseEnter={() => onRowEnter(p.id, coverMap[p.id] ?? null, title)}
               className="br-border-b grid w-full grid-cols-12 items-center gap-3 px-4 py-4 text-left transition-colors hover:bg-[var(--br-ink)] hover:text-[var(--br-paper)] sm:px-6"
             >
               <span className="col-span-2 text-sm sm:col-span-1">{String(i + 1).padStart(2, '0')}</span>
@@ -119,24 +135,14 @@ export default function BrutalistProjects() {
                 {p.technologies.slice(0, 4).map((x) => x.name).join(' / ')}
               </span>
               <span className="col-span-1 text-right text-lg font-bold">→</span>
-
-              {/* hover preview thumbnail */}
-              {cover && hover === p.id && (
-                <div className="br-border pointer-events-none col-span-12 mt-2 hidden h-40 overflow-hidden sm:block">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={assetPath(cover)} alt={title} className="h-full w-full object-cover object-top" />
-                </div>
-              )}
             </button>
           )
         })}
       </div>
 
-      <AnimatePresence>
-        {active ? (
-          <ProjectExpandedCard project={active} onClose={() => setActive(null)} screenshotMode={screenshotMode} />
-        ) : null}
-      </AnimatePresence>
+      {active && (
+        <ProjectExpandedCard project={active} onClose={() => setActive(null)} screenshotMode={screenshotMode} />
+      )}
     </section>
   )
 }
