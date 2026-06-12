@@ -4,7 +4,8 @@ import { createContext, useContext, type ReactNode } from "react";
 
 export type ProjectImagesManifest = Record<string, string[]>;
 
-const ProjectImagesContext = createContext<ProjectImagesManifest | null>(null);
+// Exported so the 3D shell can re-provide this value inside drei <Html> portals.
+export const ProjectImagesContext = createContext<ProjectImagesManifest | null>(null);
 
 export function ProjectImagesProvider({
   manifest,

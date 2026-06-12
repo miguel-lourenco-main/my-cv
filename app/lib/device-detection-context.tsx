@@ -22,13 +22,15 @@ const DEFAULT_LAPTOP_DETECTION: LaptopDetectionResult = {
   orientation: "landscape",
 };
 
-type DeviceDetectionContextValue = {
+export type DeviceDetectionContextValue = {
   mobile: MobileDetectionResult;
   laptop: LaptopDetectionResult;
   isLaptop: boolean;
 };
 
-const DeviceDetectionContext = createContext<DeviceDetectionContextValue | null>(null);
+// Exported so the 3D shell can re-provide this value inside drei <Html> portals,
+// which otherwise lose React context across the R3F renderer boundary.
+export const DeviceDetectionContext = createContext<DeviceDetectionContextValue | null>(null);
 
 export function DeviceDetectionProvider({ children }: { children: ReactNode }) {
   const mobile = useDeviceDetection(detectMobileDevice, DEFAULT_MOBILE_DETECTION, true);

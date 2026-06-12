@@ -166,7 +166,9 @@ export type I18nCompatContext = {
   loadProjectNamespace: (projectId: string) => Promise<void>
 }
 
-const I18nCompat = createContext<I18nCompatContext | null>(null)
+// Exported so the 3D shell can re-provide this value inside drei <Html> portals,
+// which otherwise lose React context across the R3F renderer boundary.
+export const I18nCompat = createContext<I18nCompatContext | null>(null)
 
 export function TranslationProvider({
   children,

@@ -1,8 +1,17 @@
 "use client";
 
-import React, { useMemo, useRef } from "react";
+import React, { useContext, useMemo, useRef } from "react";
 import { motion } from "motion/react";
 import { useInView } from "../lib/hooks/use-in-view";
+
+/**
+ * When true (provided by the 3D shell's screens), reveals render in their final
+ * visible state immediately and skip the IntersectionObserver — which is
+ * unreliable inside drei's transformed <Html> portal, where the viewport-based
+ * observer may never fire and would otherwise leave content stuck at opacity 0.
+ * Defaults to false, so the 2D site keeps its scroll-triggered animations.
+ */
+export const RevealStaticContext = React.createContext(false);
 
 /**
  * Animation direction for reveal effects.
@@ -64,8 +73,10 @@ export function Reveal(props: RevealProps & any) {
   // Get the motion component for the specified element type
   const Comp = useMemo(() => (((motion as any)[as] ?? motion.div) as any), [as]);
   const ref = useRef<HTMLDivElement | null>(null);
-  // Detect when element enters viewport
-  const inView = useInView(ref, { threshold: 0.15, once });
+  const forceStatic = useContext(RevealStaticContext);
+  // Detect when element enters viewport (bypassed on 3D screens — see context).
+  const observedInView = useInView(ref, { threshold: 0.15, once });
+  const inView = forceStatic || observedInView;
 
   // Calculate initial offset based on direction for slide animations
   const offset = useMemo(() => {
@@ -97,9 +108,9 @@ export function Reveal(props: RevealProps & any) {
   return (
     <Comp
       ref={ref as any}
-      initial={initial}
+      initial={forceStatic ? animate : initial}
       animate={inView ? animate : initial}
-      transition={{ delay, duration, ease: [0.22, 1, 0.36, 1] }}
+      transition={forceStatic ? { duration: 0 } : { delay, duration, ease: [0.22, 1, 0.36, 1] }}
       className={className}
       {...(rest as any)}
     >

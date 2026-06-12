@@ -242,3 +242,19 @@ html {
 .scrollbar-none::-webkit-scrollbar-track {
   display: none;
 }
+
+/* DOM-in-3D section screens (immersive shell): slim scrollbar when focused. */
+.cv-screen-surface {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+.cv-screen-surface::-webkit-scrollbar {
+  width: 8px;
+}
+.cv-screen-surface::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+}
+.cv-screen-surface::-webkit-scrollbar-track {
+  background: transparent;
+}
