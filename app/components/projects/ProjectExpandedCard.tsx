@@ -142,6 +142,9 @@ export function ProjectExpandedCard({
           <motion.div
             ref={ref}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
+            // Opt out of Lenis smooth scrolling so wheel/touch events scroll
+            // the dialog itself instead of the page behind it.
+            data-lenis-prevent
             className="relative w-full scrollbar-none max-w-[900px] h-full md:max-h-[90%] p-6 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 md:rounded-3xl overflow-y-auto shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
