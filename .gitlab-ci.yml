@@ -11,3 +11,91 @@ include:
 variables:
   NODE_ENV: production
   PNPM_CACHE_FOLDER: .pnpm-store
+
+# ---------------------------------------------------------------------------
+# A/B variant deployments
+# ---------------------------------------------------------------------------
+# Besides `main` (built by `build_job` and served at the site root), we also
+# build the `warp` and `visor` intro variants from their own branches and serve
+# them under `/warp` and `/visor` on the same GitLab Pages site, so all three
+# CVs are reachable for A/B testing.
+#
+# Each variant lives on a feature branch that diverges from main (including
+# package.json / pnpm-lock.yaml), so it gets a clean checkout + install + build
+# with BASE_PATH set to its subpath. The `pages` job then merges the three
+# outputs into a single `public/` artifact.
+
+# Hidden template: build an intro variant branch under a subpath.
+# Consumers set VARIANT_NAME (output dir suffix), VARIANT_BRANCH (git branch),
+# and BASE_PATH (subpath, e.g. /warp).
+.build_variant:
+  extends: .node18_pnpm_devdeps
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  variables:
+    GIT_DEPTH: "0"                 # full history so the variant branch is checkoutable
+    GIT_SUBMODULE_STRATEGY: none
+  before_script:
+    # Replace the default before_script: switch to the variant branch *before*
+    # installing, since its lockfile differs from main's.
+    - git fetch origin "+refs/heads/${VARIANT_BRANCH}:refs/remotes/origin/${VARIANT_BRANCH}"
+    - git checkout -f -B "ci-${VARIANT_NAME}" "origin/${VARIANT_BRANCH}"
+    - corepack enable
+    - corepack prepare pnpm@9.12.0 --activate
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile --prod=false
+  script:
+    - node scripts/download-readmes.js
+    - pnpm run build               # next build honors BASE_PATH for basePath + assetPrefix
+    - rm -rf "out-${VARIANT_NAME}"
+    - mv out "out-${VARIANT_NAME}"
+
+build_warp:
+  extends: .build_variant
+  variables:
+    VARIANT_NAME: warp
+    VARIANT_BRANCH: feat/intro-warp
+    BASE_PATH: /warp
+  artifacts:
+    paths:
+      - out-warp/
+    expire_in: 1 hour
+
+build_visor:
+  extends: .build_variant
+  variables:
+    VARIANT_NAME: visor
+    VARIANT_BRANCH: feat/intro-visor
+    BASE_PATH: /visor
+  artifacts:
+    paths:
+      - out-visor/
+    expire_in: 1 hour
+
+# Override the included `pages` job to assemble all three CVs into one site:
+#   /        -> main      (build_job  -> out/)
+#   /warp/   -> warp      (build_warp -> out-warp/)
+#   /visor/  -> visor     (build_visor-> out-visor/)
+pages:
+  stage: deploy_production
+  dependencies:
+    - build_job
+    - build_warp
+    - build_visor
+  script:
+    - echo "Deploying main + warp + visor to GitLab Pages - ${CI_PAGES_URL}"
+    - rm -rf public && mkdir -p public
+    - cp -r out/. public/
+    - mkdir -p public/warp && cp -r out-warp/. public/warp/
+    - mkdir -p public/visor && cp -r out-visor/. public/visor/
+    - ls -la public/ public/warp/ public/visor/
+  artifacts:
+    paths:
+      - public/
+    expire_in: never
+  environment:
+    name: production
+    url: $CI_PAGES_URL
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
