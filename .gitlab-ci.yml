@@ -46,7 +46,7 @@ pages:
   script:
     - echo "Publishing locally-built site to ${CI_PAGES_URL}"
     - rm -rf public && mkdir -p public
-    - curl --fail --silent --show-error --header "JOB-TOKEN: ${CI_JOB_TOKEN}" -o site.tgz "${SITE_PKG}"
+    - 'curl --fail --silent --show-error --header "JOB-TOKEN: ${CI_JOB_TOKEN}" -o site.tgz "${SITE_PKG}"'
     - tar xzf site.tgz -C public
     - ls -la public/ public/warp/ public/visor/
   artifacts:
