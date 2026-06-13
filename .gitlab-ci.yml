@@ -57,6 +57,7 @@ build_warp:
     VARIANT_NAME: warp
     VARIANT_BRANCH: feat/intro-warp
     BASE_PATH: /warp
+    NEXT_PUBLIC_ENABLE_3D: "true"   # activate the immersive 3D warp shell (else useShellMode falls back to 2D)
   artifacts:
     paths:
       - out-warp/
@@ -68,6 +69,7 @@ build_visor:
     VARIANT_NAME: visor
     VARIANT_BRANCH: feat/intro-visor
     BASE_PATH: /visor
+    NEXT_PUBLIC_ENABLE_3D: "true"   # activate the immersive 3D visor shell (else useShellMode falls back to 2D)
   artifacts:
     paths:
       - out-visor/
