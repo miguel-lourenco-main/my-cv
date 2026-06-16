@@ -1,16 +1,5 @@
-# ===========================================================================
-# TEMPORARY no-build deploy.
-# ---------------------------------------------------------------------------
-# The CI runner is currently on an IPv6-only network with no NAT64, so the
-# npm registry (IPv4-only path via corepack/npm) is unreachable and the normal
-# build jobs fail at `corepack prepare`. The three CVs were therefore built
-# LOCALLY and uploaded to this project's generic Package Registry; the `pages`
-# job below just fetches and publishes that artifact (curl + tar over IPv6,
-# no npm). The git clone / package download work fine over IPv6.
-#
-# TO RESTORE the normal build-based pipeline once on a dual-stack/IPv4 network:
-#   git revert <this commit>      (brings back build_job/build_warp/build_visor)
-# ===========================================================================
+# Submodule `infra` is not part of the parent tree; `include:local` cannot see those paths on GitLab.
+# Pin `ref` to match: `git ls-tree HEAD infra` (update both when bumping the submodule).
 include:
   - project: public-work4/infra
     ref: b57406f13da5475b161fd8cb032f05e5fb892db4
@@ -23,31 +12,85 @@ variables:
   NODE_ENV: production
   PNPM_CACHE_FOLDER: .pnpm-store
 
-# Disable the npm/corepack-dependent jobs from the included templates — they
-# can't reach the IPv4-only npm registry on the current IPv6-only network.
-i18n:translate:
-  rules:
-    - when: never
+# ---------------------------------------------------------------------------
+# A/B variant deployments
+# ---------------------------------------------------------------------------
+# Besides `main` (built by `build_job` and served at the site root), we also
+# build the `warp` and `visor` intro variants from their own branches and serve
+# them under `/warp` and `/visor` on the same GitLab Pages site, so all three
+# CVs are reachable for A/B testing.
+#
+# Each variant lives on a feature branch that diverges from main (including
+# package.json / pnpm-lock.yaml), so it gets a clean checkout + install + build
+# with BASE_PATH set to its subpath. The `pages` job then merges the three
+# outputs into a single `public/` artifact.
 
-build_job:
+# Hidden template: build an intro variant branch under a subpath.
+# Consumers set VARIANT_NAME (output dir suffix), VARIANT_BRANCH (git branch),
+# and BASE_PATH (subpath, e.g. /warp).
+.build_variant:
+  extends: .node18_pnpm_devdeps
+  stage: build
   rules:
-    - when: never
-
-# Publish the locally-built site (root = systeme, /warp, /visor — both variants
-# carry the 3D flag + the laptop-height-cap fix) from the generic Package
-# Registry. No build, no npm: only curl + tar, which work over IPv6.
-pages:
-  image: node:18.18.0
-  stage: deploy_production
-  dependencies: []
+    - if: $CI_COMMIT_BRANCH == "main"
   variables:
-    GIT_STRATEGY: none
-    SITE_PKG: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/cv-site/20260613-051245/site.tgz"
+    GIT_DEPTH: "0"                 # full history so the variant branch is checkoutable
+    GIT_SUBMODULE_STRATEGY: none
+  before_script:
+    # Replace the default before_script: switch to the variant branch *before*
+    # installing, since its lockfile differs from main's.
+    - git fetch origin "+refs/heads/${VARIANT_BRANCH}:refs/remotes/origin/${VARIANT_BRANCH}"
+    - git checkout -f -B "ci-${VARIANT_NAME}" "origin/${VARIANT_BRANCH}"
+    - corepack enable
+    - corepack prepare pnpm@9.12.0 --activate
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile --prod=false
   script:
-    - echo "Publishing locally-built site to ${CI_PAGES_URL}"
+    - node scripts/download-readmes.js
+    - pnpm run build               # next build honors BASE_PATH for basePath + assetPrefix
+    - rm -rf "out-${VARIANT_NAME}"
+    - mv out "out-${VARIANT_NAME}"
+
+build_warp:
+  extends: .build_variant
+  variables:
+    VARIANT_NAME: warp
+    VARIANT_BRANCH: feat/intro-warp
+    BASE_PATH: /warp
+    NEXT_PUBLIC_ENABLE_3D: "true"   # activate the immersive 3D warp shell (else useShellMode falls back to 2D)
+  artifacts:
+    paths:
+      - out-warp/
+    expire_in: 1 hour
+
+build_visor:
+  extends: .build_variant
+  variables:
+    VARIANT_NAME: visor
+    VARIANT_BRANCH: feat/intro-visor
+    BASE_PATH: /visor
+    NEXT_PUBLIC_ENABLE_3D: "true"   # activate the immersive 3D visor shell (else useShellMode falls back to 2D)
+  artifacts:
+    paths:
+      - out-visor/
+    expire_in: 1 hour
+
+# Override the included `pages` job to assemble all three CVs into one site:
+#   /        -> main      (build_job  -> out/)
+#   /warp/   -> warp      (build_warp -> out-warp/)
+#   /visor/  -> visor     (build_visor-> out-visor/)
+pages:
+  stage: deploy_production
+  dependencies:
+    - build_job
+    - build_warp
+    - build_visor
+  script:
+    - echo "Deploying main + warp + visor to GitLab Pages - ${CI_PAGES_URL}"
     - rm -rf public && mkdir -p public
-    - 'curl --fail --silent --show-error --header "JOB-TOKEN: ${CI_JOB_TOKEN}" -o site.tgz "${SITE_PKG}"'
-    - tar xzf site.tgz -C public
+    - cp -r out/. public/
+    - mkdir -p public/warp && cp -r out-warp/. public/warp/
+    - mkdir -p public/visor && cp -r out-visor/. public/visor/
     - ls -la public/ public/warp/ public/visor/
   artifacts:
     paths:
