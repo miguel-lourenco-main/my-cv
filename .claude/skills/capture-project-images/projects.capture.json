@@ -1,0 +1,161 @@
+{
+  "_comment": "LIVING CACHE of per-project shot plans, keyed by imageDir (CV id, or repo slug for adopted projects). Targets are NOT chosen here — the skill DISCOVERS them via discover-projects.mjs (cloud+local+catalog merge), the user selects, then the skill upserts/refreshes the selected project's entry from its source before capturing. Hand-tuned login/theme/custom scene steps are preserved across refreshes. repoDir should point at the project's webDir (monorepo subdir if applicable). Step DSL is documented in reference.md.",
+  "deviceScaleFactor": 2,
+  "viewports": {
+    "desktop": { "width": 1440, "height": 900 },
+    "mobile": { "width": 390, "height": 844 }
+  },
+  "projects": {
+    "cash-register": {
+      "repoDir": "/home/migaloco/Desktop/personal/projects/cash_register",
+      "devCommand": "pnpm dev",
+      "port": 3000,
+      "liveUrl": "https://cash-register-a85839.gitlab.io",
+      "imageDir": "cash-register",
+      "start": "/",
+      "theme": { "strategy": "localStorage+class", "key": "cash-register-theme", "darkClass": "dark" },
+      "themes": ["L", "D"],
+      "_authNote": "PIN-gated (Festa POS). Real login: select #operator-select (option labelled 'Name (role)'), fill #pin-input, submit 'Iniciar Turno'. Admin PIN in secrets.cashRegister.adminPin reaches /products. Local uses 127.0.0.1 Supabase (not running) → capture against the live deployment. If operators don't load, scenes fall back to capturing the login screen.",
+      "login": [
+        { "waitFor": "#operator-select" },
+        { "select": ["#operator-select", "admin"] },
+        { "wait": 400 },
+        { "fill": ["#pin-input", "{{secret.cashRegister.adminPin}}"] },
+        { "click": "button[type=\"submit\"]" },
+        { "wait": 2000 }
+      ],
+      "marketingOrder": ["register", "orders_list", "products", "payment", "order_detail", "register_mobile"],
+      "_usedStateNote": "Capture against LOCAL seeded Supabase so the dashboard has orders and login works (Ana L. / adminPin). Setup: pnpm supabase:start && npx supabase db reset && pnpm supabase:env-sync && node scripts/upload-products-cloud.mjs --local (the seed leaves product image_url NULL — the upload step pushes generated-images/*.webp to local storage and sets image_url, otherwise product cards show placeholder icons). Scenes fill the cart / open payment so nothing shows an empty state.",
+      "scenes": [
+        { "name": "register", "path": "/", "steps": [
+          { "wait": 1300 },
+          { "optional": [
+            { "click": "button:has-text(\"Cerveja\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Gin tónico\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Sidra\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Caipirão\")" }, { "wait": 300 }
+          ] },
+          { "shot": "register" }
+        ] },
+        { "name": "payment", "path": "/", "steps": [
+          { "wait": 1300 },
+          { "optional": [
+            { "click": "button:has-text(\"Cerveja\")" }, { "wait": 220 },
+            { "click": "button:has-text(\"Gin tónico\")" }, { "wait": 220 },
+            { "click": "button:has-text(\"Sidra\")" }, { "wait": 300 },
+            { "click": "button:has-text(\"Confirmar Pedido\")" }, { "wait": 1000 },
+            { "click": "button:has-text(\"5€\")" }, { "wait": 400 }
+          ] },
+          { "shot": "payment" }
+        ] },
+        { "name": "products", "path": "/products", "settle": 1300 },
+        { "name": "orders_list", "path": "/orders", "settle": 1500 },
+        { "name": "order_detail", "path": "/orders", "steps": [
+          { "wait": 1400 },
+          { "optional": [ { "click": "button.bg-card" }, { "wait": 900 } ] },
+          { "shot": "order_detail" }
+        ] },
+        { "name": "register_mobile", "path": "/", "viewport": "mobile", "steps": [
+          { "wait": 1300 },
+          { "optional": [
+            { "click": "button:has-text(\"Cerveja\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Sidra\")" }, { "wait": 300 }
+          ] },
+          { "shot": "register_mobile" }
+        ] }
+      ]
+    },
+
+    "ui-components": {
+      "repoDir": "/home/migaloco/Desktop/personal/projects/ui-components",
+      "devCommand": "pnpm dev",
+      "port": 3000,
+      "liveUrl": "https://ui-components-5218c2.gitlab.io",
+      "imageDir": "ui-components",
+      "start": "/",
+      "theme": { "strategy": "next-themes", "key": "theme", "darkClass": "dark" },
+      "themes": ["L", "D"],
+      "marketingOrder": ["hero", "playground", "component_variants", "component_detail", "themes_grid", "theme_detail", "components_grid", "requests"],
+      "scenes": [
+        { "name": "hero", "path": "/", "settle": 1400 },
+        { "name": "components_grid", "path": "/components", "settle": 1200 },
+        { "name": "component_detail", "path": "/components?component=button", "settle": 1200 },
+        { "name": "component_variants", "path": "/components?component=button", "steps": [
+          { "wait": 1000 },
+          { "optional": [ { "reveal": ["text=/Examples|Variants/", 24] }, { "wait": 500 } ] },
+          { "shot": "component_variants" }
+        ] },
+        { "name": "playground", "path": "/playground", "steps": [
+          { "wait": 1200 },
+          { "optional": [ { "click": "#search-desktop >> text=Button" }, { "wait": 900 } ] },
+          { "shot": "playground" }
+        ] },
+        { "name": "themes_grid", "path": "/themes", "settle": 1200 },
+        { "name": "theme_detail", "path": "/themes?theme=default", "settle": 1200 },
+        { "name": "requests", "path": "/requests", "settle": 1200 }
+      ]
+    },
+
+    "agentic-hub": {
+      "repoDir": "/home/migaloco/Desktop/personal/projects/agentichub",
+      "devCommand": "pnpm dev",
+      "port": 3000,
+      "liveUrl": "https://agentichub-64abdc.gitlab.io",
+      "imageDir": "agentic-hub",
+      "start": "/",
+      "_themeNote": "App is hard-coded dark only (no toggle). Capturing D only. If a light theme is added later, set themes to [\"L\",\"D\"] and theme.strategy accordingly.",
+      "theme": { "strategy": "class-only", "key": "theme", "darkClass": "dark" },
+      "themes": ["D"],
+      "marketingOrder": ["main_page", "agents_list", "agent_info", "categories", "two_sided", "how_it_works", "most_hired_agents", "agent_hire", "agent_invest", "list_agent"],
+      "scenes": [
+        { "name": "main_page", "path": "/", "settle": 1400 },
+        { "name": "sections", "path": "/", "autoSections": { "headerOffset": 80 }, "settle": 1200 },
+        { "name": "agents_list", "path": "/agents", "settle": 1200 },
+        { "name": "agent_info", "path": "/agents/1", "settle": 1200 },
+        { "name": "agent_hire", "path": "/agents/1", "steps": [
+          { "optional": [ { "click": "button:has-text(\"Hire\")" }, { "wait": 900 } ] },
+          { "shot": "agent_hire" }
+        ] },
+        { "name": "agent_invest", "path": "/agents/1", "steps": [
+          { "optional": [ { "click": "button:has-text(\"Invest\")" }, { "wait": 900 } ] },
+          { "shot": "agent_invest" }
+        ] }
+      ]
+    },
+
+    "job-ai-hub": {
+      "repoDir": "/home/migaloco/Desktop/personal/projects/v0-job-hunting-platform",
+      "devCommand": "pnpm dev",
+      "port": 3000,
+      "liveUrl": "https://v0-job-hunting-platform-two.vercel.app",
+      "imageDir": "job-ai-hub",
+      "start": "/",
+      "_authNote": "Dashboard routes are behind (auth) sign-in — no creds available, so only the public landing is captured. Add sign-in creds + dashboard scenes to refresh the in-app screens.",
+      "theme": { "strategy": "next-themes", "key": "theme", "darkClass": "dark" },
+      "themes": ["L", "D"],
+      "marketingOrder": ["hero", "dashboard", "ai_chat", "job_applications", "resume_editor", "interview", "id_job_application", "user_profile", "pillars", "more_features"],
+      "scenes": [
+        { "name": "hero", "path": "/", "settle": 1500 }
+      ]
+    },
+
+    "sonora": {
+      "repoDir": "/home/migaloco/Desktop/personal/projects/sonora",
+      "devCommand": "pnpm dev",
+      "port": 3000,
+      "liveUrl": "https://sonora-d09e63.gitlab.io",
+      "imageDir": "sonora",
+      "start": "/",
+      "theme": { "strategy": "next-themes", "key": "theme", "darkClass": "dark" },
+      "themes": ["L", "D"],
+      "marketingOrder": ["hero", "branch", "player", "library", "story", "voices", "listen", "voice_studio", "the_enchanted_forest_an"],
+      "scenes": [
+        { "name": "hero", "path": "/", "settle": 1400 },
+        { "name": "sections", "path": "/", "autoSections": { "headerOffset": 72 }, "settle": 1200 },
+        { "name": "story", "path": "/story/1", "settle": 1300 },
+        { "name": "player", "path": "/player/1", "settle": 1400 },
+        { "name": "voice_studio", "path": "/voices", "settle": 1300 }
+      ]
+    }
+  }
+}

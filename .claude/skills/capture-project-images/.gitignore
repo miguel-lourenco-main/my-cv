@@ -1,0 +1,10 @@
+# Skill-local dependencies (Playwright) — not part of the CV app deps
+node_modules/
+package-lock.json
+
+# Real credentials — never commit
+secrets.json
+
+# Logs from dev-server launches
+*.log
+.serve-*.log

@@ -1,0 +1,13 @@
+{
+  "name": "capture-project-images",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright screenshot engine for CV project images",
+  "scripts": {
+    "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.61.0"
+  }
+}
