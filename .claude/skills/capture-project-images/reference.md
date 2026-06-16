@@ -63,6 +63,17 @@ node capture.mjs --project <id> --base <url> \
 - `--only` — comma list of scene names to run (fast iteration).
 - `--headed` — show the browser (debug).
 - `--dry-run` — log what would be captured, write nothing.
+- `--allow-errors` — accept image/media load failures instead of degrading the scene.
+- `--img-timeout <ms>` — how long to wait for in-shot images to load (default 9000).
+
+### Image loading & errors
+
+Before every shot the engine waits for the images that will be in frame to actually
+finish loading (`complete && naturalWidth > 0`), so a slow Supabase/CDN image isn't
+captured blank. It also tracks failed image/media requests (network failure or ≥400).
+If any image fails to load and `--allow-errors` is **not** set, the scene is reported
+`SCENE DEGRADED` and counts as a failure (exit 2) so you notice — fix the data/source
+or re-run with `--allow-errors` (also settable per project/scene via `allowErrors: true`).
 
 Exit codes: `0` success, `2` one or more scenes failed, `1` fatal (bad args/config).
 

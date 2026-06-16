@@ -226,3 +226,8 @@ preview the gallery, and to push / open an MR.
 - **Secrets** live only in `secrets.json` (gitignored). Never commit or echo them.
 - **Monorepos**: `webDir` (from discovery) is where the web app + dev script live; boot
   and recon from there, not the repo root.
+- **Image loading**: the engine waits for in-shot images to load and **degrades a scene
+  if any image fails** (exit 2) — so a slow/broken Supabase/CDN image never ships blank.
+  Pass `--allow-errors` (or per-project/scene `allowErrors`) to accept failures. If product
+  images come from storage that the seed leaves empty, populate it first (cash-register:
+  `node scripts/upload-products-cloud.mjs --local` after the DB reset).

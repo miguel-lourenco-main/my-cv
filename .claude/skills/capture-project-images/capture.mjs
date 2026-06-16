@@ -59,6 +59,8 @@ const configPath = resolve(args.config || join(__dirname, 'projects.capture.json
 const secretsPath = resolve(args.secrets || join(__dirname, 'secrets.json'));
 const headed = !!args.headed;
 const dryRun = !!args['dry-run'];
+const allowErrorsFlag = !!args['allow-errors'];
+const imgWaitMs = Number(args['img-timeout'] || 9000);
 const onlyScenes = args.only ? String(args.only).split(',').map((s) => s.trim()).filter(Boolean) : null;
 
 if (!existsSync(configPath)) {
@@ -172,6 +174,42 @@ const HIDE_DEV_OVERLAYS = `(() => {
   } catch (e) {}
 })();`;
 
+/**
+ * Wait until the images that will be in the shot have actually loaded (so a slow
+ * Supabase/CDN image isn't captured blank). Returns the still-broken srcs. Records
+ * them on page._imgErrors so the scene can decide whether that's acceptable.
+ */
+async function waitForImages(page, rootSelector, timeout = imgWaitMs) {
+  let res = { total: 0, failed: 0, srcs: [] };
+  try {
+    res = await page.evaluate(async ({ rootSelector, timeout }) => {
+      const root = (rootSelector && document.querySelector(rootSelector)) || document;
+      const inView = (el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width < 3 || r.height < 3) return false;
+        if (rootSelector) return true; // element shot: include all imgs in the element
+        return r.bottom > 0 && r.top < (window.innerHeight || 900);
+      };
+      const imgs = [...root.querySelectorAll('img')].filter((i) => getComputedStyle(i).visibility !== 'hidden' && getComputedStyle(i).display !== 'none' && inView(i));
+      imgs.forEach((i) => { if (!i.complete) i.addEventListener('error', () => { i.dataset.__capFailed = '1'; }, { once: true }); });
+      const broken = () => imgs.filter((i) => i.dataset.__capFailed === '1' || (i.complete && i.naturalWidth === 0));
+      const pending = () => imgs.filter((i) => !i.complete && i.dataset.__capFailed !== '1');
+      const start = Date.now();
+      while (Date.now() - start < timeout) {
+        if (pending().length === 0) break;
+        await new Promise((r) => setTimeout(r, 150));
+      }
+      const bad = [...new Set([...broken(), ...pending()])];
+      return { total: imgs.length, failed: bad.length, srcs: bad.slice(0, 6).map((i) => i.currentSrc || i.src || '(no src)') };
+    }, { rootSelector: rootSelector || null, timeout });
+  } catch { /* ignore */ }
+  if (res.failed > 0) {
+    page._imgErrors = page._imgErrors || [];
+    page._imgErrors.push(...res.srcs);
+  }
+  return res;
+}
+
 async function shoot(page, name, theme, opts = {}) {
   const file = join(outDir, `${name}_${theme}.png`);
   if (dryRun) {
@@ -183,18 +221,20 @@ async function shoot(page, name, theme, opts = {}) {
   if (opts.selector) {
     const loc = page.locator(opts.selector).first();
     await loc.scrollIntoViewIfNeeded({ timeout: 8000 }).catch(() => {});
-    await loc.screenshot({ path: file, animations: 'disabled', ...(opts.padding != null ? {} : {}) });
-    log(`shot -> ${imageDir}/${name}_${theme}.png  [el ${opts.selector}]`);
+    const wEl = await waitForImages(page, opts.selector);
+    await loc.screenshot({ path: file, animations: 'disabled' });
+    log(`shot -> ${imageDir}/${name}_${theme}.png  [el ${opts.selector}]${wEl.failed ? `  ⚠ ${wEl.failed} img not loaded` : ''}`);
     return;
   }
   // Otherwise a viewport-framed shot (landscape). fullPage only when explicitly asked.
+  const w = await waitForImages(page);
   await page.screenshot({
     path: file,
     fullPage: opts.fullPage === true,
     animations: 'disabled',
     ...(opts.clip ? { clip: opts.clip } : {}),
   });
-  log(`shot -> ${imageDir}/${name}_${theme}.png${opts.fullPage ? '  [fullPage]' : ''}`);
+  log(`shot -> ${imageDir}/${name}_${theme}.png${opts.fullPage ? '  [fullPage]' : ''}${w.failed ? `  ⚠ ${w.failed} img not loaded` : ''}`);
 }
 
 /** Execute one declarative step against the page. */
@@ -376,6 +416,11 @@ async function runScene(context, scene, theme) {
   const vp = scene.viewport ? viewports[scene.viewport] || defaultViewport : defaultViewport;
   const page = await context.newPage();
   await page.setViewportSize(vp);
+  // Track image/media load failures so a broken/slow asset doesn't pass silently.
+  page._imgErrors = [];
+  const allowErrors = allowErrorsFlag || project.allowErrors === true || scene.allowErrors === true;
+  page.on('requestfailed', (r) => { if (['image', 'media'].includes(r.resourceType())) page._imgErrors.push(r.url()); });
+  page.on('response', (r) => { if (r.status() >= 400 && ['image', 'media'].includes(r.request().resourceType())) page._imgErrors.push(r.url()); });
   let hadExplicitShot = false;
   try {
     if (scene.path != null) {
@@ -383,17 +428,24 @@ async function runScene(context, scene, theme) {
     }
     if (scene.autoSections) {
       await captureSections(page, theme, scene);
-      return true;
+    } else {
+      for (const step of scene.steps || []) {
+        if (Object.keys(step)[0] === 'shot') hadExplicitShot = true;
+        await runStep(page, step, { theme });
+      }
+      // Auto-capture if the scene declared no explicit shot.
+      if (!hadExplicitShot) {
+        await page.waitForTimeout(scene.settle ?? 400);
+        await shoot(page, scene.name, theme, scene.shotOpts || {});
+      }
     }
-    for (const step of scene.steps || []) {
-      if (Object.keys(step)[0] === 'shot') hadExplicitShot = true;
-      await runStep(page, step, { theme });
+    // Image/media that never loaded → degrade the scene unless errors are allowed.
+    const errs = [...new Set(page._imgErrors)];
+    if (errs.length && !allowErrors) {
+      log(`SCENE DEGRADED "${scene.name}" [${theme}]: ${errs.length} image(s) failed/slow — ${errs.slice(0, 3).join(' , ')}${errs.length > 3 ? ' …' : ''}  (pass --allow-errors to accept)`);
+      return false;
     }
-    // Auto-capture if the scene declared no explicit shot.
-    if (!hadExplicitShot) {
-      await page.waitForTimeout(scene.settle ?? 400);
-      await shoot(page, scene.name, theme, scene.shotOpts || {});
-    }
+    if (errs.length) log(`note "${scene.name}" [${theme}]: ${errs.length} image error(s) accepted (--allow-errors)`);
     return true;
   } catch (e) {
     log(`SCENE FAILED "${scene.name}" [${theme}]: ${e.message.split('\n')[0]}`);

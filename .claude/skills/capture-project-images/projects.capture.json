@@ -25,7 +25,7 @@
         { "wait": 2000 }
       ],
       "marketingOrder": ["register", "orders_list", "products", "payment", "order_detail", "register_mobile"],
-      "_usedStateNote": "Capture against LOCAL seeded Supabase (pnpm supabase:start && db reset && env-sync) so the dashboard has orders and login works (Ana L. / adminPin). Scenes fill the cart / open payment so nothing shows an empty state.",
+      "_usedStateNote": "Capture against LOCAL seeded Supabase so the dashboard has orders and login works (Ana L. / adminPin). Setup: pnpm supabase:start && npx supabase db reset && pnpm supabase:env-sync && node scripts/upload-products-cloud.mjs --local (the seed leaves product image_url NULL — the upload step pushes generated-images/*.webp to local storage and sets image_url, otherwise product cards show placeholder icons). Scenes fill the cart / open payment so nothing shows an empty state.",
       "scenes": [
         { "name": "register", "path": "/", "steps": [
           { "wait": 1300 },
