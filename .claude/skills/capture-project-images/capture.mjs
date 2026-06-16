@@ -302,6 +302,76 @@ async function runStep(page, step, ctx) {
   }
 }
 
+/**
+ * Auto-capture every distinct section of a (marketing) page as its own viewport
+ * shot. Enumerates real sections (dropping wrappers, header/nav/footer, and — by
+ * default — the hero), frames each at the top of the viewport, and names it from
+ * its id / heading. Configure via scene.autoSections (true or an options object).
+ */
+async function captureSections(page, theme, scene) {
+  const cfg = scene.autoSections === true ? {} : (scene.autoSections || {});
+  const minHeight = cfg.minHeight || 260;
+  const headerOffset = cfg.headerOffset ?? 72;
+  const skipFirst = cfg.skipFirst !== false; // hero is captured by its own scene
+  const exclude = cfg.exclude || [];
+  const max = cfg.max || 14;
+
+  await page.waitForTimeout(scene.settle ?? 1000);
+  // Trigger lazy/intersection-observed sections, then return to top.
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 110)); }
+    window.scrollTo(0, 0);
+  });
+  await page.waitForTimeout(400);
+
+  const sections = await page.evaluate(({ minHeight, exclude, skipFirst, max }) => {
+    const slug = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').split('_').filter(Boolean).slice(0, 4).join('_');
+    const excluded = (el) => el.closest('footer,header,nav,[role="banner"],[role="navigation"]') || exclude.some((sx) => { try { return el.matches(sx) || el.closest(sx); } catch { return false; } });
+    const cand = [...document.querySelectorAll('section,[data-section],[id],main > div')].filter((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.height < minHeight || r.width < 300) return false;
+      const st = getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) return false;
+      return !excluded(el);
+    });
+    // Drop wrappers: any candidate that contains >= 2 other candidates.
+    const leaves = cand.filter((el) => cand.filter((o) => o !== el && el.contains(o)).length < 2);
+    // Greedy de-dup by vertical band (keeps outer over inner via height tiebreak).
+    const withPos = leaves.map((el) => { const r = el.getBoundingClientRect(); return { el, top: r.top + window.scrollY, h: r.height }; })
+      .sort((a, b) => a.top - b.top || b.h - a.h);
+    const kept = [];
+    for (const it of withPos) {
+      const mid = it.top + it.h / 2;
+      if (kept.some((k) => mid >= k.top && mid <= k.top + k.h)) continue;
+      kept.push(it);
+    }
+    let chosen = skipFirst ? kept.slice(1) : kept;
+    chosen = chosen.slice(0, max);
+    const used = {};
+    return chosen.map((it, i) => {
+      const el = it.el;
+      let name = el.id ? slug(el.id) : '';
+      if (!name) { const hd = el.querySelector('h1,h2,h3'); name = hd ? slug(hd.textContent) : ''; }
+      if (!name) name = `section_${i + 1}`;
+      if (used[name]) { used[name]++; name = `${name}_${used[name]}`; } else used[name] = 1;
+      el.setAttribute('data-cap-idx', String(i));
+      return { idx: i, name, top: Math.round(it.top) };
+    });
+  }, { minHeight, exclude, skipFirst, max });
+
+  log(`autoSections [${theme}]: ${sections.map((s) => s.name).join(', ') || '(none)'}`);
+  let n = 0;
+  for (const s of sections) {
+    try {
+      await runStep(page, { reveal: [`[data-cap-idx="${s.idx}"]`, headerOffset] }, { theme });
+      await page.waitForTimeout(cfg.sectionSettle ?? 450);
+      await shoot(page, s.name, theme, {});
+      n++;
+    } catch (e) { log(`section "${s.name}" failed: ${e.message.split('\n')[0]}`); }
+  }
+  return n;
+}
+
 async function runScene(context, scene, theme) {
   const vp = scene.viewport ? viewports[scene.viewport] || defaultViewport : defaultViewport;
   const page = await context.newPage();
@@ -310,6 +380,10 @@ async function runScene(context, scene, theme) {
   try {
     if (scene.path != null) {
       await runStep(page, { goto: scene.path }, { theme });
+    }
+    if (scene.autoSections) {
+      await captureSections(page, theme, scene);
+      return true;
     }
     for (const step of scene.steps || []) {
       if (Object.keys(step)[0] === 'shot') hadExplicitShot = true;

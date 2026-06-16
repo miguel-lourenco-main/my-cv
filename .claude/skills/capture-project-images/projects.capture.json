@@ -73,9 +73,7 @@
       "themes": ["D"],
       "scenes": [
         { "name": "main_page", "path": "/", "settle": 1400 },
-        { "name": "two_sided", "path": "/", "steps": [ { "wait": 1000 }, { "optional": [ { "reveal": ["#two-sided", 80] }, { "wait": 500 } ] }, { "shot": "two_sided" } ] },
-        { "name": "categories", "path": "/", "steps": [ { "wait": 1000 }, { "optional": [ { "reveal": ["#categories", 80] }, { "wait": 500 } ] }, { "shot": "categories" } ] },
-        { "name": "how_it_works", "path": "/", "steps": [ { "wait": 1000 }, { "optional": [ { "reveal": ["#how-it-works", 80] }, { "wait": 500 } ] }, { "shot": "how_it_works" } ] },
+        { "name": "sections", "path": "/", "autoSections": { "headerOffset": 80 }, "settle": 1200 },
         { "name": "agents_list", "path": "/agents", "settle": 1200 },
         { "name": "agent_info", "path": "/agents/1", "settle": 1200 },
         { "name": "agent_hire", "path": "/agents/1", "steps": [
@@ -115,12 +113,10 @@
       "themes": ["L", "D"],
       "scenes": [
         { "name": "hero", "path": "/", "settle": 1400 },
-        { "name": "listen", "path": "/", "steps": [ { "wait": 1000 }, { "optional": [ { "reveal": ["#listen", 72] }, { "wait": 500 } ] }, { "shot": "listen" } ] },
-        { "name": "branch", "path": "/", "steps": [ { "wait": 1000 }, { "optional": [ { "reveal": ["#branch", 72] }, { "wait": 500 } ] }, { "shot": "branch" } ] },
-        { "name": "library", "path": "/", "steps": [ { "wait": 1000 }, { "optional": [ { "reveal": ["#library", 72] }, { "wait": 500 } ] }, { "shot": "library" } ] },
+        { "name": "sections", "path": "/", "autoSections": { "headerOffset": 72 }, "settle": 1200 },
         { "name": "story", "path": "/story/1", "settle": 1300 },
         { "name": "player", "path": "/player/1", "settle": 1400 },
-        { "name": "voices", "path": "/voices", "settle": 1300 }
+        { "name": "voice_studio", "path": "/voices", "settle": 1300 }
       ]
     }
   }
