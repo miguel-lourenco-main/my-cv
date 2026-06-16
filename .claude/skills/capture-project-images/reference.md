@@ -32,6 +32,24 @@ Per-entry JSON fields used by the skill: `key`, `displayName`, `gitlabPath`, `na
 **Web-app filter**: `inCv || liveUrl || framework`. Non-web repos are hidden (shown with
 `--all`). **Capturable**: has a `localDir` or a `liveUrl`; non-capturable rows are skipped.
 
+## order-images.mjs — marketing viewing order
+
+Builds a project's `imagesFirst` (carousel order) from its `marketingOrder` (scene
+base-names, best→least) in `projects.capture.json`. Keeps each scene's themes adjacent
+(L then D; dark-only → just D) and appends any captured-but-unlisted file so nothing is
+dropped. Order as a marketing narrative: signature → richest/used feature → breadth →
+detail → mobile/utility last; never lead with an empty state.
+
+```bash
+node order-images.mjs --project <id>          # prints the TS imagesFirst array
+node order-images.mjs --project <id> --json   # prints a JSON array
+```
+
+## probe-sections.mjs — section recon
+
+Lists a page's candidate section selectors with size + nearest heading, to build
+`autoSections`/`reveal` shots. `node probe-sections.mjs --base <url> [--path /] [--theme D]`.
+
 ## capture.mjs — CLI
 
 ```bash

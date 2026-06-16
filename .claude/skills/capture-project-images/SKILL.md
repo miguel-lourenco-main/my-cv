@@ -160,11 +160,33 @@ direct `details.*`) — NOT i18n `*Key` fields — so no `public/locales/**` fil
 From the my-cv repo root: `pnpm generate-images`. Rewrites
 `public/projects-images-manifest.json` and `app/lib/projects-images-manifest.ts` from disk.
 
-### Step 6 — Curate imagesFirst
+### Step 6 — Curate imagesFirst (marketing order)
 
-For each updated project in `projects.data.ts`, order `imagesFirst` so the strongest shots
-lead, interleaving light/dark (`hero_L, hero_D, <feature>_L, <feature>_D, …`). Only
-reference files that now exist (the manifest is the full list; `imagesFirst` just reorders).
+The carousel viewing order is a **marketing narrative**, not file order. Each project
+declares a `marketingOrder` (scene base-names, best→least) in `projects.capture.json`;
+`order-images.mjs` expands it into the `imagesFirst` array.
+
+**Ordering principle** — lead with the single most striking *signature* screen, then tell a
+value story: **signature → core feature(s) in their richest/“used” state → breadth of
+capabilities → supporting detail → responsive(mobile)/utility last.** Never lead with an
+empty state. Each scene's themes stay adjacent (L then D); dark-only projects emit just D.
+
+For each updated project:
+1. Set/refresh `marketingOrder` in `projects.capture.json` to reflect the above (put the
+   hero first, the most impressive feature second, secondary/mobile/empty-ish screens last).
+2. Generate the array and paste it into the project's `imagesFirst` in `projects.data.ts`:
+   ```bash
+   node order-images.mjs --project <imageDir>          # TS array
+   node order-images.mjs --project <imageDir> --json   # JSON
+   ```
+   It only lists files that exist and appends any captured-but-unlisted file (so nothing is
+   dropped — the trailing `[note]` tells you what was appended; fold those into
+   `marketingOrder` if they deserve a better position).
+
+> Capture every screen in its **used** state, not empty: fill carts/forms, seed or place
+> data so dashboards/lists show real content (e.g. cash-register runs against a locally
+> seeded Supabase so the orders dashboard has revenue + history). An empty state should
+> only appear if it's the genuine point of the shot.
 
 ### Step 7 — New branch + commit
 

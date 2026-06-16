@@ -24,11 +24,45 @@
         { "click": "button[type=\"submit\"]" },
         { "wait": 2000 }
       ],
+      "marketingOrder": ["register", "orders_list", "products", "payment", "order_detail", "register_mobile"],
+      "_usedStateNote": "Capture against LOCAL seeded Supabase (pnpm supabase:start && db reset && env-sync) so the dashboard has orders and login works (Ana L. / adminPin). Scenes fill the cart / open payment so nothing shows an empty state.",
       "scenes": [
-        { "name": "register", "path": "/", "settle": 1200 },
-        { "name": "orders_list", "path": "/orders", "settle": 1200 },
-        { "name": "products", "path": "/products", "settle": 1200 },
-        { "name": "register_mobile", "path": "/", "viewport": "mobile", "settle": 1200 }
+        { "name": "register", "path": "/", "steps": [
+          { "wait": 1300 },
+          { "optional": [
+            { "click": "button:has-text(\"Cerveja\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Gin tónico\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Sidra\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Caipirão\")" }, { "wait": 300 }
+          ] },
+          { "shot": "register" }
+        ] },
+        { "name": "payment", "path": "/", "steps": [
+          { "wait": 1300 },
+          { "optional": [
+            { "click": "button:has-text(\"Cerveja\")" }, { "wait": 220 },
+            { "click": "button:has-text(\"Gin tónico\")" }, { "wait": 220 },
+            { "click": "button:has-text(\"Sidra\")" }, { "wait": 300 },
+            { "click": "button:has-text(\"Confirmar Pedido\")" }, { "wait": 1000 },
+            { "click": "button:has-text(\"5€\")" }, { "wait": 400 }
+          ] },
+          { "shot": "payment" }
+        ] },
+        { "name": "products", "path": "/products", "settle": 1300 },
+        { "name": "orders_list", "path": "/orders", "settle": 1500 },
+        { "name": "order_detail", "path": "/orders", "steps": [
+          { "wait": 1400 },
+          { "optional": [ { "click": "button.bg-card" }, { "wait": 900 } ] },
+          { "shot": "order_detail" }
+        ] },
+        { "name": "register_mobile", "path": "/", "viewport": "mobile", "steps": [
+          { "wait": 1300 },
+          { "optional": [
+            { "click": "button:has-text(\"Cerveja\")" }, { "wait": 250 },
+            { "click": "button:has-text(\"Sidra\")" }, { "wait": 300 }
+          ] },
+          { "shot": "register_mobile" }
+        ] }
       ]
     },
 
@@ -41,6 +75,7 @@
       "start": "/",
       "theme": { "strategy": "next-themes", "key": "theme", "darkClass": "dark" },
       "themes": ["L", "D"],
+      "marketingOrder": ["hero", "playground", "component_variants", "component_detail", "themes_grid", "theme_detail", "components_grid", "requests"],
       "scenes": [
         { "name": "hero", "path": "/", "settle": 1400 },
         { "name": "components_grid", "path": "/components", "settle": 1200 },
@@ -71,6 +106,7 @@
       "_themeNote": "App is hard-coded dark only (no toggle). Capturing D only. If a light theme is added later, set themes to [\"L\",\"D\"] and theme.strategy accordingly.",
       "theme": { "strategy": "class-only", "key": "theme", "darkClass": "dark" },
       "themes": ["D"],
+      "marketingOrder": ["main_page", "agents_list", "agent_info", "categories", "two_sided", "how_it_works", "most_hired_agents", "agent_hire", "agent_invest", "list_agent"],
       "scenes": [
         { "name": "main_page", "path": "/", "settle": 1400 },
         { "name": "sections", "path": "/", "autoSections": { "headerOffset": 80 }, "settle": 1200 },
@@ -97,6 +133,7 @@
       "_authNote": "Dashboard routes are behind (auth) sign-in — no creds available, so only the public landing is captured. Add sign-in creds + dashboard scenes to refresh the in-app screens.",
       "theme": { "strategy": "next-themes", "key": "theme", "darkClass": "dark" },
       "themes": ["L", "D"],
+      "marketingOrder": ["hero", "dashboard", "ai_chat", "job_applications", "resume_editor", "interview", "id_job_application", "user_profile", "pillars", "more_features"],
       "scenes": [
         { "name": "hero", "path": "/", "settle": 1500 }
       ]
@@ -111,6 +148,7 @@
       "start": "/",
       "theme": { "strategy": "next-themes", "key": "theme", "darkClass": "dark" },
       "themes": ["L", "D"],
+      "marketingOrder": ["hero", "branch", "player", "library", "story", "voices", "listen", "voice_studio", "the_enchanted_forest_an"],
       "scenes": [
         { "name": "hero", "path": "/", "settle": 1400 },
         { "name": "sections", "path": "/", "autoSections": { "headerOffset": 72 }, "settle": 1200 },
