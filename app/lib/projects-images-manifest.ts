@@ -18,8 +18,12 @@ export const projectsImagesManifest: Record<string, string[]> = {
     "/projects_images/agentic-hub/two_sided_D.png"
   ],
   "cash-register": [
+    "/projects_images/cash-register/order_detail_D.png",
+    "/projects_images/cash-register/order_detail_L.png",
     "/projects_images/cash-register/orders_list_D.png",
     "/projects_images/cash-register/orders_list_L.png",
+    "/projects_images/cash-register/payment_D.png",
+    "/projects_images/cash-register/payment_L.png",
     "/projects_images/cash-register/products_D.png",
     "/projects_images/cash-register/products_L.png",
     "/projects_images/cash-register/register_D.png",
