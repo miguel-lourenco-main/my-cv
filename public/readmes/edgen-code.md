@@ -60,7 +60,7 @@ panel.webview.postMessage({ type: "chat:delta", payload: { token } });
 
 - Visual Studio Code (recent stable)
 - Node.js (LTS recommended)
-- Package manager: `pnpm` or `npm`
+- Package manager: `pnpm`
 - An LLM backend endpoint (local or remote)
 
 ---
