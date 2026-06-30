@@ -13,7 +13,7 @@
 # ===========================================================================
 include:
   - project: public-work4/infra
-    ref: b57406f13da5475b161fd8cb032f05e5fb892db4
+    ref: 6cafd7d888cb72ca981216fc6a6188dcb71d3722
     file:
       - ci/templates/fragments/toolchain-node-pnpm.gitlab-ci.yml
       - ci/templates/jobs-my-cv.gitlab-ci.yml
