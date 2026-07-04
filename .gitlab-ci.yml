@@ -44,11 +44,17 @@ pages:
     GIT_STRATEGY: none
     SITE_PKG: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/cv-site/20260613-051245/site.tgz"
   script:
+    # GIT_STRATEGY none → no checkout, so the ci-log lib is absent and these
+    # helpers no-op today; they light up if the checkout ever returns. The
+    # plain echoes stay so the log is informative either way.
+    - if [ -f infra/ci/scripts/lib/ci-log.sh ]; then . infra/ci/scripts/lib/ci-log.sh; elif [ -f ci/scripts/lib/ci-log.sh ]; then . ci/scripts/lib/ci-log.sh; else for f in ci_banner ci_section_start ci_section_end ci_step ci_ok ci_warn ci_fail ci_info ci_kv ci_hr ci_summary ci_summary_end; do eval "$f(){ :; }"; done; fi
+    - ci_banner "📄 GitLab Pages Deploy — prebuilt site" "fetch from Package Registry (no build, IPv6-safe)"
     - echo "Publishing locally-built site to ${CI_PAGES_URL}"
     - rm -rf public && mkdir -p public
     - 'curl --fail --silent --show-error --header "JOB-TOKEN: ${CI_JOB_TOKEN}" -o site.tgz "${SITE_PKG}"'
     - tar xzf site.tgz -C public
     - ls -la public/ public/warp/ public/visor/
+    - ci_ok "Site content ready for publish"
   artifacts:
     paths:
       - public/
