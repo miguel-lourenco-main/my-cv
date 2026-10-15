@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { cn } from "@/app/lib/utils";
 import { assetPath } from "@/app/lib/asset-path";
+import { useI18n } from "@/app/lib/i18n";
 import type { ProjectClient, ProjectCompany } from "./projects.types";
 import { getInitials, resolveCompanyClientLogo } from "./company-client-logos";
 
@@ -67,6 +68,8 @@ export function CompanyClientCircles({
   size = 32,
   className,
 }: CompanyClientCirclesProps) {
+  const { t } = useI18n();
+  const tp = t("projects");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Normalize company for consistent tooltip + rendering
@@ -187,14 +190,14 @@ export function CompanyClientCircles({
           const tooltipText = entity.tooltipText ?? (() => {
             // Company circle: tooltip depends on whether it's an employer or a client
             if (entity.isCompany) {
-              if (!normalizedCompany) return "Made while working at freelance";
+              if (!normalizedCompany) return tp("context.madeFreelance");
               return normalizedCompany.relationship === "employer"
-                ? `Made while working at ${normalizedCompany.name}`
-                : `Made for ${normalizedCompany.name}`;
+                ? tp("context.madeAtCompany", { company: normalizedCompany.name })
+                : tp("context.madeFor", { company: normalizedCompany.name });
             }
 
             // Client circles: always "Made for {client}"
-            return `Made for ${entity.name}`;
+            return tp("context.madeFor", { company: entity.name });
           })();
 
           return (

@@ -40,6 +40,7 @@ const ENDPOINTS = [
 export default function SystemeContact() {
   const { t } = useI18n()
   const tc = t('contact')
+  const tn = t('navigation')
 
   const scope = useGsap<HTMLElement>((_self) => {
     gsap.from('[data-contact-line]', {
@@ -63,7 +64,7 @@ export default function SystemeContact() {
     <section ref={scope} id="endpoint" className="relative bg-[var(--sys-bg)]">
       <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-40">
       <div className="sys-mono mb-6 text-[11px] uppercase tracking-[0.3em] text-[var(--sys-muted)]">
-        04 / <span className="sys-accent">endpoint</span>
+        04 / <span className="sys-accent">{tn('sections.endpoint')}</span>
       </div>
 
       <h2 className="sys-display max-w-4xl text-5xl font-semibold leading-[0.95] tracking-tight sm:text-7xl">
@@ -98,7 +99,7 @@ export default function SystemeContact() {
 
       <footer className="sys-mono mt-20 flex flex-wrap items-center justify-between gap-3 text-[10px] uppercase tracking-[0.25em] text-[var(--sys-muted)]">
         <span>© Miguel Lourenço</span>
-        <span>built with Next.js · static export · WebGL</span>
+        <span>{tc('builtWith')}</span>
       </footer>
       </div>
     </section>

@@ -6,5 +6,17 @@
   "tooling": "Outils",
   "testing": "Tests",
   "automation": "Automatisation",
-  "ai": "IA"
+  "ai": "IA",
+  "sectionTitle": "Le système derrière le travail",
+  "sectionSubtitle": "Six couches que je conçois et développe — de l'interface à l'infrastructure, jusqu'à l'orchestration d'IA.",
+  "items": {
+    "cicdPipelines": "Pipelines CI/CD",
+    "envConfig": "Gestion des environnements et de la configuration",
+    "ciTestAutomation": "Automatisation des tests en CI",
+    "n8nWorkflows": "Workflows n8n",
+    "apiIntegrations": "Intégrations d'API",
+    "opsAutomation": "Automatisation opérationnelle",
+    "promptToolOrchestration": "Orchestration de prompts et d'outils",
+    "aiProductFlows": "Parcours produit assistés par l'IA"
+  }
 }

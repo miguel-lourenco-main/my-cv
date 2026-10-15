@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useSmoothScroll } from '../scroll/SmoothScrollProvider'
+import { useI18n } from '../../lib/i18n'
 
-const SECTIONS = [
-  { id: 'input', label: 'INPUT' },
-  { id: 'architecture', label: 'ARCHITECTURE' },
-  { id: 'output', label: 'OUTPUT' },
-  { id: 'endpoint', label: 'ENDPOINT' },
-]
+/** Section ids double as `navigation.sections.*` translation keys. */
+const SECTIONS = [{ id: 'input' }, { id: 'architecture' }, { id: 'output' }, { id: 'endpoint' }]
 
 /**
  * Persistent left rail: the pipeline index (01–04) with the active layer lit in
@@ -16,6 +13,8 @@ const SECTIONS = [
  */
 export default function SystemeRail() {
   const { scroller, scrollTo } = useSmoothScroll()
+  const { t } = useI18n()
+  const tn = t('navigation')
   const [active, setActive] = useState(0)
   const [progress, setProgress] = useState(0)
 
@@ -53,7 +52,7 @@ export default function SystemeRail() {
 
   return (
     <nav
-      aria-label="Sections"
+      aria-label={tn('sections.label')}
       className="pointer-events-none fixed left-0 top-0 z-40 hidden h-full w-16 flex-col items-center justify-center gap-10 lg:flex"
     >
       {/* scan track */}
@@ -89,7 +88,7 @@ export default function SystemeRail() {
                     : 'text-[var(--sys-muted)] opacity-0 group-hover:opacity-70'
                 }`}
               >
-                {s.label}
+                {tn(`sections.${s.id}`)}
               </span>
             </button>
           </li>

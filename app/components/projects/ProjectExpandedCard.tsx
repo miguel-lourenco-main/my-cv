@@ -157,6 +157,7 @@ export function ProjectExpandedCard({
   useOutsideClick(ref, () => onClose());
 
   const tp = t("projects");
+  const tn = t("navigation");
 
   if (!portalTarget) return null;
 
@@ -198,7 +199,7 @@ export function ProjectExpandedCard({
                   {/* Dim layer (dismiss) */}
                   <button
                     type="button"
-                    aria-label="Close tech stack focus"
+                    aria-label={tp("dialog.closeTechFocus")}
                     className="absolute inset-0 bg-black/35 backdrop-blur-[1px] cursor-pointer"
                     onClick={() => setIsTechStackFocused(false)}
                   />
@@ -379,7 +380,7 @@ export function ProjectExpandedCard({
                     "shadow-md hover:shadow-lg",
                     "text-neutral-700 dark:text-neutral-200 hover:text-neutral-800 dark:hover:text-neutral-100"
                   )}
-                  aria-label="Scroll to content"
+                  aria-label={tp("dialog.scrollToContent")}
                   animate={{ y: [0, -8, 0] }}
                   transition={{
                     duration: 1.2,
@@ -407,6 +408,8 @@ export function ProjectExpandedCard({
 }
 
 function ProjectButtons({ project }: { project: Project }) {
+  const { t } = useI18n();
+  const tp = t("projects");
   return (
     <div className="flex w-fit shrink-0 gap-2">
       <BaseButton
@@ -414,7 +417,7 @@ function ProjectButtons({ project }: { project: Project }) {
         className="flex items-center gap-2 p-2 text-sm rounded-full font-bold bg-green-600 hover:bg-green-700 text-white"
         theme="green"
       >
-        Visit <GlobeIcon className="size-5" />
+        {tp("dialog.visit")} <GlobeIcon className="size-5" />
       </BaseButton>
       <GitlabButton
         href={project.gitlabUrl}
@@ -427,11 +430,12 @@ function ProjectButtons({ project }: { project: Project }) {
 }
 
 function ProjectCloseButton({ onClose, className }: { onClose: () => void, className?: string }) {
+  const { t } = useI18n();
   return (
     <button
       onClick={onClose}
       className={cn(className, "flex items-center justify-center size-8 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-900 transition-colors")}
-      aria-label="Close"
+      aria-label={t("navigation")("close")}
     >
       <X className="size-4 text-gray-600 dark:text-gray-400" />
     </button>

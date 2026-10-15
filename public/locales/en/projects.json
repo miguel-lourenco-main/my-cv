@@ -41,6 +41,37 @@
       "gitlabPages": "GitLab Pages",
       "vercel": "Vercel",
       "none": "Not deployed"
-    }
+    },
+    "madeAtCompany": "Made while working at {{company}}",
+    "madeFor": "Made for {{company}}",
+    "madeFreelance": "Made while working at freelance"
+  },
+  "browse": {
+    "all": "All",
+    "personal": "Personal"
+  },
+  "type": {
+    "personal": "Personal",
+    "professional": "Professional",
+    "hybrid": "Hybrid"
+  },
+  "card": {
+    "view": "view",
+    "open": "Open {{title}}",
+    "private": "Private"
+  },
+  "dialog": {
+    "visit": "Visit",
+    "closeTechFocus": "Close tech stack focus",
+    "scrollToContent": "Scroll to content"
+  },
+  "carousel": {
+    "prev": "Prev",
+    "next": "Next",
+    "slide": "Slide {{n}}",
+    "goToSlide": "Go to slide {{n}}",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "expanded": "Expanded"
   }
 }

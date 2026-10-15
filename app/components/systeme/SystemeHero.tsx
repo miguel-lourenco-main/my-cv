@@ -8,6 +8,9 @@ import SystemeBackdrop from './SystemeBackdrop'
 import { useMagnetic } from './useMagnetic'
 import { useGsap, gsap, ScrollTrigger } from '../scroll/useGsap'
 
+/** Intl locale used for the hero date stamp, per site locale. */
+const DATE_LOCALE: Record<string, string> = { en: 'en-GB', pt: 'pt-PT', fr: 'fr-FR', es: 'es-ES' }
+
 const TECH_TERMS = [
   'TypeScript/JavaScript', 'TypeScript', 'JavaScript', 'React', 'Next.js',
   'Tailwind CSS', 'Node.js', 'SQL/Postgres', 'SQL', 'Postgres', 'REST APIs',
@@ -50,11 +53,11 @@ export default function SystemeHero({ started }: { started: boolean }) {
 
   useEffect(() => {
     setToday(
-      new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      new Intl.DateTimeFormat(DATE_LOCALE[locale] ?? 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
         .format(new Date())
         .toUpperCase()
     )
-  }, [])
+  }, [locale])
 
   const cvEmbedSrc = useMemo(() => `${cvPath}#pagemode=none&navpanes=0&toolbar=0&zoom=page-width&view=FitH`, [cvPath])
   const intro = (th('intro1') || '').split('\n\n').filter((p) => p.trim())
@@ -123,12 +126,12 @@ export default function SystemeHero({ started }: { started: boolean }) {
           <div data-hero-fade className="sys-mono mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs uppercase tracking-[0.2em] text-[var(--sys-muted)]">
             <span className="flex items-center gap-2">
               <span className="sys-pulse inline-block h-2 w-2 rounded-full bg-[var(--sys-accent)]" />
-              available for work
+              {th('status.available')}
             </span>
             <span className="text-[var(--sys-line-2)]">/</span>
-            <span>Full-stack developer</span>
+            <span>{th('status.role')}</span>
             <span className="text-[var(--sys-line-2)]">/</span>
-            <span>Portugal {today && <span className="text-[var(--sys-muted)]/70">· {today}</span>}</span>
+            <span>{th('status.location')} {today && <span className="text-[var(--sys-muted)]/70">· {today}</span>}</span>
           </div>
         </div>
 
@@ -162,7 +165,7 @@ export default function SystemeHero({ started }: { started: boolean }) {
 
       {/* Scroll cue */}
       <div data-hero-fade className="sys-mono absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-[10px] uppercase tracking-[0.3em] text-[var(--sys-muted)]">
-        scroll ↓
+        {th('scrollCue')} ↓
       </div>
 
       <CvFocusModal open={focusOpen} onClose={() => setFocusOpen(false)} cvPath={cvEmbedSrc} title={th('ctaViewCv')} />
