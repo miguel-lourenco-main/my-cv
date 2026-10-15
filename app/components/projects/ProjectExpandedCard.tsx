@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "../../lib/hooks/use-outside-click";
@@ -16,6 +17,7 @@ import { ProjectCompanyClientInfo } from "./ProjectCompanyClientInfo";
 import type { ProjectScreenshotMode } from "./project-images";
 import { getOfficialTechUrl } from "./tech-links";
 import { ScreenshotModeButton } from "./ScreenshotModeButton";
+import { useSmoothScroll } from "../scroll/SmoothScrollProvider";
 
 const GitlabReadmeViewer = dynamic(
   () =>
@@ -26,9 +28,23 @@ const GitlabReadmeViewer = dynamic(
 );
 
 /**
+ * Where the dialog is portalled. The project sections are GSAP-pinned (and so
+ * transformed), which turns `position: fixed` into "fixed to the section"; the
+ * dialog must live outside them to be centred in the viewport. The `.systeme`
+ * shell is preferred over `body` so the dialog keeps that art direction's
+ * cursor and scrollbar rules; it is not transformed, so `fixed` still resolves
+ * against the viewport.
+ */
+function getPortalTarget(): HTMLElement {
+  return document.querySelector<HTMLElement>(".systeme") ?? document.body;
+}
+
+/**
  * Expanded project card modal component.
  * Displays detailed project information including carousel, technologies, and descriptions.
- * Supports keyboard navigation (Escape to close) and outside click to close.
+ * Rendered through a portal as a viewport-centred overlay with a backdrop.
+ * Supports keyboard navigation (Escape to close) and outside click to close,
+ * and locks page scrolling (body, the Lenis scroll container) while open.
  * 
  * @param props - ProjectExpandedCard component props
  * @param props.project - Project data to display (null to hide modal)
@@ -57,6 +73,8 @@ export function ProjectExpandedCard({
   const ref = useRef<HTMLDivElement>(null);
   const tabContentAnchorRef = useRef<HTMLDivElement>(null);
   const { getProjectString, getProjectArray, t } = useI18n();
+  const { lenis, scroller } = useSmoothScroll();
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   const [activeTab, setActiveTab] = useState<"info" | "experience">("info");
   const [showScrollToContentButton, setShowScrollToContentButton] =
@@ -65,7 +83,11 @@ export function ProjectExpandedCard({
   // Local screenshot mode for this expanded card only (independent from global state)
   const [localScreenshotMode, setLocalScreenshotMode] = useState<ProjectScreenshotMode>(screenshotMode);
 
-  // Handle keyboard navigation and prevent body scroll when modal is open
+  useEffect(() => {
+    setPortalTarget(getPortalTarget());
+  }, []);
+
+  // Handle keyboard navigation (Escape closes the tech focus first, then the modal)
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
@@ -75,18 +97,25 @@ export function ProjectExpandedCard({
       }
       onClose();
     }
-    // Prevent body scroll when modal is open
-    if (project) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
     window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose, isTechStackFocused]);
+
+  // Lock page scrolling while the modal is open. The page scrolls inside the
+  // Lenis-driven `#page-scroll-container`, not the body, so lock both.
+  useEffect(() => {
+    if (!project) return;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevScrollerOverflow = scroller?.style.overflow ?? "";
+    document.body.style.overflow = "hidden";
+    if (scroller) scroller.style.overflow = "hidden";
+    lenis?.stop();
     return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = prevBodyOverflow;
+      if (scroller) scroller.style.overflow = prevScrollerOverflow;
+      lenis?.start();
     };
-  }, [project, onClose, isTechStackFocused]);
+  }, [project, lenis, scroller]);
 
   // Reset mobile "scroll hint" state when opening a project
   useEffect(() => {
@@ -129,18 +158,24 @@ export function ProjectExpandedCard({
 
   const tp = t("projects");
 
-  return (
+  if (!portalTarget) return null;
+
+  return createPortal(
     <AnimatePresence>
       {project ? (
-        <div className="fixed inset-0 z-[100] grid place-items-center">
+        <div className="fixed inset-0 z-[100] grid place-items-center md:p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 z-40"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            aria-hidden="true"
           />
           <motion.div
             ref={ref}
+            role="dialog"
+            aria-modal="true"
+            aria-label={getProjectString(project, "title")}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
             // Opt out of Lenis smooth scrolling so wheel/touch events scroll
             // the dialog itself instead of the page behind it.
@@ -366,7 +401,8 @@ export function ProjectExpandedCard({
           </motion.div>
         </div>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    portalTarget
   );
 }
 
