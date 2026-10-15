@@ -124,3 +124,18 @@ export const CATEGORY_CARDS: CategoryCardConfig[] = [
     ),
   },
 ];
+
+/**
+ * Descriptive (non-brand) category items, mapped to `categories.items.*`
+ * translation keys. Items not listed here are product/tool names and render as-is.
+ */
+export const CATEGORY_ITEM_KEYS: Record<string, string> = {
+  "CI/CD pipelines": "cicdPipelines",
+  "Environment/config management": "envConfig",
+  "Test automation in CI": "ciTestAutomation",
+  "n8n workflows": "n8nWorkflows",
+  "API integrations": "apiIntegrations",
+  "Operational automation": "opsAutomation",
+  "Prompt + tool orchestration": "promptToolOrchestration",
+  "AI-assisted product flows": "aiProductFlows",
+};

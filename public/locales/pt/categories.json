@@ -6,5 +6,17 @@
   "tooling": "Ferramentas",
   "testing": "Testes",
   "automation": "Automação",
-  "ai": "IA"
+  "ai": "IA",
+  "sectionTitle": "O sistema por trás do trabalho",
+  "sectionSubtitle": "Seis camadas que desenho e construo — da interface à infraestrutura e à orquestração de IA.",
+  "items": {
+    "cicdPipelines": "Pipelines de CI/CD",
+    "envConfig": "Gestão de ambientes e configuração",
+    "ciTestAutomation": "Automação de testes em CI",
+    "n8nWorkflows": "Workflows n8n",
+    "apiIntegrations": "Integrações de APIs",
+    "opsAutomation": "Automação operacional",
+    "promptToolOrchestration": "Orquestração de prompts e ferramentas",
+    "aiProductFlows": "Fluxos de produto assistidos por IA"
+  }
 }

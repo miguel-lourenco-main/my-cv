@@ -7,6 +7,7 @@ import {
   type ProjectScreenshotMode,
 } from "./project-images";
 import { assetPath } from "../../lib/asset-path";
+import { useI18n } from "../../lib/i18n";
 
 /**
  * Image carousel component for project galleries.
@@ -29,6 +30,8 @@ export function ProjectCarousel({
   images: string[];
   screenshotMode?: ProjectScreenshotMode;
 }) {
+  const { t } = useI18n();
+  const tp = t("projects");
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -57,7 +60,7 @@ export function ProjectCarousel({
             <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>
               <img
                 src={assetPath(src)}
-                alt={`Slide ${idx + 1}`}
+                alt={tp("carousel.slide", { n: idx + 1 })}
                 loading={idx === selectedIndex ? "eager" : "lazy"}
                 decoding="async"
                 className="w-full h-60 md:h-72 lg:h-80 object-cover cursor-zoom-in"
@@ -76,7 +79,7 @@ export function ProjectCarousel({
             <button
               key={`dot-${idx}`}
               className={`h-2 w-2 rounded-full ${selectedIndex === idx ? "bg-slate-900 dark:bg-slate-100" : "bg-slate-300 dark:bg-slate-700"}`}
-              aria-label={`Go to slide ${idx + 1}`}
+              aria-label={tp("carousel.goToSlide", { n: idx + 1 })}
               onClick={() => emblaApi?.scrollTo(idx)}
             />
           ))}
@@ -86,13 +89,13 @@ export function ProjectCarousel({
             className="px-3 py-1 text-sm rounded-md bg-foreground hover:bg-muted-foreground"
             onClick={() => emblaApi?.scrollPrev()}
           >
-            Prev
+            {tp("carousel.prev")}
           </button>
           <button
             className="px-3 py-1 text-sm rounded-md bg-foreground hover:bg-muted-foreground"
             onClick={() => emblaApi?.scrollNext()}
           >
-            Next
+            {tp("carousel.next")}
           </button>
         </div>
       </div>
@@ -134,6 +137,8 @@ function Lightbox({
   onPrev: () => void;
   onNext: () => void;
 }) {
+  const { t } = useI18n();
+  const tp = t("projects");
   const [current, setCurrent] = useState(index);
 
   // Sync current index when prop changes
@@ -164,7 +169,7 @@ function Lightbox({
   return (
     <div className="fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4" onClick={handleBackdrop}>
       <button
-        aria-label="Close"
+        aria-label={t("navigation")("close")}
         className="absolute top-4 right-4 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
         onClick={onClose}
       >
@@ -174,7 +179,7 @@ function Lightbox({
         </svg>
       </button>
       <button
-        aria-label="Previous image"
+        aria-label={tp("carousel.previousImage")}
         className="absolute left-4 md:left-6 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
         onClick={(e) => { e.stopPropagation(); onPrev(); }}
       >
@@ -183,7 +188,7 @@ function Lightbox({
         </svg>
       </button>
       <button
-        aria-label="Next image"
+        aria-label={tp("carousel.nextImage")}
         className="absolute right-4 md:right-6 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
         onClick={(e) => { e.stopPropagation(); onNext(); }}
       >
@@ -195,7 +200,7 @@ function Lightbox({
       <div className="max-h-[90vh] max-w-[95vw] md:max-w-[90vw]">
         <img
           src={assetPath(images[current])}
-          alt="Expanded"
+          alt={tp("carousel.expanded")}
           decoding="async"
           className="object-contain w-full h-full"
         />

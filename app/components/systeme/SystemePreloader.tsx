@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useReducedMotion } from '../../lib/use-reduced-motion'
+import { useI18n } from '../../lib/i18n'
 
 const SERVICES = ['frontend', 'backend', 'devops', 'testing', 'automation', 'ai']
 
@@ -13,6 +14,8 @@ const SERVICES = ['frontend', 'backend', 'devops', 'testing', 'automation', 'ai'
  */
 export default function SystemePreloader({ onDone }: { onDone: () => void }) {
   const reducedMotion = useReducedMotion()
+  const { t } = useI18n()
+  const tn = t('navigation')
   const rootRef = useRef<HTMLDivElement>(null)
   const counterRef = useRef<HTMLSpanElement>(null)
   const [gone, setGone] = useState(false)
@@ -87,7 +90,7 @@ export default function SystemePreloader({ onDone }: { onDone: () => void }) {
           onClick={finish}
           className="sys-mono text-[10px] uppercase tracking-[0.3em] text-[var(--sys-muted)] transition-colors hover:text-[var(--sys-text)]"
         >
-          skip ↵
+          {tn('skip')} ↵
         </button>
       </div>
 

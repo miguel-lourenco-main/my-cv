@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { Button } from "../shadcn/button";
+import { useI18n } from "../../lib/i18n";
 
 export default function CvFocusModal({
   open,
@@ -15,6 +16,8 @@ export default function CvFocusModal({
   cvPath: string;
   title: string;
 }) {
+  const { t } = useI18n();
+  const closeLabel = t("navigation")("close");
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -66,8 +69,8 @@ export default function CvFocusModal({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              aria-label="Close"
-              title="Close"
+              aria-label={closeLabel}
+              title={closeLabel}
               className="h-9 w-9"
             >
               <X className="size-5" />

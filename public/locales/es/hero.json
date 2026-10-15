@@ -2,5 +2,11 @@
   "intro1": "Soy un desarrollador de Portugal que construye productos web de extremo a extremo, desde UX/UI hasta APIs y datos.\n\nTrabajo principalmente con TypeScript/JavaScript, usando React y Next.js en el frontend y Node.js en el backend, con SQL/Postgres, APIs REST y tooling moderno para entregar sistemas fiables y de alto rendimiento.",
   "intro2": "Soy un ingeniero que prospera construyendo sistemas y tiene experiencia práctica en todos los aspectos del proceso de desarrollo, desde arquitecturar repositorios y dar forma a flujos de experiencia de usuario hasta construir interfaces intuitivas e implementar características principales del backend.",
   "ctaDownloadCv": "Descargar CV",
-  "ctaViewCv": "Ver CV"
+  "ctaViewCv": "Ver CV",
+  "status": {
+    "available": "disponible para trabajar",
+    "role": "Desarrollador full-stack",
+    "location": "Portugal"
+  },
+  "scrollCue": "desplazar"
 }

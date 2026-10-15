@@ -5,5 +5,18 @@
   "themeToggle": "Alternar tema",
   "languageSwitcher": "Mudar idioma",
   "greeting": "Olá, sou o",
-  "name": "Miguel Lourenço"
+  "name": "Miguel Lourenço",
+  "portfolio": "portefólio",
+  "work": "Trabalho",
+  "contact": "Contacto",
+  "lang": "Idioma",
+  "close": "Fechar",
+  "skip": "saltar",
+  "sections": {
+    "label": "Secções",
+    "input": "entrada",
+    "architecture": "arquitetura",
+    "output": "resultado",
+    "endpoint": "endpoint"
+  }
 }

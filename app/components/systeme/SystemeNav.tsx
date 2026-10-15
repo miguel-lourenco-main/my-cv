@@ -9,7 +9,8 @@ import { useSmoothScroll } from '../scroll/SmoothScrollProvider'
 
 function LangSwitch() {
   const pathname = usePathname()
-  const { locale } = useI18n()
+  const { locale, t } = useI18n()
+  const tn = t('navigation')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useOutsideClick(ref, () => setOpen(false))
@@ -34,7 +35,7 @@ function LangSwitch() {
         onClick={() => setOpen((v) => !v)}
         className="sys-mono flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-[var(--sys-muted)] transition-colors hover:text-[var(--sys-text)]"
       >
-        LANG / <span className="text-[var(--sys-text)]">{current.label}</span>
+        {tn('lang')} / <span className="text-[var(--sys-text)]">{current.label}</span>
         <span className="text-[var(--sys-muted)]">▾</span>
       </button>
       {open && (
@@ -58,6 +59,8 @@ function LangSwitch() {
 
 export default function SystemeNav() {
   const { scrollTo } = useSmoothScroll()
+  const { t } = useI18n()
+  const tn = t('navigation')
 
   return (
     <header className="fixed inset-x-0 top-0 z-40">
@@ -67,20 +70,20 @@ export default function SystemeNav() {
           className="sys-mono text-xs font-semibold uppercase tracking-[0.25em] text-[var(--sys-text)]"
         >
           ML<span className="sys-accent">.</span>
-          <span className="ml-2 hidden text-[var(--sys-muted)] sm:inline">/ portfolio</span>
+          <span className="ml-2 hidden text-[var(--sys-muted)] sm:inline">/ {tn('portfolio')}</span>
         </button>
         <nav className="flex items-center gap-6">
           <button
             onClick={() => scrollTo('#output', { offset: -40 })}
             className="sys-mono hidden text-[11px] uppercase tracking-[0.2em] text-[var(--sys-muted)] transition-colors hover:text-[var(--sys-text)] sm:block"
           >
-            Work
+            {tn('work')}
           </button>
           <button
             onClick={() => scrollTo('#endpoint', { offset: -40 })}
             className="sys-mono hidden text-[11px] uppercase tracking-[0.2em] text-[var(--sys-muted)] transition-colors hover:text-[var(--sys-text)] sm:block"
           >
-            Contact
+            {tn('contact')}
           </button>
           <LangSwitch />
         </nav>

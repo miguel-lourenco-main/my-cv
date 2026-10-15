@@ -6,6 +6,18 @@
   "tooling": "Tooling",
   "testing": "Testing",
   "automation": "Automation",
-  "ai": "AI"
+  "ai": "AI",
+  "sectionTitle": "The system behind the work",
+  "sectionSubtitle": "Six layers I design and build across — from interface to infrastructure to AI orchestration.",
+  "items": {
+    "cicdPipelines": "CI/CD pipelines",
+    "envConfig": "Environment/config management",
+    "ciTestAutomation": "Test automation in CI",
+    "n8nWorkflows": "n8n workflows",
+    "apiIntegrations": "API integrations",
+    "opsAutomation": "Operational automation",
+    "promptToolOrchestration": "Prompt + tool orchestration",
+    "aiProductFlows": "AI-assisted product flows"
+  }
 }
 

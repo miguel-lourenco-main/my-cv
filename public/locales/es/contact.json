@@ -1,4 +1,5 @@
 {
   "title": "Ponte en Contacto",
-  "subtitle": "Siempre estoy interesado en nuevas oportunidades, colaboraciones y conversaciones interesantes sobre tecnología."
+  "subtitle": "Siempre estoy interesado en nuevas oportunidades, colaboraciones y conversaciones interesantes sobre tecnología.",
+  "builtWith": "hecho con Next.js · exportación estática · WebGL"
 }

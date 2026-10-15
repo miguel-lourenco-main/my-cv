@@ -6,5 +6,17 @@
   "tooling": "Herramientas",
   "testing": "Pruebas",
   "automation": "Automatización",
-  "ai": "IA"
+  "ai": "IA",
+  "sectionTitle": "El sistema detrás del trabajo",
+  "sectionSubtitle": "Seis capas que diseño y construyo — de la interfaz a la infraestructura y la orquestación de IA.",
+  "items": {
+    "cicdPipelines": "Pipelines de CI/CD",
+    "envConfig": "Gestión de entornos y configuración",
+    "ciTestAutomation": "Automatización de pruebas en CI",
+    "n8nWorkflows": "Flujos de trabajo n8n",
+    "apiIntegrations": "Integraciones de API",
+    "opsAutomation": "Automatización operativa",
+    "promptToolOrchestration": "Orquestación de prompts y herramientas",
+    "aiProductFlows": "Flujos de producto asistidos por IA"
+  }
 }

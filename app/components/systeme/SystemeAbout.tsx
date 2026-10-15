@@ -1,6 +1,6 @@
 'use client'
 
-import { CATEGORY_CARDS } from '../categories/category-cards.config'
+import { CATEGORY_CARDS, CATEGORY_ITEM_KEYS } from '../categories/category-cards.config'
 import { useI18n } from '../../lib/i18n'
 import { useGsap, gsap } from '../scroll/useGsap'
 
@@ -12,6 +12,7 @@ import { useGsap, gsap } from '../scroll/useGsap'
 export default function SystemeAbout() {
   const { t } = useI18n()
   const tc = t('categories')
+  const tn = t('navigation')
 
   const scope = useGsap<HTMLElement>((_self, el) => {
     const layers = gsap.utils.toArray<HTMLElement>('[data-layer]')
@@ -43,11 +44,11 @@ export default function SystemeAbout() {
     <section ref={scope} id="architecture" className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-40">
       <header className="mb-16 max-w-2xl">
         <div className="sys-mono mb-4 text-[11px] uppercase tracking-[0.3em] text-[var(--sys-muted)]">
-          02 / <span className="sys-accent">architecture</span>
+          02 / <span className="sys-accent">{tn('sections.architecture')}</span>
         </div>
-        <h2 className="sys-display text-4xl font-semibold tracking-tight sm:text-5xl">The system behind the work</h2>
+        <h2 className="sys-display text-4xl font-semibold tracking-tight sm:text-5xl">{tc('sectionTitle')}</h2>
         <p className="mt-4 text-[var(--sys-text)]/60">
-          Six layers I design and build across — from interface to infrastructure to AI orchestration.
+          {tc('sectionSubtitle')}
         </p>
       </header>
 
@@ -76,7 +77,7 @@ export default function SystemeAbout() {
                 <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
                   {c.items.map((item) => (
                     <li key={item} className="sys-mono text-xs text-[var(--sys-text)]/55">
-                      {item}
+                      {CATEGORY_ITEM_KEYS[item] ? tc(`items.${CATEGORY_ITEM_KEYS[item]}`) : item}
                     </li>
                   ))}
                 </ul>

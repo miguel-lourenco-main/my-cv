@@ -25,21 +25,17 @@ const ProjectExpandedCard = dynamic(
   { ssr: false }
 )
 
-const DEPLOY_LABEL: Record<string, string> = {
+/** Deployment labels; `null` entries are translated (`projects.card.*`). */
+const DEPLOY_LABEL: Record<string, string | null> = {
   gitlab_pages: 'GitLab Pages',
   vercel: 'Vercel',
-  none: 'Private',
-}
-
-const TYPE_LABEL: Record<string, string> = {
-  personal: 'Personal',
-  professional: 'Professional',
-  hybrid: 'Hybrid',
+  none: null,
 }
 
 export default function SystemeProjects() {
   const { t, getProjectString, loadProjectNamespace } = useI18n()
   const tp = t('projects')
+  const tn = t('navigation')
   const manifest = useProjectImagesManifest()
   const allProjects = useMemo(() => resolveProjectsWithImages(manifest), [manifest])
 
@@ -94,8 +90,8 @@ export default function SystemeProjects() {
   )
 
   const filters: { id: AffiliationFilterValue; label: string }[] = [
-    { id: AFFILIATION_ALL, label: 'All' },
-    { id: AFFILIATION_PERSONAL, label: 'Personal' },
+    { id: AFFILIATION_ALL, label: tp('browse.all') },
+    { id: AFFILIATION_PERSONAL, label: tp('browse.personal') },
     ...companyOptions.map((c) => ({ id: c.id as AffiliationFilterValue, label: c.name })),
   ]
 
@@ -107,7 +103,7 @@ export default function SystemeProjects() {
         <header className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div>
             <div className="sys-mono mb-2 text-[11px] uppercase tracking-[0.3em] text-[var(--sys-muted)]">
-              03 / <span className="sys-accent">output</span>
+              03 / <span className="sys-accent">{tn('sections.output')}</span>
             </div>
             <h2 className="sys-display text-3xl font-semibold tracking-tight sm:text-4xl">{tp('title')}</h2>
           </div>
@@ -185,6 +181,8 @@ function ProjectSlide({
   description: string
   onOpen: (p: Project) => void
 }) {
+  const { t } = useI18n()
+  const tp = t('projects')
   const cover = getProjectCoverImageByMode(project.images, screenshotMode)
   const company = resolveCompanyFields(project.company)
   const meta = project.experience
@@ -205,7 +203,7 @@ function ProjectSlide({
           isDesktop ? 'h-[46vh]' : ''
         }`}
         style={isDesktop ? undefined : { aspectRatio: '16 / 10' }}
-        aria-label={`Open ${title}`}
+        aria-label={tp('card.open', { title })}
       >
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -220,7 +218,7 @@ function ProjectSlide({
         )}
         <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/5" />
         <span className="sys-mono absolute right-4 top-4 rounded border border-white/10 bg-black/40 px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--sys-text)]/80 backdrop-blur">
-          view ↗
+          {tp('card.view')} ↗
         </span>
       </button>
 
@@ -232,7 +230,7 @@ function ProjectSlide({
             </span>
             {project.type && (
               <span className="sys-mono text-[10px] uppercase tracking-wider text-[var(--sys-accent)]/80">
-                {TYPE_LABEL[project.type]}
+                {tp(`type.${project.type}`)}
               </span>
             )}
           </div>
@@ -243,7 +241,7 @@ function ProjectSlide({
           <div className="sys-mono text-[11px] uppercase tracking-wider text-[var(--sys-muted)]">{meta}</div>
           {project.deployment && (
             <div className="sys-mono mt-1 text-[11px] text-[var(--sys-text)]/40">
-              {DEPLOY_LABEL[project.deployment] ?? ''}
+              {DEPLOY_LABEL[project.deployment] ?? tp('card.private')}
             </div>
           )}
           <div className="mt-3 flex flex-wrap gap-1.5 md:justify-end">

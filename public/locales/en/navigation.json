@@ -5,6 +5,19 @@
   "themeToggle": "Toggle theme",
   "languageSwitcher": "Change language",
   "greeting": "Hi, I'm",
-  "name": "Miguel Lourenço"
+  "name": "Miguel Lourenço",
+  "portfolio": "portfolio",
+  "work": "Work",
+  "contact": "Contact",
+  "lang": "Lang",
+  "close": "Close",
+  "skip": "skip",
+  "sections": {
+    "label": "Sections",
+    "input": "input",
+    "architecture": "architecture",
+    "output": "output",
+    "endpoint": "endpoint"
+  }
 }
 
