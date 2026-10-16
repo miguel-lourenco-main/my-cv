@@ -13,6 +13,12 @@ import {
   type LookState,
 } from './look-state'
 
+/** Warp arrival: seconds to decelerate into place, how far back (world units)
+ *  it starts, and how much wider (degrees) the FOV is at full warp speed. */
+const WARP_IN_S = 2.0
+const WARP_BACK = 11
+const WARP_FOV_KICK = 38
+
 /** Arrow keys pan at this fraction of the peak cursor speed. */
 const KEY_SPEED = MAX_LOOK_SPEED * 0.8
 
@@ -136,22 +142,22 @@ export default function CameraRig({
     const driftYaw = idleFactor.current * Math.sin(t * 0.06) * 0.03
     const driftPitch = idleFactor.current * Math.sin(t * 0.045 + 1.3) * 0.014
 
-    // Establishing fly-in: held off-centre + pulled back during the intro, then
-    // eases home over ~2.4s (easeOutCubic) once the intro reveals the scene.
-    // Plays exactly once per mount, and is immune to frameloop clock resets.
+    // Warp arrival: the intro's star-streak warp carries straight on into the
+    // scene. The camera starts dead ahead of the screens but far back, with a
+    // wide "speed" FOV, and decelerates into place (easeOutQuart) while the
+    // intro overlay's streaks fade over it. Plays exactly once per mount, and is
+    // immune to frameloop clock resets.
     if (revealed) introElapsed.current = (introElapsed.current ?? 0) + Math.min(delta, 0.1)
-    const introP = introElapsed.current === null ? 0 : Math.min(1, introElapsed.current / 2.4)
-    const introRemain = Math.pow(1 - introP, 3)
-    const introYaw = introRemain * 0.55
-    const introPitch = introRemain * 0.24
-    const introBack = introRemain * 2.0
+    const introP = introElapsed.current === null ? 0 : Math.min(1, introElapsed.current / WARP_IN_S)
+    const introRemain = Math.pow(1 - introP, 4)
+    const introBack = introRemain * WARP_BACK
+    const fov = CAMERA_FOV + introRemain * WARP_FOV_KICK
+    if (cam.current && Math.abs(cam.current.fov - fov) > 0.01) {
+      cam.current.fov = fov
+      cam.current.updateProjectionMatrix()
+    }
 
-    group.rotation.set(
-      state.pitch + driftPitch + introPitch,
-      state.yaw + driftYaw + introYaw,
-      0,
-      'YXZ'
-    )
+    group.rotation.set(state.pitch + driftPitch, state.yaw + driftYaw, 0, 'YXZ')
 
     // Dolly the camera forward (−Z local) toward a focused screen, plus the
     // decaying intro pull-back.

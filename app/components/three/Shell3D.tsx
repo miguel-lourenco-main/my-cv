@@ -58,7 +58,13 @@ export default function Shell3D({ greeting }: { greeting: string }) {
   // Initial branded intro/loading sequence; the scene reveal (camera fly-in)
   // waits until it finishes.
   const [introDone, setIntroDone] = useState(false)
-  const handleIntroDone = useCallback(() => setIntroDone(true), [])
+  // The camera arrival starts mid-intro, when the warp punches through the name.
+  const [revealed, setRevealed] = useState(false)
+  const handleIntroDone = useCallback(() => {
+    setRevealed(true)
+    setIntroDone(true)
+  }, [])
+  const handleReveal = useCallback(() => setRevealed(true), [])
 
   const [focusedId, setFocusedId] = useState<ScreenId | null>(null)
   const clear = useCallback(() => setFocusedId(null), [])
@@ -151,7 +157,7 @@ export default function Shell3D({ greeting }: { greeting: string }) {
       {/* Keep the greeting in the a11y/SEO tree even in the WebGL shell. */}
       <h1 className="sr-only">{greeting}</h1>
       <SceneCanvas className={hide3D ? 'cv-3d-hidden' : ''} paused={hide3D}>
-        <Scene focus={focus} bridged={bridged} greeting={greeting} revealed={introDone} />
+        <Scene focus={focus} bridged={bridged} greeting={greeting} revealed={revealed} />
       </SceneCanvas>
 
       {/* Real 2D page takes over at full-screen; switches slide on a shared plane. */}
@@ -166,7 +172,7 @@ export default function Shell3D({ greeting }: { greeting: string }) {
       {introDone && <SpaceCursor focused={!!focusedId} hidden={!!pageId} />}
 
       {/* Branded loading/intro sequence, revealing the space when it finishes. */}
-      {!introDone && <IntroSequence onDone={handleIntroDone} />}
+      {!introDone && <IntroSequence onDone={handleIntroDone} onReveal={handleReveal} />}
     </div>
   )
 }
