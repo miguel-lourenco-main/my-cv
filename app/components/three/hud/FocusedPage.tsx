@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { motion, useIsPresent } from 'motion/react'
 import { RevealStaticContext } from '../../Reveal'
 import ScreenSection from '../screens/ScreenSections'
 import { SCREEN_ACCENT } from '../screens/screen-theme'
@@ -42,9 +42,15 @@ export default function FocusedPage({
   dir: SlideDir
 }) {
   const accent = SCREEN_ACCENT[id]
+  // While fading out after "Back to space", the page still covers the viewport.
+  // Drop the `cv-focus-page` class (native cursor) and pointer events right
+  // away, so the reticle and screen clicks work again during the exit fade.
+  const isPresent = useIsPresent()
   return (
     <motion.div
-      className="cv-focus-page cv-screen-surface fixed inset-0 z-40 overflow-y-auto overflow-x-hidden bg-[#05060a]"
+      className={`cv-screen-surface fixed inset-0 z-40 overflow-y-auto overflow-x-hidden bg-[#05060a] ${
+        isPresent ? 'cv-focus-page' : 'pointer-events-none'
+      }`}
       custom={dir}
       variants={variants}
       initial="initial"
