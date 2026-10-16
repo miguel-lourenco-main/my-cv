@@ -216,13 +216,16 @@ export default function ScreenPlane({
             <RevealStaticContext.Provider value={true}>
               <div
                 data-screen={slot.id}
-                className={`flex flex-col overflow-hidden bg-background text-foreground ${
-                  isFocused ? '' : 'rounded-2xl ring-1 ring-white/10'
+                className={`relative flex flex-col overflow-hidden bg-background text-foreground ${
+                  isFocused ? '' : 'cv-holo rounded-2xl ring-1 ring-white/10'
                 }`}
                 style={{
                   width: surfacePx.w,
                   height: surfacePx.h,
-                  opacity: dimmed ? 0 : 1,
+                  // Holographic: slightly see-through at rest (space shows
+                  // through), solid once focused so the page reads cleanly.
+                  opacity: dimmed ? 0 : isFocused ? 1 : 0.86,
+                  ['--holo' as string]: accent,
                   transition:
                     'width 0.5s cubic-bezier(0.22,1,0.36,1), height 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease',
                   backfaceVisibility: 'hidden',
@@ -255,6 +258,10 @@ export default function ScreenPlane({
                 <div className="flex-1 overflow-hidden">
                   <ScreenSection id={slot.id} greeting={greeting} showName={false} />
                 </div>
+
+                {/* Hologram layer (prototype, #9): scanlines, a sweeping sheen
+                    and an accent edge glow over the resting window. */}
+                {!isFocused && <div aria-hidden className="cv-holo-layer" />}
               </div>
             </RevealStaticContext.Provider>
           </ScreenContextBridge>

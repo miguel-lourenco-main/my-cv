@@ -360,3 +360,55 @@ html {
 .cv-screen-surface::-webkit-scrollbar-track {
   background: transparent;
 }
+/* ── Holographic windows (prototype, #9) ─────────────────────────────── */
+.cv-holo {
+  animation: cv-holo-flicker 6s steps(1) infinite;
+}
+.cv-holo-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  border-radius: inherit;
+  /* accent edge glow */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--holo) 55%, transparent),
+    inset 0 0 60px -10px color-mix(in srgb, var(--holo) 45%, transparent);
+  /* fine scanlines */
+  background-image: repeating-linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--holo) 14%, transparent) 0 1px,
+    transparent 1px 4px
+  );
+  mix-blend-mode: screen;
+  overflow: hidden;
+}
+/* a light band sweeping down the projection */
+.cv-holo-layer::after {
+  content: '';
+  position: absolute;
+  inset: -40% 0 auto 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--holo) 22%, transparent) 50%,
+    transparent
+  );
+  animation: cv-holo-sweep 5.5s linear infinite;
+}
+@keyframes cv-holo-sweep {
+  to { transform: translateY(350%); }
+}
+@keyframes cv-holo-flicker {
+  0%, 100% { filter: none; }
+  41% { filter: brightness(1.18) saturate(1.2); }
+  42% { filter: none; }
+  77% { filter: brightness(0.86); }
+  78% { filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-holo,
+  .cv-holo-layer::after {
+    animation: none;
+  }
+}
