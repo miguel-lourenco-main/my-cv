@@ -283,6 +283,7 @@ export function ProjectExpandedCard({
             <div className="w-full relative">
               <ProjectCarousel
                 images={project.images}
+                video={project.video}
                 screenshotMode={localScreenshotMode}
               />
               {/* Screenshot mode toggle button in top-right corner of carousel */}
