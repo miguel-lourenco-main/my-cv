@@ -154,8 +154,9 @@ export default function Shell3D({ greeting }: { greeting: string }) {
 
       <AmbientHud focusedId={focusedId} onBack={clear} />
       {/* The themed reticle is for steering; on the real page use the native
-          cursor, and hide it entirely during the intro. */}
-      {!pageId && introDone && <SpaceCursor focused={!!focusedId} />}
+          cursor, and hide it entirely during the intro. It stays mounted while
+          hidden so it reappears at the pointer as soon as the page closes. */}
+      {introDone && <SpaceCursor focused={!!focusedId} hidden={!!pageId} />}
 
       {/* Branded loading/intro sequence, revealing the space when it finishes. */}
       {!introDone && <IntroSequence onDone={handleIntroDone} />}

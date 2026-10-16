@@ -9,7 +9,15 @@ import { useEffect, useRef, useState } from 'react'
  * floating windows. Shrinks to a tight reticle while a screen is focused so it
  * doesn't obstruct reading/interaction.
  */
-export default function SpaceCursor({ focused }: { focused: boolean }) {
+export default function SpaceCursor({
+  focused,
+  hidden = false,
+}: {
+  focused: boolean
+  /** Hide without unmounting (e.g. over the full-screen 2D page), so the reticle
+   *  keeps tracking the pointer and reappears in place, with no mouse move needed. */
+  hidden?: boolean
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const target = useRef({ x: -100, y: -100 })
   const pos = useRef({ x: -100, y: -100 })
@@ -67,7 +75,7 @@ export default function SpaceCursor({ focused }: { focused: boolean }) {
       ref={ref}
       aria-hidden
       className="cv-cursor pointer-events-none fixed left-0 top-0 z-[70]"
-      style={{ opacity: visible ? 1 : 0 }}
+      style={{ opacity: visible && !hidden ? 1 : 0 }}
     >
       <div className="cv-cursor-inner" style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
         <svg className="cv-cursor-ring" width="46" height="46" viewBox="-23 -23 46 46">
