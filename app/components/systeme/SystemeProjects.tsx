@@ -97,13 +97,15 @@ export default function SystemeProjects() {
 
   const onOpen = useCallback((p: Project) => setActive(p), [])
 
+  // `#output` (rail + nav target) is the Featured section just above; this is
+  // the full archive that follows it.
   return (
-    <section ref={scope} id="output" className="relative min-h-[100svh] bg-[var(--sys-bg)]">
+    <section ref={scope} id="output-all" className="relative min-h-[100svh] bg-[var(--sys-bg)]">
       <div className="mx-auto max-w-7xl px-6 pt-24 lg:px-10 lg:pt-16">
         <header className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div>
             <div className="sys-mono mb-2 text-[11px] uppercase tracking-[0.3em] text-[var(--sys-muted)]">
-              03 / <span className="sys-accent">{tn('sections.output')}</span>
+              03.2 / <span className="sys-accent">{tn('sections.output')}</span>
             </div>
             <h2 className="sys-display text-3xl font-semibold tracking-tight sm:text-4xl">{tp('title')}</h2>
           </div>

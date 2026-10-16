@@ -13,6 +13,7 @@ import SystemeContact from './SystemeContact'
 // Deferred (ssr:false) so its i18n project-namespace loading runs after the
 // TranslationProvider has initialised — mirrors the original Projects mount.
 const SystemeProjects = dynamic(() => import('./SystemeProjects'), { ssr: false })
+const SystemeFeatured = dynamic(() => import('./SystemeFeatured'), { ssr: false })
 
 /**
  * Top-level composition for the Systeme art direction — a single full-viewport
@@ -38,6 +39,7 @@ export default function SystemeHome() {
           <div data-lenis-content>
             <SystemeHero started={started} />
             <SystemeAbout />
+            <SystemeFeatured />
             <SystemeProjects />
             <SystemeContact />
           </div>
