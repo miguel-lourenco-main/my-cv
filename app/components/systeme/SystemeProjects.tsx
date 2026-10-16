@@ -10,7 +10,9 @@ import type { Project } from '../projects/projects.types'
 import { getProjectCoverImageByMode, type ProjectScreenshotMode } from '../projects/project-images'
 import {
   AFFILIATION_ALL,
+  AFFILIATION_FEATURED,
   AFFILIATION_PERSONAL,
+  FEATURED_PROJECT_IDS,
   deriveCompanyFilterOptions,
   filterProjectsByAffiliation,
   resolveCompanyFields,
@@ -40,15 +42,25 @@ export default function SystemeProjects() {
   const allProjects = useMemo(() => resolveProjectsWithImages(manifest), [manifest])
 
   const [screenshotMode] = useState<ProjectScreenshotMode>('dark')
-  const [affiliation, setAffiliation] = useState<AffiliationFilterValue>(AFFILIATION_ALL)
+  // Open on the hand-picked projects; "All" is one click away.
+  const hasFeatured = FEATURED_PROJECT_IDS.length > 0
+  const [affiliation, setAffiliation] = useState<AffiliationFilterValue>(
+    hasFeatured ? AFFILIATION_FEATURED : AFFILIATION_ALL
+  )
   const [active, setActive] = useState<Project | null>(null)
   const [isDesktop, setIsDesktop] = useState(false)
 
   const companyOptions = useMemo(() => deriveCompanyFilterOptions(allProjects), [allProjects])
-  const displayed = useMemo(
-    () => sortProjects(filterProjectsByAffiliation(allProjects, affiliation), 'recent'),
-    [allProjects, affiliation]
-  )
+  const displayed = useMemo(() => {
+    const filtered = filterProjectsByAffiliation(allProjects, affiliation)
+    // Featured keeps its curated order; every other filter sorts by recency.
+    if (affiliation === AFFILIATION_FEATURED) {
+      return [...filtered].sort(
+        (a, b) => FEATURED_PROJECT_IDS.indexOf(a.id) - FEATURED_PROJECT_IDS.indexOf(b.id)
+      )
+    }
+    return sortProjects(filtered, 'recent')
+  }, [allProjects, affiliation])
 
   useEffect(() => {
     // Guard: i18next may not be initialised on the very first tick.
@@ -90,6 +102,7 @@ export default function SystemeProjects() {
   )
 
   const filters: { id: AffiliationFilterValue; label: string }[] = [
+    ...(hasFeatured ? [{ id: AFFILIATION_FEATURED as AffiliationFilterValue, label: tp('browse.featured') }] : []),
     { id: AFFILIATION_ALL, label: tp('browse.all') },
     { id: AFFILIATION_PERSONAL, label: tp('browse.personal') },
     ...companyOptions.map((c) => ({ id: c.id as AffiliationFilterValue, label: c.name })),

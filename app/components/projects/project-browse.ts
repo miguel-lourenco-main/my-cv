@@ -25,10 +25,13 @@ export function getFeaturedProjects(projects: Project[]): Project[] {
 export const AFFILIATION_ALL = "all" as const;
 /** Reserved id — not used as a company name */
 export const AFFILIATION_PERSONAL = "__personal__" as const;
+/** Reserved id — the hand-picked {@link FEATURED_PROJECT_IDS} */
+export const AFFILIATION_FEATURED = "__featured__" as const;
 
 export type AffiliationFilterValue =
   | typeof AFFILIATION_ALL
   | typeof AFFILIATION_PERSONAL
+  | typeof AFFILIATION_FEATURED
   | string;
 
 export type ProjectSortMode = "recent" | "start_asc";
@@ -83,6 +86,7 @@ export function filterProjectsByAffiliation(
   selection: AffiliationFilterValue,
 ): Project[] {
   if (selection === AFFILIATION_ALL) return projects;
+  if (selection === AFFILIATION_FEATURED) return projects.filter(isFeaturedProject);
   if (selection === AFFILIATION_PERSONAL) {
     return projects.filter((p) => p.type !== "professional");
   }
