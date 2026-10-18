@@ -179,9 +179,12 @@ export function ProjectExpandedCard({
             aria-label={getProjectString(project, "title")}
             layoutId={`card-${getProjectString(project, "title")}-${id}`}
             // Opt out of Lenis smooth scrolling so wheel/touch events scroll
-            // the dialog itself instead of the page behind it.
+            // the dialog itself instead of the page behind it. The dialog is
+            // the *only* scroll container inside the modal (no nested panes),
+            // and `overscroll-contain` stops scroll chaining to the page once
+            // it reaches either end.
             data-lenis-prevent
-            className="relative w-full scrollbar-none max-w-[900px] h-full md:max-h-[90%] p-6 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 md:rounded-3xl overflow-y-auto shadow-lg z-50"
+            className="relative w-full scrollbar-none max-w-[900px] h-full md:max-h-[90%] p-6 flex flex-col gap-y-4 bg-white dark:bg-neutral-900 md:rounded-3xl overflow-y-auto overscroll-contain shadow-lg z-50"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
@@ -296,17 +299,12 @@ export function ProjectExpandedCard({
               </div>
             </div>
 
-            <div
-              className={cn(
-                "flex flex-col overflow-hidden min-h-[600px]",
-                // Desktop keeps the existing "fill remaining space" behavior
-                "sm:flex-1 space-y-8",
-                // Mobile: increase size, but keep it reasonable (two panes)
-                "max-sm:min-h-[90svh]"
-              )}
-            >
-              {/* Tabs pane (mobile: 1 viewport tall) */}
-              <div className="relative flex flex-col gap-4">
+            {/* Tabs + tab content. The content flows inside the dialog's own
+                scroll instead of a nested scroll pane, so the wheel/touch
+                scroll is captured consistently wherever the pointer is. */}
+            <div className="flex flex-col space-y-8">
+              {/* Tabs bar: stays reachable while reading long content */}
+              <div className="sticky -top-6 z-[65] -mx-6 px-6 pt-2 bg-white dark:bg-neutral-900">
                 <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
                   <button
                     type="button"
@@ -340,13 +338,13 @@ export function ProjectExpandedCard({
                 </div>
               </div>
 
-              {/* Content pane (mobile: 1 viewport tall) */}
+              {/* Content pane */}
               <div
                 ref={tabContentAnchorRef}
-                className="relative flex-1 min-h-0 sm:ml-4"
+                className="relative sm:ml-4"
               >
                 {activeTab === "info" && (
-                  <div className="h-full overflow-y-auto pr-2 space-y-6">
+                  <div className="pr-2 space-y-6">
                     <GitlabReadmeViewer projectId={project.id} />
                   </div>
                 )}
@@ -355,7 +353,7 @@ export function ProjectExpandedCard({
                   project.details?.personalExperience &&
                   (project.details.personalExperience.text ||
                     project.details.personalExperience.textKey) && (
-                    <div className="h-full overflow-y-auto pr-1">
+                    <div className="pr-1">
                       <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
                         {getProjectString(
                           { ...project.details.personalExperience, id: project.id },
