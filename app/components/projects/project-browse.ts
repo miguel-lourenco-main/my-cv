@@ -1,5 +1,26 @@
 import type { Project, ProjectCompany } from "./projects.types";
 
+/**
+ * Projects to put in front of visitors first, in display order.
+ * Edit this list to change what is featured; ids must match `projectsData`.
+ */
+export const FEATURED_PROJECT_IDS: readonly string[] = [
+  "job-ai-hub",
+  "sonora",
+  "cash-register",
+];
+
+export function isFeaturedProject(project: Project): boolean {
+  return FEATURED_PROJECT_IDS.includes(project.id);
+}
+
+/** Featured projects in {@link FEATURED_PROJECT_IDS} order (unknown ids skipped). */
+export function getFeaturedProjects(projects: Project[]): Project[] {
+  return FEATURED_PROJECT_IDS.map((id) => projects.find((p) => p.id === id)).filter(
+    (p): p is Project => p !== undefined,
+  );
+}
+
 /** Single-select browse filter: all projects, personal-only, or one employer company name */
 export const AFFILIATION_ALL = "all" as const;
 /** Reserved id — not used as a company name */

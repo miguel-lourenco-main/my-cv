@@ -46,6 +46,11 @@
     "madeFor": "Réalisé pour {{company}}",
     "madeFreelance": "Réalisé en freelance"
   },
+  "featured": {
+    "title": "À la une",
+    "lead": "Les projets que je vous montrerais en premier — ceux que je préfère et dont je suis le plus sûr.",
+    "details": "Détails du projet"
+  },
   "browse": {
     "all": "Tous",
     "personal": "Personnels"
