@@ -21,7 +21,8 @@ function SectionBody({
       // Only one copy may own the shared `intro-name` layoutId — the 2D page.
       return <Hero showShared={showName} greeting={greeting} isLaptop={false} />
     case 'tech':
-      return <About isLaptop={false} />
+      // The HUD stage already titles this screen "Tech Stack"; drop the duplicate.
+      return <About isLaptop={false} showTitle={false} />
     case 'projects':
       return <Projects isLaptop={false} />
     case 'contact':

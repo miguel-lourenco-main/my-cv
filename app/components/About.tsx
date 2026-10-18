@@ -9,7 +9,14 @@ import { useI18n } from "../lib/i18n";
 import { useMobileDetection } from "../lib/use-mobile-detection";
 import { getSectionClasses } from "../lib/use-section-classes";
 
-export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
+export default function About({
+  isLaptop = false,
+  showTitle = true,
+}: {
+  isLaptop?: boolean;
+  /** False where a surrounding frame already titles the section (3D screens). */
+  showTitle?: boolean;
+}) {
   const { t } = useI18n();
   const { isMobile, isPhone } = useMobileDetection();
   const ta = t('about');
@@ -51,7 +58,7 @@ export default function About({ isLaptop = false }: { isLaptop?: boolean }) {
   return (
     <TechStackDemoProvider>
       <section id="technical-skills" className={sectionClasses}>
-        {titleWrapper}
+        {showTitle && titleWrapper}
         {renderCards("grid grid-cols-1 gap-12 lg:hidden block", 0.1, 0.06)}
         <div className="lg:block hidden w-full sm:w-[95%] lg:w-[90%] xl:w-[85%] 2xl:w-[90%]">
           {renderCards("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12", 0.2, 0)}

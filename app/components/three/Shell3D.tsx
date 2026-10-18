@@ -104,22 +104,29 @@ export default function Shell3D({ greeting }: { greeting: string }) {
     return () => window.clearTimeout(t)
   }, [pageId])
 
-  // While focused, arrow keys jump to the adjacent screen in that direction.
+  // While focused, step to the adjacent screen in a direction (arrow keys and
+  // the on-screen guide arrows). Returns false when there's no screen that way.
+  const navigate = useCallback(
+    (dir: LookDirection): boolean => {
+      if (!focusedId) return false
+      const next = neighborScreen(focusedId, dir)
+      if (!next) return false
+      setSlideDir(DIR_VEC[dir])
+      setFocusedId(next)
+      return true
+    },
+    [focusedId]
+  )
+
   useEffect(() => {
     if (!focusedId) return
     const onKey = (e: KeyboardEvent) => {
       const dir = ARROW_DIR[e.key]
-      if (!dir) return
-      const next = neighborScreen(focusedId, dir)
-      if (next) {
-        e.preventDefault()
-        setSlideDir(DIR_VEC[dir])
-        setFocusedId(next)
-      }
+      if (dir && navigate(dir)) e.preventDefault()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [focusedId])
+  }, [focusedId, navigate])
 
   // Debug/QA hooks so the focus flow can be driven headlessly (e.g. Playwright).
   useEffect(() => {
@@ -152,10 +159,11 @@ export default function Shell3D({ greeting }: { greeting: string }) {
         {pageId && <FocusedPage key={pageId} id={pageId} greeting={greeting} dir={slideDir} />}
       </AnimatePresence>
 
-      <AmbientHud focusedId={focusedId} onBack={clear} />
+      <AmbientHud focusedId={focusedId} onBack={clear} onNavigate={navigate} />
       {/* The themed reticle is for steering; on the real page use the native
-          cursor, and hide it entirely during the intro. */}
-      {!pageId && introDone && <SpaceCursor focused={!!focusedId} />}
+          cursor, and hide it entirely during the intro. It stays mounted while
+          hidden so it reappears at the pointer as soon as the page closes. */}
+      {introDone && <SpaceCursor focused={!!focusedId} hidden={!!pageId} />}
 
       {/* Branded loading/intro sequence, revealing the space when it finishes. */}
       {!introDone && <IntroSequence onDone={handleIntroDone} />}

@@ -34,7 +34,12 @@ export default function CameraRig({
   const cam = useRef<PerspectiveCameraImpl>(null)
   const idleFactor = useRef(0)
   const dollyZ = useRef(0)
-  const introStart = useRef<number | null>(null)
+  // Own time bases, accumulated from the clamped frame delta. R3F resets
+  // `clock.elapsedTime` to 0 whenever the frameloop changes (the canvas pauses
+  // while a full-screen page is open, and on tab visibility changes), which made
+  // the clock-based fly-in replay from a huge offset after every close.
+  const introElapsed = useRef<number | null>(null)
+  const driftTime = useRef(0)
   const keys = useRef({ left: false, right: false, up: false, down: false })
   const gl = useThree((s) => s.gl)
 
@@ -97,7 +102,7 @@ export default function CameraRig({
     }
   }, [lookRef])
 
-  useFrame((threeState, delta) => {
+  useFrame((_threeState, delta) => {
     const group = rig.current
     if (!group) return
     const state = lookRef.current
@@ -126,14 +131,16 @@ export default function CameraRig({
     const steering = state.active || k.left || k.right || k.up || k.down
     const idle = !steering && performance.now() - state.lastInteractionMs > 2600 ? 1 : 0
     damp(idleFactor, 'current', idle, 0.6, dt)
-    const t = threeState.clock.elapsedTime
+    driftTime.current += dt
+    const t = driftTime.current
     const driftYaw = idleFactor.current * Math.sin(t * 0.06) * 0.03
     const driftPitch = idleFactor.current * Math.sin(t * 0.045 + 1.3) * 0.014
 
     // Establishing fly-in: held off-centre + pulled back during the intro, then
     // eases home over ~2.4s (easeOutCubic) once the intro reveals the scene.
-    if (revealed && introStart.current === null) introStart.current = t
-    const introP = introStart.current === null ? 0 : Math.min(1, (t - introStart.current) / 2.4)
+    // Plays exactly once per mount, and is immune to frameloop clock resets.
+    if (revealed) introElapsed.current = (introElapsed.current ?? 0) + Math.min(delta, 0.1)
+    const introP = introElapsed.current === null ? 0 : Math.min(1, introElapsed.current / 2.4)
     const introRemain = Math.pow(1 - introP, 3)
     const introYaw = introRemain * 0.55
     const introPitch = introRemain * 0.24
