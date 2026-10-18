@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import {
   filterProjectImagesByMode,
@@ -8,6 +8,8 @@ import {
 } from "./project-images";
 import { assetPath } from "../../lib/asset-path";
 import { useI18n } from "../../lib/i18n";
+import { useReducedMotion } from "../../lib/use-reduced-motion";
+import type { ProjectVideo } from "./projects.types";
 
 /**
  * Image carousel component for project galleries.
@@ -17,6 +19,9 @@ import { useI18n } from "../../lib/i18n";
  * @param props - ProjectCarousel component props
  * @param props.images - Array of image paths (supports _L.png and _D.png suffixes for theme variants)
  * @param props.screenshotMode - User-selected screenshot mode (light or dark)
+ * @param props.video - Optional walkthrough video, shown as the first slide. It
+ *   plays (muted) while its slide is selected — unless the user prefers reduced
+ *   motion — and pauses when the user slides on to the screenshots.
  * 
  * @example
  * ```tsx
@@ -26,21 +31,42 @@ import { useI18n } from "../../lib/i18n";
 export function ProjectCarousel({
   images,
   screenshotMode = "dark",
+  video,
 }: {
   images: string[];
   screenshotMode?: ProjectScreenshotMode;
+  video?: ProjectVideo;
 }) {
   const { t } = useI18n();
   const tp = t("projects");
+  const reducedMotion = useReducedMotion();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Filter images to the selected mode (light/dark), collapsing L/D pairs.
   const filteredImages = useMemo(() => {
     return filterProjectImagesByMode(images, screenshotMode);
   }, [images, screenshotMode]);
+
+  // Slide 0 is the video when there is one; images follow it.
+  const videoOffset = video ? 1 : 0;
+  const slideCount = filteredImages.length + videoOffset;
+
+  // Play the video only while its slide is showing.
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (selectedIndex === 0 && !reducedMotion) {
+      void el.play().catch(() => {
+        /* autoplay blocked: the native controls still let the user start it */
+      });
+    } else {
+      el.pause();
+    }
+  }, [selectedIndex, reducedMotion]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -56,12 +82,32 @@ export function ProjectCarousel({
     <div className="w-full">
       <div className="relative overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800" ref={emblaRef}>
         <div className="flex">
+          {video && (
+            <div className="min-w-0 flex-[0_0_100%]" key="video">
+              <video
+                ref={videoRef}
+                className="w-full h-60 md:h-72 lg:h-80 object-cover bg-black"
+                poster={video.poster ? assetPath(video.poster) : undefined}
+                muted
+                loop
+                playsInline
+                controls
+                preload="metadata"
+                aria-label={tp("carousel.video")}
+              >
+                {video.sources?.map((s) => (
+                  <source key={s.src} src={assetPath(s.src)} type={s.type} />
+                ))}
+                <source src={assetPath(video.src)} />
+              </video>
+            </div>
+          )}
           {filteredImages.map((src, idx) => (
             <div className="min-w-0 flex-[0_0_100%]" key={`${src}-${idx}`}>
               <img
                 src={assetPath(src)}
-                alt={tp("carousel.slide", { n: idx + 1 })}
-                loading={idx === selectedIndex ? "eager" : "lazy"}
+                alt={tp("carousel.slide", { n: idx + 1 + videoOffset })}
+                loading={idx + videoOffset === selectedIndex ? "eager" : "lazy"}
                 decoding="async"
                 className="w-full h-60 md:h-72 lg:h-80 object-cover cursor-zoom-in"
                 onClick={() => {
@@ -74,15 +120,25 @@ export function ProjectCarousel({
         </div>
       </div>
       <div className="flex items-center justify-between mt-3">
-        <div className="flex gap-2">
-          {filteredImages.map((_, idx) => (
-            <button
-              key={`dot-${idx}`}
-              className={`h-2 w-2 rounded-full ${selectedIndex === idx ? "bg-slate-900 dark:bg-slate-100" : "bg-slate-300 dark:bg-slate-700"}`}
-              aria-label={tp("carousel.goToSlide", { n: idx + 1 })}
-              onClick={() => emblaApi?.scrollTo(idx)}
-            />
-          ))}
+        <div className="flex items-center gap-2">
+          {Array.from({ length: slideCount }, (_, idx) =>
+            video && idx === 0 ? (
+              // The video's dot is a small play triangle so it reads as "the video".
+              <button
+                key="dot-video"
+                className={`h-0 w-0 border-y-[5px] border-l-[8px] border-y-transparent ${selectedIndex === 0 ? "border-l-slate-900 dark:border-l-slate-100" : "border-l-slate-300 dark:border-l-slate-700"}`}
+                aria-label={tp("carousel.goToVideo")}
+                onClick={() => emblaApi?.scrollTo(0)}
+              />
+            ) : (
+              <button
+                key={`dot-${idx}`}
+                className={`h-2 w-2 rounded-full ${selectedIndex === idx ? "bg-slate-900 dark:bg-slate-100" : "bg-slate-300 dark:bg-slate-700"}`}
+                aria-label={tp("carousel.goToSlide", { n: idx + 1 })}
+                onClick={() => emblaApi?.scrollTo(idx)}
+              />
+            )
+          )}
         </div>
         <div className="flex gap-2 text-background">
           <button

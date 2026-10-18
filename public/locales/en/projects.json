@@ -69,6 +69,8 @@
     "prev": "Prev",
     "next": "Next",
     "slide": "Slide {{n}}",
+    "video": "Walkthrough video",
+    "goToVideo": "Go to video",
     "goToSlide": "Go to slide {{n}}",
     "previousImage": "Previous image",
     "nextImage": "Next image",

@@ -9,6 +9,19 @@ export type ProjectTechnology = {
 };
 
 /**
+ * A walkthrough video shown as the first slide of the project's media carousel.
+ * Paths are public paths, e.g. '/projects_videos/sonora/demo.mp4'.
+ */
+export type ProjectVideo = {
+  /** Video file (mp4/H.264 plays everywhere; webm is a good smaller second choice). */
+  src: string;
+  /** Optional still shown before playback; defaults to the first frame. */
+  poster?: string;
+  /** Optional extra sources (e.g. a webm next to the mp4), tried before `src`. */
+  sources?: { src: string; type: string }[];
+};
+
+/**
  * Where the project is deployed/hosted.
  */
 export type ProjectDeployment = "gitlab_pages" | "vercel" | "none";
@@ -139,6 +152,11 @@ export type Project = {
    * - Or just filenames (e.g. 'main_page_L.png')
    */
   imagesFirst?: string[];
+  /**
+   * Optional walkthrough video of someone using the app. When set it is the
+   * first media slide in the project dialog; the screenshots follow it.
+   */
+  video?: ProjectVideo;
   /** Optional project logo path, e.g. '/projects/logos/project-logo.svg' */
   logo?: string;
   /** Project website URL */
