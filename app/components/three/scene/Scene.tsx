@@ -7,6 +7,7 @@ import { createLookState, FOCUS_VIEW_DISTANCE, type LookState } from '../camera/
 import { SCREEN_LAYOUT, SCREEN_RADIUS } from '../camera/layout'
 import { FocusContext, type FocusValue } from '../screens/FocusContext'
 import ScreensGroup from '../screens/ScreensGroup'
+import HoloBeams from '../screens/HoloBeams'
 import SpaceEnvironment from '../space/SpaceEnvironment'
 import PostFX from '../fx/PostFX'
 import type { BridgedContexts } from '../ScreenContextBridge'
@@ -77,6 +78,7 @@ export default function Scene({
         <pointLight position={[0, 1, -6]} intensity={20} color="#88aaff" />
 
         <ScreensGroup bridged={bridged} greeting={greeting} />
+        <HoloBeams />
         <SpaceEnvironment />
         <PostFX />
       </FocusContext.Provider>
