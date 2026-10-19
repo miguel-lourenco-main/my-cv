@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "export": "next export",
-    "generate-images": "node scripts/generate-images-manifest.js"
+    "generate-images": "node scripts/generate-images-manifest.js",
+    "record-videos": "node scripts/record-project-videos.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -45,6 +46,7 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
+    "playwright-core": "1.62.1",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
