@@ -154,7 +154,8 @@ export type Project = {
   imagesFirst?: string[];
   /**
    * Optional walkthrough video of someone using the app. When set it is the
-   * first media slide in the project dialog; the screenshots follow it.
+   * first media slide in the project dialog and, for featured projects, in the
+   * Featured viewer (lazy-loaded, muted loop); the screenshots follow it.
    */
   video?: ProjectVideo;
   /** Optional project logo path, e.g. '/projects/logos/project-logo.svg' */
