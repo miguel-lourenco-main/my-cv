@@ -76,6 +76,8 @@
     "slide": "Imagen {{n}}",
     "video": "Vídeo de demostración",
     "goToVideo": "Ir al vídeo",
+    "pauseVideo": "Pausar vídeo",
+    "playVideo": "Reproducir vídeo",
     "goToSlide": "Ir a la imagen {{n}}",
     "previousImage": "Imagen anterior",
     "nextImage": "Imagen siguiente",
