@@ -25,33 +25,46 @@ const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/cs
   ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".woff2": "font/woff2", ".txt": "text/plain" };
 const MODELS = ["llama3.1:8b", "qwen2.5:7b", "mistral:7b"];
 
-// Q1 is a neutral general-knowledge question (the "general chat" feature);
-// Q2 is a follow-up that only makes sense with the conversation's context,
-// asked after switching the model.
+// ONE demo data set, re-seeded off camera before every clip:
+// - two older chats, "Docker volumes" and "Haiku about Lisbon", each with its own
+//   matching answer (the mock answers by prompt, not by turn number);
+// - the main conversation "TCP vs UDP": Q1 on llama3.1:8b, then the context-
+//   dependent follow-up Q2 after switching to qwen2.5:7b.
 const QUESTIONS = [
   "Summarize the difference between TCP and UDP in 3 bullets",
   "Which one would you use for a video call, and why?",
 ];
-const ANSWERS = [
-  [
+const EXTRA_Q = ["Explain Docker volumes", "Write a haiku about Lisbon"];
+const ANSWERS = {
+  [QUESTIONS[0]]: [
     "Here is the gist:\n\n",
     "- TCP is connection-oriented: it sets up a session and guarantees complete, ordered delivery\n",
     "- UDP is connectionless: it fires off independent datagrams with no delivery or ordering guarantees\n",
     "- TCP trades latency for reliability; UDP trades reliability for speed\n\n",
     "Use TCP for web pages, files and email, and UDP for games, voice and live video.",
   ].join(""),
-  [
+  [QUESTIONS[1]]: [
     "UDP, in most cases:\n\n",
     "1. A late video frame is useless, so retransmitting it (as TCP would) only adds lag\n",
     "2. Losing a few packets causes a brief glitch, which beats a frozen picture\n",
     "3. WebRTC runs over UDP and adds its own lightweight error correction\n\n",
     "TCP is kept as a fallback for networks that block UDP.",
   ].join(""),
-];
-// The app repaints the streamed answer only when the accumulated length hits a
-// multiple of 32, so the first 32 characters go out as one chunk: the
-// "Thinking" skeleton is replaced by text straight away instead of jumping.
-const THINK_MS = [0, 0];
+  [EXTRA_Q[0]]: [
+    "A Docker volume is storage that lives outside a container's writable layer:\n\n",
+    "- It survives when the container is removed or recreated\n",
+    "- Several containers can mount the same volume to share data\n",
+    "- Docker manages it under /var/lib/docker/volumes, unlike a bind mount\n\n",
+    "Create one with docker volume create data and mount it with -v data:/app/data.",
+  ].join(""),
+  [EXTRA_Q[1]]: [
+    "Here is one:\n\n",
+    "Yellow tram climbs slow\n",
+    "past tiled walls the river light\n",
+    "fado in the dusk",
+  ].join(""),
+};
+const tail = (q) => ANSWERS[q].slice(-14);
 
 function serve(port) {
   const cors = {
@@ -71,20 +84,19 @@ function serve(port) {
         return res.end(JSON.stringify({ object: "list", data: MODELS.map((id) => ({ id, object: "model" })) }));
       }
       if (req.url.startsWith("/v1/chat/completions")) {
-        // The answer depends on how many user turns the conversation has, not on a
-        // server-wide counter, so every segment (its own browser context) and any
-        // re-recording gets the same answer for the same question.
+        // The answer depends only on the last user prompt, so every chat gets its
+        // own matching answer in every segment and re-recording.
         let body = "";
         req.on("data", (b) => { body += b; });
         req.on("end", () => {
-          let turn = 1;
-          try { turn = JSON.parse(body).messages.filter((m) => m.role === "user").length; } catch {}
-          const text = ANSWERS[Math.min(Math.max(turn, 1), ANSWERS.length) - 1];
+          let q = "";
+          try { q = JSON.parse(body).messages.filter((m) => m.role === "user").pop().content; } catch {}
+          if (typeof q !== "string") q = JSON.stringify(q);
+          const text = ANSWERS[q.trim()] ?? ANSWERS[QUESTIONS[0]];
           res.writeHead(200, { ...cors, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" });
           // One character per chunk after the first 32 (see THINK_MS above).
           const chars = [...text];
           const chunks = [chars.slice(0, 32).join(""), ...chars.slice(32)];
-          const think = THINK_MS[Math.min(Math.max(turn, 1), THINK_MS.length) - 1];
           let i = 0;
           const tick = () => {
             if (i >= chunks.length) {
@@ -95,7 +107,7 @@ function serve(port) {
             res.write(`data: ${JSON.stringify(delta)}\n\n`);
             setTimeout(tick, 8);
           };
-          setTimeout(tick, think); // a short "thinking" beat before the first token
+          setTimeout(tick, 0);
         });
         return;
       }
@@ -145,7 +157,7 @@ const DECORATE = () => {
         transform-origin: 4px 2px; transition: scale .12s ease; filter: drop-shadow(0 1px 3px rgba(0,0,0,.9)); }
       .__flow_ripple { position: fixed; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%;
         border: 2px solid rgba(96,165,250,.95); background: rgba(96,165,250,.25); pointer-events: none;
-        z-index: 2147483646; animation: __flow_ripple .5s ease-out forwards; }
+        z-index: 2147483646; animation: __flow_ripple .28s ease-out forwards; }
       @keyframes __flow_ripple { from { transform: scale(.6); opacity: 1; } to { transform: scale(2.6); opacity: 0; } }
       html:has(a[href^="/chat"] > svg.lucide-arrow-left) body { zoom: 1.3; }
       html:has(a[href^="/chat"] > svg.lucide-arrow-left) .container { max-width: 740px !important; }
@@ -168,15 +180,25 @@ const DECORATE = () => {
       r.style.left = `${e.clientX}px`;
       r.style.top = `${e.clientY}px`;
       document.documentElement.appendChild(r);
-      setTimeout(() => r.remove(), 600);
+      setTimeout(() => r.remove(), 300);
     }, true);
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply);
   else apply();
 };
 
-/** Send the composer's text and wait until the user bubble is on screen. */
-const EXTRA_Q = ["Explain Docker volumes", "Write a haiku about Lisbon"];
+/** Wait for the streamed answer to `q` to finish and be fully on screen. */
+async function waitAnswer(page, q) {
+  await page.waitForFunction(() => !/generating/i.test(document.body.innerText), null, { timeout: 30000 }).catch(() => {});
+  await page.getByText(tail(q), { exact: false }).last().waitFor({ state: "visible", timeout: 15000 }).catch(() => {});
+}
+
+async function send(h, composer, question) {
+  const { page } = h;
+  await composer.press("Enter");
+  await page.getByText(question, { exact: true }).last().waitFor({ state: "visible", timeout: 10000 });
+  await h.wait(300);
+}
 
 /** Off camera: ask a question in a fresh chat and wait for the answer. */
 async function ask(h, question) {
@@ -184,28 +206,11 @@ async function ask(h, question) {
   const composer = page.locator("textarea:visible").first();
   await page.getByRole("button", { name: "New Chat" }).last().click();
   await composer.waitFor({ state: "visible" });
+  await h.wait(200);
   await composer.fill(question);
   await send(h, composer, question);
-  await answered(page);
-  // The full mock answer must be on screen before the clip starts (no half-streamed head frames).
-  await page.getByText(/live video\./).last().waitFor({ state: "visible", timeout: 15000 }).catch(() => {});
-  await h.wait(500);
-}
-
-/** Off camera: the full two-exchange conversation on qwen2.5:7b, titled. Every clip after model-switch starts from this. */
-async function seedConvo(h, title = "TCP vs UDP") {
-  const { page } = h;
-  await ask(h, QUESTIONS[0]);
-  await page.getByRole("combobox").filter({ hasText: "llama3.1:8b" }).click();
-  await page.getByRole("option", { name: "qwen2.5:7b" }).click();
-  const composer = page.locator("textarea:visible").first();
-  await composer.fill(QUESTIONS[1]);
-  await send(h, composer, QUESTIONS[1]);
-  await answered(page);
-  await page.getByText(/block UDP\./).last().waitFor({ state: "visible", timeout: 15000 }).catch(() => {});
+  await waitAnswer(page, question);
   await h.wait(400);
-  await rename(h, title);
-  await pinBottom(page);
 }
 
 /** Off camera: give the newest "New chat" a real title (the app never auto-titles). */
@@ -219,16 +224,39 @@ async function rename(h, title) {
   await page.locator("button.group", { hasText: title }).first().waitFor({ state: "visible" });
 }
 
-async function send(h, composer, question) {
-  const { page } = h;
-  await composer.press("Enter");
-  await page.getByText(question, { exact: true }).last().waitFor({ state: "visible", timeout: 10000 });
-  await h.wait(300); // let the bubble + "Thinking" layout settle
+/** Off camera: collapse the sidebar's "Yesterday" group (it only holds a "coming next" placeholder). */
+async function collapseYesterday(page) {
+  const ph = page.getByText("Grouped history coming next").first();
+  if (await ph.isVisible().catch(() => false)) {
+    await page.getByRole("button", { name: "Yesterday" }).first().click().catch(() => {});
+    await ph.waitFor({ state: "hidden", timeout: 2000 }).catch(() => {});
+  }
 }
 
-/** Wait for the streamed answer to finish (the composer shows "generating…" meanwhile). */
-const answered = (page) =>
-  page.waitForFunction(() => !/generating/i.test(document.body.innerText), null, { timeout: 30000 }).catch(() => {});
+/** Off camera: the two older chats of the demo data set. Every clip starts with them. */
+async function seedHistory(h) {
+  await ask(h, EXTRA_Q[0]);
+  await rename(h, "Docker volumes");
+  await ask(h, EXTRA_Q[1]);
+  await rename(h, "Haiku about Lisbon");
+  await collapseYesterday(h.page);
+}
+
+/** Off camera: the full two-exchange "TCP vs UDP" conversation on qwen2.5:7b. */
+async function seedConvo(h, title = "TCP vs UDP") {
+  const { page } = h;
+  await ask(h, QUESTIONS[0]);
+  await page.getByRole("combobox").filter({ hasText: "llama3.1:8b" }).click();
+  await page.getByRole("option", { name: "qwen2.5:7b" }).click();
+  const composer = page.locator("textarea:visible").first();
+  await composer.fill(QUESTIONS[1]);
+  await send(h, composer, QUESTIONS[1]);
+  await waitAnswer(page, QUESTIONS[1]);
+  await h.wait(400);
+  await rename(h, title);
+  await collapseYesterday(page);
+  await pinBottom(page);
+}
 
 /** Pin the message list to the bottom so a new bubble and its answer grow in place. */
 const pinBottom = (page) =>
@@ -243,7 +271,8 @@ export default {
   target: 35,
   pacing: { featureLead: 100, navDwell: 800 },
   colorScheme: "dark",
-  posterFrom: { segment: "model-switch", at: -0.5 }, // both exchanges fully streamed, qwen2.5:7b selected
+  // The end of the chat clip: the whole TCP/UDP answer on screen, cursor parked in the gutter.
+  posterFrom: { segment: "chat", at: -0.3 },
   server: ({ port }) => ({
     command: process.execPath,
     args: [fileURLToPath(import.meta.url), "--serve", String(port)],
@@ -273,6 +302,7 @@ export default {
       title: "New chat, streamed answer",
       priority: 1,
       async before(h) {
+        await seedHistory(h);
         await h.page.getByRole("button", { name: "New Chat" }).last().click();
         const composer = h.page.locator("textarea:visible").first();
         await composer.waitFor({ state: "visible" });
@@ -287,9 +317,9 @@ export default {
         await composer.pressSequentially(QUESTIONS[0], { delay: 12 });
         await composer.press("Enter");
         await page.getByText(QUESTIONS[0], { exact: true }).last().waitFor({ state: "visible", timeout: 10000 });
-        await answered(page);
-        await page.getByText(/live video\./).last().waitFor({ state: "visible", timeout: 15000 }).catch(() => {});
-        await h.beat(800);
+        await waitAnswer(page, QUESTIONS[0]);
+        await h.moveTo(1180, 470, 220); // park the cursor in the gutter for the poster frame
+        await h.beat(700);
       },
     },
     {
@@ -297,6 +327,7 @@ export default {
       title: "Switch model mid-conversation, context-aware follow-up",
       priority: 2,
       async before(h) {
+        await seedHistory(h);
         await ask(h, QUESTIONS[0]);
         await pinBottom(h.page);
         await h.moveTo(640, 700, 16);
@@ -304,14 +335,13 @@ export default {
       async run(h) {
         const { page } = h;
         const composer = page.locator("textarea:visible").first();
-        await h.click(page.getByRole("combobox").filter({ hasText: "llama3.1:8b" }), { pause: 300, move: 200 });
+        await h.click(page.getByRole("combobox").filter({ hasText: "llama3.1:8b" }), { pause: 400, move: 200 });
         await h.click(page.getByRole("option", { name: "qwen2.5:7b" }), { pause: 60, move: 160 });
         await pinBottom(page);
         await composer.pressSequentially(QUESTIONS[1], { delay: 12 });
         await composer.press("Enter");
         await page.getByText(QUESTIONS[1], { exact: true }).last().waitFor({ state: "visible", timeout: 10000 });
-        await answered(page);
-        await page.getByText(/block UDP\./).last().waitFor({ state: "visible", timeout: 15000 }).catch(() => {});
+        await waitAnswer(page, QUESTIONS[1]);
         await pinBottom(page);
         await h.beat(700);
       },
@@ -321,27 +351,41 @@ export default {
       title: "Settings: provider status, proxy vs local, model and key",
       priority: 3,
       async before(h) {
+        const { page } = h;
+        await seedHistory(h);
         await seedConvo(h);
-        await h.page.locator('button[aria-haspopup="menu"]:visible').evaluateAll((els) => {
+        await page.locator('button[aria-haspopup="menu"]:visible').evaluateAll((els) => {
           const top = els.filter((e) => e.getBoundingClientRect().top < 60).sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left)[0];
           top?.setAttribute("data-rec", "more");
         });
+        // Warm the /admin route off camera (Next prefetches the link once the menu shows it),
+        // so the on-camera click lands on the page without a loading frame.
+        await page.locator('[data-rec="more"]').click();
+        await page.getByRole("menuitem", { name: "Settings" }).hover();
+        await page.evaluate((u) => fetch(u).catch(() => {}), new URL("/admin/", page.url()).href);
+        await h.wait(900);
+        await page.keyboard.press("Escape");
+        await h.wait(300);
         await h.moveTo(900, 200, 16);
       },
       async run(h) {
         const { page } = h;
         await h.click(page.locator('[data-rec="more"]'), { pause: 40, move: 160 });
-        await h.click(page.getByRole("menuitem", { name: "Settings" }), { pause: 40, move: 140, navDwell: 100 });
+        await h.click(page.getByRole("menuitem", { name: "Settings" }), { pause: 0, move: 140, navDwell: 0 });
         await page.getByText("Local (Ollama)").first().waitFor({ state: "visible" });
-        await h.waitForStill(1200);
+        await h.beat(500);
+        await h.click(page.getByText("Local (Ollama)").first(), { pause: 0, move: 300 });
+        await h.beat(900); // Status now reads "Ollama via local"
+        await h.click(page.getByText(/Proxy \(recommended\)/).first(), { pause: 0, move: 220 });
+        await h.beat(700); // proxy options (LiteLLM, Helicone, OpenRouter, Cloudflare) are on screen
+        // Choosing Proxy resets the model to the app's default, which this server does not
+        // serve: pick one of the models discovered from /v1/models, then save.
+        await h.glide(page.locator("#ai-model"), { offset: 150, ms: 450 });
+        await h.click(page.locator("#ai-model"), { pause: 300, move: 200 });
+        await h.click(page.getByRole("option", { name: "qwen2.5:7b", exact: true }), { pause: 100, move: 140 });
+        await h.glide(page.getByRole("button", { name: "Save Changes" }), { offset: 520, ms: 450, pause: 120 });
+        await h.click(page.getByRole("button", { name: "Save Changes" }), { pause: 0, move: 220 });
         await h.beat(900);
-        await h.click(page.getByText("Local (Ollama)").first(), { pause: 0, move: 160 });
-        await h.beat(900);
-        await h.click(page.getByText(/Proxy \(recommended\)/).first(), { pause: 0, move: 160 });
-        await h.click(page.getByText("Proxy options (click to learn more)"), { pause: 0, move: 140 });
-        await h.beat(900);
-        await h.glide(page.getByLabel("API Key").or(page.locator("#ai-model")).first(), { offset: 200, ms: 450 }).catch(() => {});
-        await h.beat(800);
       },
     },
     {
@@ -349,10 +393,7 @@ export default {
       title: "Local chat history and search",
       priority: 4,
       async before(h) {
-        await ask(h, EXTRA_Q[0]);
-        await rename(h, "Docker volumes");
-        await ask(h, EXTRA_Q[1]);
-        await rename(h, "Haiku about Lisbon");
+        await seedHistory(h);
         await seedConvo(h);
         await h.wait(300);
         await h.moveTo(160, 400, 16);
@@ -360,11 +401,12 @@ export default {
       async run(h) {
         const { page } = h;
         await h.click(page.locator("button.group", { hasText: "Haiku about Lisbon" }).first(), { pause: 0, move: 200 });
-        await h.beat(600);
+        await h.beat(800);
         await h.click(page.getByPlaceholder("Search chats..."), { pause: 0, move: 160 });
         await page.getByPlaceholder("Search chats...").pressSequentially("tcp", { delay: 30 });
-        await h.beat(500);
+        await h.beat(600);
         await h.click(page.locator("button.group", { hasText: "TCP vs UDP" }).first(), { pause: 0, move: 160 });
+        await pinBottom(page);
         await h.beat(800);
       },
     },
@@ -373,6 +415,7 @@ export default {
       title: "Light / dark theme toggle",
       priority: 5,
       async before(h) {
+        await seedHistory(h);
         await seedConvo(h);
         await h.moveTo(900, 400, 16);
       },
@@ -381,7 +424,7 @@ export default {
         const toggle = page.getByRole("button", { name: "Theme" }).first();
         await h.click(toggle, { pause: 40, move: 160 });
         await h.click(page.getByRole("menuitemradio", { name: "Light" }), { pause: 0, move: 120 });
-        await h.beat(900);
+        await h.beat(1000);
         await h.click(toggle, { pause: 40, move: 140 });
         await h.click(page.getByRole("menuitemradio", { name: "Dark" }), { pause: 0, move: 120 });
         await h.beat(300);
@@ -392,19 +435,24 @@ export default {
       title: "Command-center layout",
       priority: 6,
       async before(h) {
+        const { page } = h;
+        await seedHistory(h);
         await seedConvo(h);
         // Cut (off camera) into the command-center layout; its load shows an empty "No chats yet" flash, so it stays off camera.
-        await h.page.goto(h.page.url().replace(/\/chat\/.*$/, "/chat/command-center/"), { waitUntil: "networkidle" });
-        await h.page.locator("button.group", { hasText: "TCP vs UDP" }).first().click().catch(() => {});
+        await page.goto(page.url().replace(/\/chat\/.*$/, "/chat/command-center/"), { waitUntil: "networkidle" });
+        await page.locator("button.group", { hasText: "TCP vs UDP" }).first().click().catch(() => {});
+        await collapseYesterday(page);
         await h.wait(600);
+        await pinBottom(page);
         await h.moveTo(640, 400, 16);
       },
       async run(h) {
         const { page } = h;
-        await h.hover(page.getByRole("link", { name: "Chat" }).first(), 160);
-        await h.beat(350);
-        await h.hover(page.getByRole("link", { name: "Admin" }).first(), 160);
-        await h.beat(450);
+        // Same chat engine, second layout: open another stored chat here, then the rail.
+        await h.click(page.locator("button.group", { hasText: "Docker volumes" }).first(), { pause: 0, move: 240 });
+        await h.beat(900);
+        await h.hover(page.getByRole("link", { name: "Admin" }).first(), 220);
+        await h.beat(900);
       },
     },
   ],

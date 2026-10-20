@@ -1,101 +1,101 @@
 {
   "id": "sonora",
-  "composedAt": "2026-10-20T10:59:34.150Z",
-  "target": 30,
+  "composedAt": "2026-10-20T22:27:08.018Z",
+  "target": 40,
   "tolerance": 0.1,
   "bounds": [
-    27,
-    33
+    36,
+    44
   ],
   "xfade": 0,
-  "total": 27.08,
+  "total": 41.8,
   "status": "ok",
-  "marketingShare": 0.19,
+  "marketingShare": 0.17,
   "included": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 5.12,
+      "duration": 6.96,
       "start": 0,
-      "end": 5.12
+      "end": 6.96
     },
     {
       "key": "player",
       "kind": "feature",
       "title": "Narrated player with word-by-word highlighting",
       "priority": 1,
-      "duration": 4.88,
-      "start": 5.12,
-      "end": 10
+      "duration": 7.92,
+      "start": 6.96,
+      "end": 14.88
     },
     {
       "key": "choices",
       "kind": "feature",
       "title": "In-player branching choice",
       "priority": 2,
-      "duration": 3.84,
-      "start": 10,
-      "end": 13.84
+      "duration": 3.04,
+      "start": 14.88,
+      "end": 17.92
+    },
+    {
+      "key": "chapter-3",
+      "kind": "feature",
+      "title": "The chosen path: chapter 3 narration",
+      "priority": 3,
+      "duration": 3.8,
+      "start": 17.92,
+      "end": 21.72
     },
     {
       "key": "library",
       "kind": "feature",
-      "title": "Library: search, genre filter, open a story",
-      "priority": 3,
-      "duration": 3.92,
-      "start": 13.84,
-      "end": 17.76
+      "title": "Library: genre filter, search, open a story",
+      "priority": 4,
+      "duration": 6.84,
+      "start": 21.72,
+      "end": 28.56
     },
     {
       "key": "story-detail",
       "kind": "feature",
       "title": "Story page with the branching-paths map",
-      "priority": 4,
-      "duration": 2.96,
-      "start": 17.76,
-      "end": 20.72
+      "priority": 5,
+      "duration": 6.92,
+      "start": 28.56,
+      "end": 35.48
     },
     {
       "key": "voices",
       "kind": "feature",
       "title": "Voice Studio: bring your own narrator",
-      "priority": 5,
-      "duration": 3.4,
-      "start": 20.72,
-      "end": 24.12
-    },
-    {
-      "key": "dark-mode",
-      "kind": "feature",
-      "title": "Light and dark theme",
       "priority": 6,
-      "duration": 2.96,
-      "start": 24.12,
-      "end": 27.08
+      "duration": 6.32,
+      "start": 35.48,
+      "end": 41.8
     }
   ],
   "dropped": [],
   "missing": [],
   "clips": {
-    "marketing": 5.12,
-    "player": 4.88,
-    "choices": 3.84,
-    "library": 3.92,
-    "story-detail": 2.96,
-    "voices": 3.4,
-    "dark-mode": 2.96
+    "marketing": 6.96,
+    "player": 7.92,
+    "choices": 3.04,
+    "chapter-3": 3.8,
+    "library": 6.84,
+    "story-detail": 6.92,
+    "voices": 6.32
   },
   "poster": {
     "segment": "marketing",
     "at": 1
   },
   "files": {
-    "mp4": 2980117,
-    "webm": 1728283,
-    "poster": 133819,
-    "mp4Crf": 23,
+    "mp4": 2746190,
+    "webm": 2126282,
+    "poster": 129898,
+    "mp4Crf": 25,
     "webmCrf": 38
   }
 }

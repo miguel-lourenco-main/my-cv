@@ -1,0 +1,111 @@
+{
+  "id": "cash-register",
+  "composedAt": "2026-10-20T22:33:58.540Z",
+  "target": 33,
+  "tolerance": 0.1,
+  "bounds": [
+    29.7,
+    36.3
+  ],
+  "xfade": 0,
+  "total": 33.2,
+  "status": "ok",
+  "marketingShare": 0,
+  "included": [
+    {
+      "key": "take-order",
+      "kind": "feature",
+      "title": "Taking an order: drinks, search, food, quantity",
+      "priority": 1,
+      "duration": 8.96,
+      "start": 0,
+      "end": 8.96
+    },
+    {
+      "key": "payment",
+      "kind": "feature",
+      "title": "Payment: cash, change due",
+      "priority": 2,
+      "duration": 2.76,
+      "start": 8.96,
+      "end": 11.72
+    },
+    {
+      "key": "payment-done",
+      "kind": "feature",
+      "title": "Payment: confirmation",
+      "priority": 2,
+      "duration": 1.4,
+      "start": 11.72,
+      "end": 13.12
+    },
+    {
+      "key": "orders-dashboard",
+      "kind": "feature",
+      "title": "Orders dashboard: KPIs and charts",
+      "priority": 3,
+      "duration": 4.52,
+      "start": 13.12,
+      "end": 17.64
+    },
+    {
+      "key": "order-details",
+      "kind": "feature",
+      "title": "Order history: details drawer",
+      "priority": 4,
+      "duration": 2.88,
+      "start": 17.64,
+      "end": 20.52
+    },
+    {
+      "key": "order-filters",
+      "kind": "feature",
+      "title": "Sort and filter the order history",
+      "priority": 5,
+      "duration": 3.68,
+      "start": 20.52,
+      "end": 24.2
+    },
+    {
+      "key": "products-admin",
+      "kind": "feature",
+      "title": "Admin: edit a menu item",
+      "priority": 6,
+      "duration": 6.28,
+      "start": 24.2,
+      "end": 30.48
+    },
+    {
+      "key": "shift-summary",
+      "kind": "feature",
+      "title": "End shift: shift summary",
+      "priority": 7,
+      "duration": 2.72,
+      "start": 30.48,
+      "end": 33.2
+    }
+  ],
+  "dropped": [],
+  "missing": [],
+  "clips": {
+    "take-order": 8.96,
+    "payment": 2.76,
+    "payment-done": 1.4,
+    "orders-dashboard": 4.52,
+    "order-details": 2.88,
+    "order-filters": 3.68,
+    "products-admin": 6.28,
+    "shift-summary": 2.72
+  },
+  "poster": {
+    "segment": "take-order",
+    "at": 8.56
+  },
+  "files": {
+    "mp4": 2720429,
+    "webm": 1833450,
+    "poster": 148455,
+    "mp4Crf": 23,
+    "webmCrf": 38
+  }
+}

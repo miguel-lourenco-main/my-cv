@@ -1,90 +1,90 @@
 {
   "id": "agentic-hub",
-  "composedAt": "2026-10-20T10:39:34.498Z",
-  "target": 40,
+  "composedAt": "2026-10-20T22:41:29.408Z",
+  "target": 26,
   "tolerance": 0.1,
   "bounds": [
-    36,
-    44
+    23.4,
+    28.6
   ],
   "xfade": 0,
-  "total": 38.64,
+  "total": 26.08,
   "status": "ok",
-  "marketingShare": 0.19,
+  "marketingShare": 0.2,
   "included": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 7.48,
+      "duration": 5.16,
       "start": 0,
-      "end": 7.48
+      "end": 5.16
     },
     {
       "key": "browse",
       "kind": "feature",
       "title": "Search results, rating filter, sort, open an agent",
       "priority": 1,
-      "duration": 8.92,
-      "start": 7.48,
-      "end": 16.4
+      "duration": 4.72,
+      "start": 5.16,
+      "end": 9.88
     },
     {
       "key": "hire",
       "kind": "feature",
       "title": "Hire an agent: buy credits with a live total",
       "priority": 2,
-      "duration": 4.68,
-      "start": 16.4,
-      "end": 21.08
+      "duration": 3.72,
+      "start": 9.88,
+      "end": 13.6
     },
     {
       "key": "invest",
       "kind": "feature",
       "title": "Invest in an agent: two-step share purchase",
       "priority": 3,
-      "duration": 5.8,
-      "start": 21.08,
-      "end": 26.88
+      "duration": 3.32,
+      "start": 13.6,
+      "end": 16.92
     },
     {
       "key": "token-activity",
       "kind": "feature",
       "title": "Performance metrics, agent token chart, live activity",
       "priority": 4,
-      "duration": 3.92,
-      "start": 26.88,
-      "end": 30.8
+      "duration": 4.8,
+      "start": 16.92,
+      "end": 21.72
     },
     {
       "key": "api",
       "kind": "feature",
       "title": "API docs and playground: send a request",
       "priority": 5,
-      "duration": 7.84,
-      "start": 30.8,
-      "end": 38.64
+      "duration": 4.36,
+      "start": 21.72,
+      "end": 26.08
     }
   ],
   "dropped": [],
   "missing": [],
   "clips": {
-    "marketing": 7.48,
-    "browse": 8.92,
-    "hire": 4.68,
-    "invest": 5.8,
-    "token-activity": 3.92,
-    "api": 7.84
+    "marketing": 5.16,
+    "browse": 4.72,
+    "hire": 3.72,
+    "invest": 3.32,
+    "token-activity": 4.8,
+    "api": 4.36
   },
   "poster": {
     "segment": "marketing",
     "at": 1
   },
   "files": {
-    "mp4": 3006842,
-    "webm": 1706304,
-    "poster": 82738,
+    "mp4": 2038626,
+    "webm": 1285558,
+    "poster": 80808,
     "mp4Crf": 23,
     "webmCrf": 38
   }

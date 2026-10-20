@@ -1,0 +1,101 @@
+{
+  "id": "oflat",
+  "composedAt": "2026-10-20T22:32:00.039Z",
+  "target": 25.4,
+  "tolerance": 0.1,
+  "bounds": [
+    22.86,
+    27.94
+  ],
+  "xfade": 0,
+  "total": 25.36,
+  "status": "ok",
+  "marketingShare": 0,
+  "included": [
+    {
+      "key": "turing-machine",
+      "kind": "feature",
+      "title": "Turing machine: step-by-step acceptance and rejection on the tape",
+      "priority": 1,
+      "duration": 7.28,
+      "start": 0,
+      "end": 7.28
+    },
+    {
+      "key": "dfa",
+      "kind": "feature",
+      "title": "Finite automaton: test a word, accepted and rejected",
+      "priority": 2,
+      "duration": 4.8,
+      "start": 7.28,
+      "end": 12.08
+    },
+    {
+      "key": "regex",
+      "kind": "feature",
+      "title": "Regular expression converted into an automaton",
+      "priority": 3,
+      "duration": 2.52,
+      "start": 12.08,
+      "end": 14.6
+    },
+    {
+      "key": "determinize",
+      "kind": "feature",
+      "title": "Make a non-deterministic automaton deterministic",
+      "priority": 4,
+      "duration": 2.56,
+      "start": 14.6,
+      "end": 17.16
+    },
+    {
+      "key": "state-analysis",
+      "kind": "feature",
+      "title": "Analysis: useful states painted, useless states removed",
+      "priority": 5,
+      "duration": 3.72,
+      "start": 17.16,
+      "end": 20.88
+    },
+    {
+      "key": "generate-words",
+      "kind": "feature",
+      "title": "Generate every accepted word up to a length",
+      "priority": 6,
+      "duration": 2.28,
+      "start": 20.88,
+      "end": 23.16
+    },
+    {
+      "key": "dark-theme",
+      "kind": "feature",
+      "title": "Dark theme",
+      "priority": 7,
+      "duration": 2.2,
+      "start": 23.16,
+      "end": 25.36
+    }
+  ],
+  "dropped": [],
+  "missing": [],
+  "clips": {
+    "turing-machine": 7.28,
+    "dfa": 4.8,
+    "regex": 2.52,
+    "determinize": 2.56,
+    "state-analysis": 3.72,
+    "generate-words": 2.28,
+    "dark-theme": 2.2
+  },
+  "poster": {
+    "segment": "turing-machine",
+    "at": 6.28
+  },
+  "files": {
+    "mp4": 835276,
+    "webm": 636482,
+    "poster": 73569,
+    "mp4Crf": 23,
+    "webmCrf": 38
+  }
+}

@@ -1,59 +1,336 @@
-// Live: the Vercel landing mounts the app's real components on in-memory demo
-// records (no account): inheritance map, resume editor, rehearsal scoring, the
-// job inbox. The signed-in app needs Supabase + a login, so the pipeline (Kanban)
-// and the AI chat are shown as captioned stills from the CV gallery
-// (public/projects_images/job-ai-hub/).
+// job-ai-hub: the landing (Vercel) for the marketing slides and the three widgets that
+// mount the app's own components on demo records (inheritance map, résumé editor,
+// rehearsal), plus the SIGNED-IN APP run locally (next dev on the flow port against the
+// local Supabase stack of ../personal-job-hunt-hub) on a seeded demo account.
 //
-// The page scrolls inside <main> (html/body are overflow:hidden). The hero is a
-// pinned, scroll-driven section: the first screen is only the "Job AI Hub"
-// wordmark, and the headline, copy and CTAs build in over the first ~1000 px.
+// DEMO DATA (one set, everywhere): the account is "A. Candidate" (a.candidate@demo.jobaihub.test),
+// the same specimen the landing's widgets use: job profiles "Platform engineering" and
+// "Founding backend"; applications Halden Systems (interviewing), Corvid Labs (applied, letter
+// attached, match 84), Tenring (saved), plus Larkspur Health, Pellow Analytics, Ostrava Freight;
+// agent postings Quillon (82) and Marrow & Finch (73). Attachments match the landing's inheritance
+// map: Halden résumé + letter + interview set, Corvid résumé + letter, Tenring résumé + interview set
+// (so base camp reads "2 of 5 open applications have nothing attached": Larkspur and Pellow).
+// The assistant clip asks for a Tenring letter; /api/chat is mocked with that one reply (the
+// real generate_cover_letter tool result shape), and Save goes through the app's real action.
+// The Halden interview run uses the landing
+// rehearsal's three questions and its rubric (Problem framing / Trade-offs / Specifics, marks
+// 4/3/5 -> 80/60/100). Every company and person is fictional. seedDemo() resets the account to
+// exactly this state; it runs in setup() and again before every app clip (clips mutate data).
+// Nothing of the owner's real account is filmed: the old gallery stills are gone.
 //
-// Segments: marketing (hero build-in + 3 quick slides, CTA hover) then one clip
-// per live component. Every feature opens already framed on its section
-// (before() jumps there off camera).
-import fs from "node:fs";
+// The landing scrolls inside <main> (html/body are overflow:hidden); the app scrolls inside a
+// flex-1 overflow-y-auto div (tagged #__app_sc off camera).
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 
-const IMG_DIR = new URL("../../public/projects_images/job-ai-hub/", import.meta.url);
-const dataUrl = (f) => `data:image/png;base64,${fs.readFileSync(new URL(f, IMG_DIR)).toString("base64")}`;
+const HUB = path.resolve(new URL("../../..", import.meta.url).pathname, "personal-job-hunt-hub");
+const DB_CONTAINER = "supabase_db_v0-job-hunting-platform";
+const LANDING = "https://v0-job-hunting-platform-two.vercel.app/";
+let APP = "http://localhost:4109";
+const NAV = 56; // landing <main> runs under the fixed 56 px nav.
 
-// Stills of the signed-in app (2560x1266 captures); each still is one or more crops
-// [x, y, w, h] in image px laid out side by side. Every crop starts right of the sidebar
-// (x > 260), whose footer shows the account owner's name.
-// `blur` boxes [x, y, w, h] in image px hide the real company name / dates of the capture
-// (the stills show the owner's real application; the video must carry demo data only).
-const STILLS = {
-  pipeline: {
-    file: "job_applications_L.png",
-    crops: [[430, 60, 1180, 340]],
-    blur: [[836, 222, 98, 24], [850, 270, 50, 20]],
-    label: "The applications pipeline",
-    ms: 1400,
+// ---------------------------------------------------------------------------
+// Demo data
+// ---------------------------------------------------------------------------
+
+const DEMO = {
+  uid: "de000000-0000-4000-8000-000000000001",
+  email: "a.candidate@demo.jobaihub.test",
+  password: "demo-only-password-2026",
+};
+
+const U = DEMO.uid;
+const q = (s) => (s === null || s === undefined ? "NULL" : `'${String(s).replace(/'/g, "''")}'`);
+const arr = (a) => `ARRAY[${a.map(q).join(",")}]::text[]`;
+
+const WEIGHTS = { role_match: 0.35, seniority_fit: 0.2, location_fit: 0.2, work_mode_fit: 0.15, recency: 0.1 };
+const breakdownJson = (b) =>
+  b ? JSON.stringify(b.map(([id, score, evidence, rule]) => ({ id, score, weight: WEIGHTS[id], ...(id === "recency" ? {} : { evidence: evidence || "" }), ...(rule ? { rule } : {}) }))) : null;
+
+const APPS = [
+  {
+    id: "demo-app-halden", role: "Senior Platform Engineer", company: "Halden Systems", location: "Remote (EU)", status: "interviewing",
+    date: "2026-10-02", salary: "€85k – €100k", platform: "Greenhouse", jp: "demo-jp-platform", regime: "Remote", next: "System design · Oct 23",
+    stack: ["Go", "PostgreSQL", "Kafka", "Kubernetes", "Terraform"], score: 91,
+    reason: "Ingestion-heavy Postgres, remote in the EU, and it asks for the reconciliation work from your last two roles. No on-call named — your hard limit.",
   },
-  interview: {
-    file: "interview_L.png",
-    crops: [[590, 60, 1030, 640]],
-    blur: [],
-    label: "Practice interviews",
-    ms: 1400,
+  {
+    id: "demo-app-corvid", role: "Backend Engineer", company: "Corvid Labs", location: "Lisbon, Portugal", status: "applied",
+    date: "2026-10-09", salary: "€60k – €72k", platform: "Ashby", jp: "demo-jp-platform", regime: "Hybrid", next: "Recruiter screen",
+    stack: ["Rust", "PostgreSQL", "Kafka", "gRPC", "AWS"], score: 84,
+    reason: "Rust and event pipelines, and it ramps people into the stack. Marked down: hybrid three days in a city you did not list.",
+    soft: ["Ownership", "Written communication"],
+    breakdown: [["role_match", 92, "Build and run the event pipeline that turns sensor data into billing records"], ["seniority_fit", 90, "early career welcome"],
+      ["location_fit", 70, null, "Lisbon, three days a week: not a city this job profile lists"], ["work_mode_fit", 65, "Hybrid, three days a week"], ["recency", 100]],
+    seniority: "Mid-level", employment: "Full-time",
+    responsibilities: "- Build and run the event pipeline that turns sensor data into billing records\n- Own two Rust services end to end, from design review to on-call handover\n- Work with product on the reconciliation reports customers download every night",
+    requirements: "- 3+ years writing backend services in production\n- Rust, or a strong systems language and the will to learn it\n- PostgreSQL schema design and query tuning\n- Event streaming (Kafka or similar)",
+    good: "- gRPC service contracts\n- Terraform on AWS",
+    benefits: "Hybrid, three days a week in the Lisbon office. Learning budget, 25 days of holiday.",
   },
-  chat: {
-    file: "ai_chat_L.png",
-    // chat column (from the first "Thought process" chip down) + the whole result panel
-    crops: [[920, 286, 690, 866], [2130, 54, 420, 540]],
-    blur: [[985, 606, 110, 23], [1065, 747, 95, 18], [1126, 792, 98, 18], [1018, 370, 262, 17], [2163, 219, 124, 20], [2437, 360, 82, 18]],
-    label: "AI chat files the application",
-    ms: 1600,
+  {
+    id: "demo-app-tenring", role: "Staff Engineer, Infrastructure", company: "Tenring", location: "Lisbon, Portugal", status: "saved",
+    date: "2026-10-14", salary: "€95k – €115k", platform: "Lever", jp: "demo-jp-founding", regime: "Hybrid",
+    stack: ["Kubernetes", "Terraform", "Go", "PostgreSQL"], score: 78,
+    reason: "Seniority and stack fit. Marked down: pre-Series-A, and you said no more sub-20 orgs.",
   },
-  application: {
-    file: "id_job_application_L.png",
-    crops: [[430, 70, 1960, 780]],
-    blur: [[474, 112, 98, 22], [452, 457, 100, 22]],
-    label: "Application: job post scraped into fields",
-    ms: 1500,
+  {
+    id: "demo-app-larkspur", role: "Senior Backend Engineer", company: "Larkspur Health", location: "Porto, Portugal", status: "applied",
+    date: "2026-10-06", salary: "€70k – €85k", platform: "Company site", jp: "demo-jp-founding", regime: "Hybrid", next: "Awaiting reply",
+    stack: ["TypeScript", "Node.js", "PostgreSQL"], score: 80,
+  },
+  {
+    id: "demo-app-pellow", role: "Platform Engineer", company: "Pellow Analytics", location: "Remote (EU)", status: "offer",
+    date: "2026-09-18", salary: "€80k – €92k", platform: "Referral", jp: "demo-jp-platform", regime: "Remote", next: "Reply to offer by Oct 27",
+    stack: ["Go", "PostgreSQL", "AWS"], score: 86,
+  },
+  {
+    id: "demo-app-ostrava", role: "Data Platform Engineer", company: "Ostrava Freight", location: "Berlin, Germany", status: "rejected",
+    date: "2026-09-10", platform: "LinkedIn", jp: "demo-jp-platform", regime: "On-site",
+    stack: ["Python", "Airflow", "Snowflake"], score: 64,
+  },
+  {
+    id: "demo-app-quillon", role: "Site Reliability Engineer", company: "Quillon", location: "Remote (EU)", status: "captured",
+    date: "2026-10-19", platform: "Greenhouse", jp: "demo-jp-platform", regime: "Remote",
+    stack: ["Go", "Prometheus", "Kubernetes"], score: 82,
+    reason: "SRE work on a Postgres-heavy platform, fully remote in the EU. Marked down: a weekly on-call rotation.",
+    breakdown: [["role_match", 85, "Keep a Postgres-heavy platform fast and boring"], ["seniority_fit", 80, "5+ years in production operations"],
+      ["location_fit", 95, "Remote within the EU"], ["work_mode_fit", 70, null, "weekly on-call rotation, your hard limit"], ["recency", 70]],
+  },
+  {
+    id: "demo-app-marrow", role: "Backend Engineer, Payments", company: "Marrow & Finch", location: "Lisbon, Portugal", status: "captured",
+    date: "2026-10-20", platform: "Ashby", jp: "demo-jp-founding", regime: "Hybrid",
+    stack: ["Kotlin", "PostgreSQL", "Kafka"], score: 73,
+    reason: "Payments ledger and reconciliation, your strongest work. Marked down: Kotlin, which is not on your profile.",
+    breakdown: [["role_match", 70, "Kotlin services behind our payments ledger"], ["seniority_fit", 80, "Mid to senior"],
+      ["location_fit", 85, "Lisbon or Porto office"], ["work_mode_fit", 60, "Hybrid, three days a week"], ["recency", 65]],
+  },
+];
+
+
+const RUBRIC = [
+  { label: "Problem framing", description: "Names the constraint before the fix.", weight: 0.34 },
+  { label: "Trade-offs", description: "Says what the choice cost.", weight: 0.33 },
+  { label: "Specifics", description: "Numbers and named systems, not generalities.", weight: 0.33 },
+];
+const RUN = [
+  { q: "demo-q-recon", marks: [4, 3, 5], t: 134,
+    said: "The constraint was the lock, not the query. I moved it to a streaming diff and it went from 40 minutes to 6.",
+    notes: ["Named the constraint before the fix", "Chose, but did not say what it cost", "Numbers, twice, unprompted"] },
+  { q: "demo-q-migration", marks: [5, 4, 3], t: 112,
+    said: "Two days in, the dual-write lag was three times what we had modelled, so I stopped it and wrote up why.",
+    notes: ["Opened on what was at stake", "Said what stopping cost the quarter", "One figure, then generalities"] },
+  { q: "demo-q-kafka", marks: [3, 4, 4], t: 161,
+    said: "At your volume it is vacuum, not throughput. Partition by day and the bloat stops compounding.",
+    notes: ["Reached the real problem late", "Weighed partitioning against a re-platform", "Specific to their stack"] },
+].map((r) => ({ ...r, score: Math.round((r.marks.reduce((a, b) => a + b, 0) / 15) * 100), fb: r.notes.join(". ") + "." }));
+const OVERALL = Math.round(RUN.reduce((a, r) => a + r.score, 0) / RUN.length);
+const SUMMARY = "Strong on specifics and framing. Say what each choice cost before the interviewer asks.";
+const FEEDBACK = {
+  overallScore: OVERALL,
+  summary: SUMMARY,
+  strengths: ["Numbers, unprompted", "Names the constraint before the fix"],
+  areasForImprovement: ["State the trade-off out loud", "Reach the real problem sooner"],
+  questionFeedback: RUN.map((r) => ({
+    questionId: r.q, score: r.score, feedback: r.fb, correctnessAssessment: "correct",
+    parameterScores: RUBRIC.map((p, i) => ({ ...p, score: r.marks[i] * 20, maxScore: 100, feedback: r.notes[i] })),
+  })),
+};
+
+const CHAT = {
+  conv: "de000000-0000-4000-8000-0000000000c1",
+  title: "Letter for Tenring",
+  prompt: "Draft a letter for Tenring",
+  reply: "Your Tenring letter is ready. Read it, then save it.",
+  draft: {
+    title: "Tenring · Staff Engineer, Infrastructure",
+    content: "Dear Tenring team,\n\nI moved three services to Kubernetes on Terraform-managed clusters, and gave a cron nobody owned a named owner.\n\nA. Candidate",
+    tone: "professional",
+    keySkills: ["Kubernetes", "Terraform", "PostgreSQL"],
+    softSkills: ["Ownership"],
+    applicationId: "demo-app-tenring",
+    company: "Tenring",
+    role: "Staff Engineer, Infrastructure",
   },
 };
 
-const NAV = 56; // <main> runs under the fixed 56 px nav.
+/**
+ * Off camera: answer POST /api/chat at once with a pre-written turn, in the AI SDK UI message
+ * stream format the real route emits: one generate_cover_letter call whose output is the same
+ * shape the real tool returns (a cover-letter draft card), then one sentence. No model is called
+ * and nothing streams on camera. The title route is answered too (it would call a model).
+ */
+async function mockChat(page) {
+  const d = CHAT.draft;
+  const chunks = [
+    { type: "start", messageId: "demo-msg-assistant-1", messageMetadata: { conversationId: CHAT.conv } },
+    { type: "start-step" },
+    { type: "tool-input-available", toolCallId: "demo-call-1", toolName: "generate_cover_letter",
+      input: { title: d.title, company: d.company, jobTitle: d.role, applicationId: d.applicationId, tone: d.tone, keySkills: d.keySkills, softSkills: d.softSkills, language: "English" } },
+    { type: "tool-output-available", toolCallId: "demo-call-1", output: { success: true, saved: false, data: d, artifact: { type: "cover-letter-draft", data: d } } },
+    { type: "finish-step" },
+    { type: "start-step" },
+    { type: "text-start", id: "demo-text-1" },
+    { type: "text-delta", id: "demo-text-1", delta: CHAT.reply },
+    { type: "text-end", id: "demo-text-1" },
+    { type: "finish-step" },
+    { type: "finish" },
+  ];
+  const body = chunks.map((c) => `data: ${JSON.stringify(c)}\n\n`).join("") + "data: [DONE]\n\n";
+  await page.route("**/api/chat", (r) =>
+    r.request().method() !== "POST"
+      ? r.continue()
+      : r.fulfill({
+          status: 200,
+          headers: { "content-type": "text/event-stream", "cache-control": "no-cache", "x-vercel-ai-ui-message-stream": "v1", "X-Conversation-Id": CHAT.conv, "X-Chat-Persistence": "ok" },
+          body,
+        }));
+  await page.route("**/api/chat/conversations/*/generate-title", (r) =>
+    r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ title: CHAT.title }) }));
+}
+
+/** A tailored résumé (synthetic): contact, summary, one experience entry. Same shape the editor writes. */
+function resumeBody(tag, summary, bullets) {
+  let n = 0;
+  const id = (k) => `${k}-demo-${tag}-${++n}`;
+  const para = (lines) => ({ id: id("p"), style: {}, blocks: lines.map((t) => ({ id: id("blk"), runs: [{ text: t }], type: "p", align: "left", indent: 0 })), titleHidden: false });
+  const sec = (role, title, subs) => ({ id: id("sec"), role, style: {}, title, subsections: subs, styleOverrideEnabled: false });
+  const sub = (extra, lines) => ({ id: id("sub"), style: {}, title: "", ...extra, paragraphs: [para(lines)], inheritEntryStyle: true });
+  return {
+    sections: [
+      sec("header", "Contact", [sub({ title: "A. Candidate" }, [DEMO.email, "Porto, Portugal"])]),
+      sec("summary", "Summary", [sub({}, [summary])]),
+      sec("experience", "Experience", [sub({ title: "Data Platform Engineer", subtitle: "Northwind Data", dateStart: "2021", dateEnd: "Present" }, bullets)]),
+    ],
+  };
+}
+const RESUMES = [
+  { id: "demo-rdoc-halden", app: "demo-app-halden", jp: "demo-jp-platform", title: "Résumé · Halden Systems",
+    summary: "Platform engineer, six years on ingestion-heavy Postgres. Remote in the EU.",
+    bullets: ["Cut a nightly reconciliation from 40 minutes to 6 with a streaming diff", "Ran Kafka-to-Postgres ingestion at 2 TB a day"] },
+  { id: "demo-rdoc-corvid", app: "demo-app-corvid", jp: "demo-jp-platform", title: "Résumé · Corvid Labs",
+    summary: "Backend engineer: Rust services and event pipelines, from design review to on-call handover.",
+    bullets: ["Wrote two Rust services in production", "Owned the event pipeline behind nightly billing records"] },
+  { id: "demo-rdoc-tenring", app: "demo-app-tenring", jp: "demo-jp-founding", title: "Résumé · Tenring",
+    summary: "Infrastructure engineer for early teams: Kubernetes, Terraform, Postgres.",
+    bullets: ["Moved three services to Kubernetes with Terraform-managed clusters", "Gave a cron nobody owned a named owner and a budget"] },
+];
+
+function seedSql() {
+  const appRows = APPS.map((a) =>
+    `(${[q(a.id), q(U), q(a.role), q(a.company), q(a.location), `${q(a.status)}::application_status`, q(a.date), q(a.salary), q(a.platform),
+      q(a.next), q(a.jp), q(a.regime), arr(a.stack), a.score ?? "NULL", q(a.reason), q(a.responsibilities), q(a.requirements), q(a.good),
+      q(a.benefits), q(a.seniority), q(a.employment), q(`https://jobs.example.com/${a.id.replace("demo-app-", "")}`),
+      a.breakdown ? `${q(breakdownJson(a.breakdown))}::jsonb` : "NULL", a.soft ? arr(a.soft) : "NULL"].join(",")})`
+  ).join(",\n");
+  return `
+BEGIN;
+INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at, confirmation_token, recovery_token, email_change, email_change_token_new, email_change_token_current,
+  phone_change, phone_change_token, reauthentication_token)
+VALUES ('00000000-0000-0000-0000-000000000000', ${q(U)}, 'authenticated', 'authenticated', ${q(DEMO.email)},
+  extensions.crypt(${q(DEMO.password)}, extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"name":"A. Candidate"}'::jsonb, now(), now(), '', '', '', '', '', '', '', '')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+VALUES (gen_random_uuid(), ${q(U)}, ${q(U)}, jsonb_build_object('sub', ${q(U)}::text, 'email', ${q(DEMO.email)}::text, 'email_verified', true), 'email', now(), now(), now())
+ON CONFLICT (provider_id, provider) DO NOTHING;
+
+-- Reset: every public row owned by the demo user (a few passes for FK order).
+DO $$
+DECLARE t record; pass int;
+BEGIN
+  FOR pass IN 1..4 LOOP
+    FOR t IN SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='user_id' AND data_type='uuid'
+             AND table_name IN (SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE') LOOP
+      BEGIN
+        EXECUTE format('DELETE FROM public.%I WHERE user_id = %L', t.table_name, '${U}');
+      EXCEPTION WHEN foreign_key_violation THEN NULL;
+      END;
+    END LOOP;
+  END LOOP;
+END $$;
+DELETE FROM activity_events WHERE application_id LIKE 'demo-app-%';
+DELETE FROM user_profiles WHERE id = ${q(U)};
+
+INSERT INTO user_profiles (id, name, email, location, default_role, tech_stack, soft_skills, profile_links, experience, future_preferences, onboarding_focus)
+VALUES (${q(U)}, 'A. Candidate', ${q(DEMO.email)}, 'Porto, Portugal', 'Platform engineer',
+  ${arr(["Rust", "Go", "PostgreSQL", "Kafka", "Kubernetes", "Terraform", "AWS"])},
+  ${arr(["Ownership", "Written communication", "Mentoring"])}, '[]'::jsonb,
+  'Six years on data platforms. Took a nightly reconciliation job from a cron nobody owned to a scheduled run with a named owner and a budget.',
+  'Platform roles: remote in the EU. A founding backend role: hybrid in Lisbon. No on-call rotations. No orgs under 20 people.', NULL);
+
+INSERT INTO job_profiles (id, user_id, role_title, relevant_tech_stack, specific_requirements, description, created_from) VALUES
+('demo-jp-platform', ${q(U)}, 'Platform engineering', ${arr(["Go", "Rust", "PostgreSQL", "Kafka", "Kubernetes"])},
+  'Remote in the EU. Ingestion and reconciliation work.', 'The same profile, aimed at platform roles.', '2026-09-01'),
+('demo-jp-founding', ${q(U)}, 'Founding backend', ${arr(["TypeScript", "Node.js", "PostgreSQL", "Terraform"])},
+  'Hybrid in Lisbon. Early teams, but not under 20 people.', 'The same profile, aimed at early backend teams.', '2026-09-05');
+
+INSERT INTO job_applications (id, user_id, role, company, location, status, date_applied, salary, platform, next_step, job_profile_id,
+  work_regime, relevant_tech_stack, match_score, match_reason, responsibilities, requirements, good_to_have, benefits, seniority_level,
+  employment_type, link, match_breakdown, soft_skills) VALUES
+${appRows};
+
+INSERT INTO activity_events (id, application_id, type, title, description, timestamp) VALUES
+('demo-evt-1', 'demo-app-corvid', 'custom', 'Job post scraped', 'Fields read from the Ashby posting', '2026-10-08T09:12:00Z'),
+('demo-evt-2', 'demo-app-corvid', 'cover_letter_created', 'Cover letter drafted', 'From the Platform engineering job profile', '2026-10-08T10:30:00Z'),
+('demo-evt-3', 'demo-app-corvid', 'status_change', 'Moved to Applied', 'Sent with résumé and letter', '2026-10-09T08:45:00Z'),
+('demo-evt-4', 'demo-app-halden', 'interview_scheduled', 'System design round', 'Oct 23, 45 min', '2026-10-15T14:00:00Z');
+
+INSERT INTO questions (id, user_id, is_public, type, text, category, difficulty, tags, expected_answer_length, evaluation_parameters, answers) VALUES
+('demo-q-recon', ${q(U)}, false, 'text', 'Walk me through how you would cut a 40-minute nightly reconciliation to under 10.', 'technical', 'medium', ${arr(["Systems design", "PostgreSQL"])}, 'medium', ${q(JSON.stringify(RUBRIC))}::jsonb, '[]'::jsonb),
+('demo-q-migration', ${q(U)}, false, 'text', 'Tell me about a migration you called off. What did you see that the room didn''t?', 'behavioral', 'medium', ${arr(["Judgement"])}, 'medium', ${q(JSON.stringify(RUBRIC))}::jsonb, '[]'::jsonb),
+('demo-q-kafka', ${q(U)}, false, 'text', 'Our ingestion is Kafka into Postgres. Where does that hurt at our volume?', 'company-specific', 'hard', ${arr(["Kafka", "PostgreSQL"])}, 'medium', ${q(JSON.stringify(RUBRIC))}::jsonb, '[]'::jsonb);
+
+INSERT INTO interview_templates (id, user_id, is_public, title, description, category_id, application_id, target_job_profile_id, question_ids, question_count, difficulty, estimated_duration, type, sub_type) VALUES
+('demo-tpl-halden', ${q(U)}, false, 'Halden Systems · platform loop', 'Written from the posting and the Platform engineering job profile.', 'technical', 'demo-app-halden', 'demo-jp-platform', ${arr(RUN.map((r) => r.q))}, 3, 'medium', 30, 'technical', 'text');
+
+INSERT INTO interviews (id, user_id, template_id, application_id, status, current_attempt_id, run_mode) VALUES
+('demo-int-halden', ${q(U)}, 'demo-tpl-halden', 'demo-app-halden', 'completed', 'demo-res-halden', NULL);
+
+INSERT INTO interview_results (id, user_id, template_id, interview_id, job_application_id, date, question_ids, responses, overall_score, ai_summary, ai_feedback, duration, title, company, role, type, sub_type, difficulty, mode) VALUES
+('demo-res-halden', ${q(U)}, 'demo-tpl-halden', 'demo-int-halden', 'demo-app-halden', '2026-10-18', ${arr(RUN.map((r) => r.q))},
+ ${q(JSON.stringify(RUN.map((r) => ({ questionId: r.q, textAnswer: r.said, score: r.score, feedback: r.fb, timeSpent: r.t }))))}::jsonb,
+ ${OVERALL}, ${q(SUMMARY)}, ${q(JSON.stringify(FEEDBACK))}::jsonb, 9, 'Halden Systems · platform loop', 'Halden Systems', 'Senior Platform Engineer', 'technical', 'text', 'medium', 'mock');
+
+INSERT INTO interview_templates (id, user_id, is_public, title, description, category_id, application_id, target_job_profile_id, question_ids, question_count, difficulty, estimated_duration, type, sub_type) VALUES
+('demo-tpl-tenring', ${q(U)}, false, 'Tenring · infrastructure loop', 'Written from the posting and the Founding backend job profile.', 'technical', 'demo-app-tenring', 'demo-jp-founding', ${arr(["demo-q-kafka", "demo-q-recon"])}, 2, 'medium', 20, 'technical', 'text');
+INSERT INTO interviews (id, user_id, template_id, application_id, status, current_attempt_id, run_mode) VALUES
+('demo-int-tenring', ${q(U)}, 'demo-tpl-tenring', 'demo-app-tenring', 'in-progress', NULL, NULL);
+
+INSERT INTO resume_documents (id, user_id, title, template_pack_id, sections, job_application_id, job_profile_id, locale, page_size) VALUES
+${RESUMES.map((r) => `(${q(r.id)}, ${q(U)}, ${q(r.title)}, 'tpl-system-single', ${q(JSON.stringify(resumeBody(r.id, r.summary, r.bullets)))}::jsonb, ${q(r.app)}, ${q(r.jp)}, 'en', 'a4')`).join(",\n")};
+
+INSERT INTO cover_letters (id, user_id, title, application_id, company, role, tone, status, content, key_skills, current_version, version_history, generated_by, revision) VALUES
+('demo-cl-halden', ${q(U)}, 'Halden Systems · Senior Platform Engineer', 'demo-app-halden', 'Halden Systems', 'Senior Platform Engineer', 'professional', 'sent',
+ ${q("Dear Halden Systems team,\n\nYou are looking for someone to keep ingestion-heavy Postgres fast while the volume grows. I have spent six years on that problem, most recently cutting a nightly reconciliation from 40 minutes to 6.\n\nA. Candidate")},
+ ${arr(["Go", "PostgreSQL", "Kafka"])}, 1, '[]'::jsonb, 'ai', 1),
+('demo-cl-corvid', ${q(U)}, 'Corvid Labs · Backend Engineer', 'demo-app-corvid', 'Corvid Labs', 'Backend Engineer', 'professional', 'sent',
+ ${q("Dear Corvid Labs team,\n\nYour posting asks for someone to run the event pipeline that turns sensor data into billing records. That is the work I know best: at Northwind Data I took a nightly reconciliation from a cron nobody owned to a scheduled run with a named owner and a budget, and cut it from 40 minutes to 6.\n\nI have written Rust in production for two years and would like to do more of it.\n\nA. Candidate")},
+ ${arr(["Rust", "PostgreSQL", "Kafka"])}, 1, '[]'::jsonb, 'ai', 1);
+
+-- The assistant clip's thread (empty; the clip fills it). Titled for what it will hold.
+INSERT INTO chat_conversations (id, user_id, title) VALUES (${q(CHAT.conv)}, ${q(U)}, ${q(CHAT.title)});
+COMMIT;
+`;
+}
+
+
+function seedDemo() {
+  execFileSync("docker", ["exec", "-i", DB_CONTAINER, "psql", "-v", "ON_ERROR_STOP=1", "-q", "-U", "postgres", "-d", "postgres"],
+    { input: seedSql(), stdio: ["pipe", "ignore", "inherit"] });
+}
+
+/** Local Supabase keys (dev-only demo keys of the local stack) for the app server. */
+function localSupabaseEnv() {
+  const out = execFileSync(path.join(HUB, "node_modules/.bin/supabase"), ["status", "-o", "env"], { cwd: HUB, stdio: ["ignore", "pipe", "ignore"] }).toString();
+  const get = (k) => (out.match(new RegExp(`^${k}="?([^"\\n]*)"?$`, "m")) || [])[1];
+  return { url: get("API_URL"), anon: get("ANON_KEY"), service: get("SERVICE_ROLE_KEY") };
+}
+
+// ---------------------------------------------------------------------------
+// Landing helpers
+// ---------------------------------------------------------------------------
 
 /**
  * The landing snaps <main> to the nearest section when scrolling stops (its own
@@ -147,74 +424,200 @@ const fitWidget = async (page) => {
   if (res.bad.length) throw new Error(`zoomed widget crosses the 32 px margin (scale ${res.cs.toFixed(2)}): ${res.bad.slice(0, 4).join(" | ")}`);
 };
 
-/** Full-frame captioned stills (cropped screenshots), hard cuts between them. */
-async function stills(page, list) {
-  const items = list.map((s) => ({ ...s, src: dataUrl(s.file) }));
-  await page.evaluate((items) => {
-    const o = document.createElement("div");
-    o.id = "__rec_stills";
-    o.style.cssText =
-      "position:fixed;inset:0;z-index:2147483646;background:#e8e5da;opacity:0;" +
-      "font-family:ui-sans-serif,system-ui,sans-serif;color:#22211d";
-    const head = document.createElement("div");
-    head.style.cssText = "position:absolute;left:40px;top:26px;right:40px;display:flex;align-items:baseline;gap:16px;white-space:nowrap";
-    head.innerHTML =
-      '<span style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#6b675c">Inside the signed-in app · screenshot</span>' +
-      '<span id="__rec_still_label" style="font-size:24px;font-weight:600"></span>';
-    o.appendChild(head);
-    const MAXW = 1220, MAXH = 690, TOP = 70, GAP = 28;
-    items.forEach((it, i) => {
-      const sumW = it.crops.reduce((t, c) => t + c[2], 0);
-      const maxH = Math.max(...it.crops.map((c) => c[3]));
-      const s = Math.min(MAXH / maxH, (MAXW - GAP * (it.crops.length - 1)) / sumW);
-      const total = sumW * s + GAP * (it.crops.length - 1);
-      let x = (1280 - total) / 2;
-      const group = document.createElement("div");
-      group.dataset.i = String(i);
-      group.style.cssText = "position:absolute;inset:0;opacity:0";
-      for (const [cx, cy, cw, ch] of it.crops) {
-        const w = cw * s, hgt = ch * s;
-        const box = document.createElement("div");
-        box.style.cssText =
-          `position:absolute;left:${x}px;top:${TOP + (MAXH - maxH * s) / 2 + 10}px;width:${w}px;height:${hgt}px;` +
-          "overflow:hidden;background:#fff;border:1px solid #c9c4b5;box-shadow:0 10px 30px rgba(0,0,0,.12)";
-        const img = new Image();
-        img.src = it.src;
-        img.style.cssText = `position:absolute;left:${-cx * s}px;top:${-cy * s}px;width:${2560 * s}px;max-width:none`;
-        box.appendChild(img);
-        for (const [bx, by, bw, bh] of it.blur || []) {
-          if (bx + bw < cx || bx > cx + cw || by + bh < cy || by > cy + ch) continue;
-          const m = document.createElement("div");
-          m.style.cssText =
-            `position:absolute;left:${(bx - cx) * s}px;top:${(by - cy) * s}px;width:${bw * s}px;height:${bh * s}px;` +
-            "backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);background:rgba(200,198,190,.75);border-radius:3px";
-          box.appendChild(m);
-        }
-        group.appendChild(box);
-        x += w + GAP;
-      }
-      o.appendChild(group);
-    });
-    document.body.appendChild(o);
-    window.__recShow = (i, label) => {
-      for (const b of o.querySelectorAll(":scope > [data-i]")) b.style.opacity = b.dataset.i === String(i) ? "1" : "0";
-      document.getElementById("__rec_still_label").textContent = label;
-      o.style.opacity = "1";
-    };
-  }, items.map(({ crops, src, blur }) => ({ crops, src, blur })));
-  await page.waitForFunction(() => [...document.querySelectorAll("#__rec_stills img")].every((i) => i.complete));
-  return items;
+
+/** Cursor glide + a plain mouse click. h.click waits on Playwright actionability checks (~1 s on these pages). */
+async function tap(h, locator, { pause = 120, move = 200 } = {}) {
+  const el = (typeof locator === "string" ? h.page.locator(locator) : locator).first();
+  await el.waitFor({ state: "visible" });
+  const b = await el.boundingBox();
+  await h.moveTo(b.x + b.width / 2, b.y + b.height / 2, move);
+  await h.page.mouse.down();
+  await h.wait(40);
+  await h.page.mouse.up();
+  if (pause) await h.wait(pause);
 }
 
+const DOCS = {
+  id: "documents",
+  widget: ".ft-docs-plate",
+  hide: ".ft-docs-side,.ft-ch-no",
+  zoom: 1.6,
+};
+
+/** Open the resume editor's full screen (cursor glides onto the button first). */
+async function openFullscreen(h) {
+  const btn = h.page.getByRole("button", { name: /full screen/i }).first();
+  const b = await btn.boundingBox();
+  await h.moveTo(b.x + b.width / 2 - 30, b.y + b.height / 2 + 24, 16);
+  await h.cursor(true);
+  await h.moveTo(b.x + b.width / 2, b.y + b.height / 2, 120);
+  await btn.click({ delay: 40 });
+  await h.wait(250);
+  await cursorIntoFullscreen(h.page);
+}
+
+const visible = (page, sel) => page.locator(sel.split(",").map((x) => `${x.trim()}:visible`).join(", "));
+
+/** Pick a resume template in the (full screen) editor. */
+async function pickTemplate(h, from, to, opts = {}) {
+  const { page } = h;
+  await tap(h, visible(page, "button, [role=combobox]").filter({ hasText: from }), { pause: opts.pause ?? 350, move: opts.move ?? 140 });
+  await tap(h, visible(page, "[role=option]").filter({ hasText: to }), { pause: opts.pickPause ?? 900, move: opts.move ?? 120 });
+}
+
+
+// ---------------------------------------------------------------------------
+// Captions: a SOLID pill (nothing half-visible behind it), placed per clip where it
+// covers the least: "bl" bottom-left, "bc" bottom-centre, "tl" top-left, "tr" top-right.
+// ---------------------------------------------------------------------------
+
+async function say(h, text, pos = "bl") {
+  await h.caption(text);
+  await h.page.evaluate((pos) => {
+    const c = document.getElementById("__rec_caption");
+    if (!c) return;
+    const at = {
+      bl: "left:24px;right:auto;bottom:24px;top:auto;transform:none",
+      bc: "left:50%;right:auto;bottom:28px;top:auto;transform:translateX(-50%)",
+      tl: "left:24px;right:auto;top:20px;bottom:auto;transform:none",
+      tr: "left:auto;right:24px;top:12px;bottom:auto;transform:none",
+    }[pos];
+    c.style.cssText += `;${at};background:#14181f;white-space:nowrap;max-width:none;transition:none;opacity:1`;
+  }, pos);
+}
+
+// ---------------------------------------------------------------------------
+// Signed-in app helpers
+// ---------------------------------------------------------------------------
+
+const isApp = (seg) => typeof seg.url === "function" || String(seg.url || "").startsWith("http://localhost");
+
+/** Off camera: tag the app's scroll container, hide the dev-mode badge and the "agent not running" note. */
+async function prepApp(page) {
+  await page.addStyleTag({ content: "nextjs-portal{display:none!important}" });
+  await page.evaluate(() => {
+    for (const n of document.querySelectorAll("div")) {
+      const o = getComputedStyle(n).overflowY;
+      if ((o === "auto" || o === "scroll") && n.scrollHeight > n.clientHeight + 40 && n.clientHeight > 400) { n.id = "__app_sc"; break; }
+    }
+    for (const p of document.querySelectorAll("p, div, span"))
+      if (p.children.length === 0 && /agent is not running here/i.test(p.textContent)) p.style.display = "none";
+  });
+}
+
+/** Scroll the app container so `locator`'s top sits at `y` px in the viewport (instant, off camera). */
+async function appScrollTo(page, locator, y) {
+  const el = locator.first();
+  await el.waitFor({ state: "visible", timeout: 15000 });
+  await el.evaluate((e, y) => {
+    const s = document.getElementById("__app_sc") || document.scrollingElement;
+    s.scrollTop += e.getBoundingClientRect().top - y;
+  }, y);
+}
+
+/** Fast eased scroll of the app container by `dy` (on camera). */
+const appGlide = (page, dy, ms = 450) =>
+  page.evaluate(({ dy, ms }) => new Promise((res) => {
+    const s = document.getElementById("__app_sc") || document.scrollingElement;
+    const a = s.scrollTop, b = Math.max(0, Math.min(s.scrollHeight - s.clientHeight, a + dy)), t0 = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      s.scrollTop = a + (b - a) * e;
+      t < 1 ? requestAnimationFrame(step) : res();
+    };
+    requestAnimationFrame(step);
+  }), { dy, ms });
+
+/** Fast eased scroll of the app container until `locator`'s top sits at `y` (re-aimed every
+ *  frame, because the app's tall header collapses into a 42 px bar once the page scrolls). */
+const appGlideTo = (page, locator, y, ms = 500) =>
+  locator.first().evaluate((el, { y, ms }) => new Promise((res) => {
+    const s = document.getElementById("__app_sc") || document.scrollingElement;
+    const a = s.scrollTop, t0 = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const goal = s.scrollTop + el.getBoundingClientRect().top - y;
+      s.scrollTop = a + (goal - a) * e;
+      t < 1 ? requestAnimationFrame(step) : res();
+    };
+    requestAnimationFrame(step);
+  }), { y, ms });
+
+/** Glide the cursor in from beside a target, show it. */
+async function cursorNear(h, locator, dx = -140, dy = 40) {
+  const b = await locator.first().boundingBox();
+  await h.moveTo(b.x + b.width / 2 + dx, b.y + b.height / 2 + dy, 16);
+  await h.cursor(true);
+}
+
+/** Park the cursor just below-right of an element, so it never sits on the words. */
+async function park(h, locator, ms = 140) {
+  const b = await locator.first().boundingBox();
+  if (b) await h.moveTo(b.x + b.width + 18, b.y + b.height + 22, ms);
+}
+
+const app = (p) => () => APP + p;
+
+// ---------------------------------------------------------------------------
+// Flow
+// ---------------------------------------------------------------------------
+
 export default {
-  url: "https://v0-job-hunting-platform-two.vercel.app/",
+  url: LANDING,
   target: 30,
   pacing: { scroller: "main", heroDwell: 900, moveMs: 200, featureLead: 100 },
-  posterFrom: { segment: "marketing", at: 1.6 }, // the complete hero
+  // A settled frame of the live résumé editor (the hero builds in, so never poster it).
+  posterFrom: { segment: "resume-editor", at: -0.3 },
 
-  async beforeEach(h) {
+  server({ port }) {
+    APP = `http://localhost:${port}`;
+    const sb = localSupabaseEnv();
+    return {
+      command: path.join(HUB, "node_modules/.bin/next"),
+      args: ["dev", "--port", String(port)],
+      cwd: HUB,
+      env: {
+        NEXT_PUBLIC_SUPABASE_URL: sb.url,
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: sb.anon,
+        SUPABASE_SERVICE_ROLE_KEY: sb.service,
+        NEXT_PUBLIC_APP_URL: APP,
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
+        TURNSTILE_SECRET_KEY: "",
+        SENTRY_DSN: "",
+        NEXT_PUBLIC_SENTRY_DSN: "",
+        UPSTASH_REDIS_REST_URL: "",
+        UPSTASH_REDIS_REST_TOKEN: "",
+        NEXT_TELEMETRY_DISABLED: "1",
+      },
+      url: `${APP}/sign-in`,
+      readyTimeoutMs: 180000,
+    };
+  },
+
+  /** Off camera: reset the demo account, sign in, and compile every route a clip opens. */
+  async setup(page, { port }) {
+    APP = `http://localhost:${port}`;
+    seedDemo();
+    await page.goto(`${APP}/sign-in`, { waitUntil: "networkidle", timeout: 180000 });
+    await page.getByLabel(/email/i).first().fill(DEMO.email);
+    await page.getByLabel(/password/i).first().fill(DEMO.password);
+    await page.getByRole("button", { name: /sign in/i }).first().click();
+    await page.waitForURL((u) => !u.pathname.startsWith("/sign-in"), { timeout: 90000 });
+    for (const p of ["/dashboard", "/postings", "/application/demo-app-corvid", "/application/demo-app-quillon?started=1", "/interviews/runs/demo-res-halden", "/assistant"])
+      await page.goto(APP + p, { waitUntil: "networkidle", timeout: 180000 }).catch(() => {});
+    seedDemo();
+  },
+
+  async beforeEach(h, seg) {
     await h.cursor(false);
-    await freezeSnap(h.page);
+    if (isApp(seg)) {
+      seedDemo();
+      await h.page.reload({ waitUntil: "networkidle", timeout: 60000 }).catch(() => {});
+      await h.waitForStill(2500);
+      await prepApp(h.page);
+    } else {
+      await freezeSnap(h.page);
+    }
   },
 
   marketing: {
@@ -257,228 +660,206 @@ export default {
     },
   },
 
-
   get features() {
     return FEATURES;
   },
 };
 
-/** Cursor glide + a plain mouse click. h.click waits on Playwright actionability checks (~1 s on these pages). */
-async function tap(h, locator, { pause = 120, move = 200 } = {}) {
-  const el = (typeof locator === "string" ? h.page.locator(locator) : locator).first();
-  await el.waitFor({ state: "visible" });
-  const b = await el.boundingBox();
-  await h.moveTo(b.x + b.width / 2, b.y + b.height / 2, move);
-  await h.page.mouse.down();
-  await h.wait(40);
-  await h.page.mouse.up();
-  if (pause) await h.wait(pause);
-}
-
-const DOCS = {
-  id: "documents",
-  widget: ".ft-docs-plate",
-  hide: ".ft-docs-side,.ft-ch-no",
-  zoom: 1.6,
-};
-
-/** Open the resume editor's full screen (cursor glides onto the button first). */
-async function openFullscreen(h) {
-  const btn = h.page.getByRole("button", { name: /full screen/i }).first();
-  const b = await btn.boundingBox();
-  await h.moveTo(b.x + b.width / 2 - 30, b.y + b.height / 2 + 24, 16);
-  await h.cursor(true);
-  await h.moveTo(b.x + b.width / 2, b.y + b.height / 2, 120);
-  await btn.click({ delay: 40 });
-  await h.wait(250);
-  await cursorIntoFullscreen(h.page);
-}
-
-const visible = (page, sel) => page.locator(sel.split(",").map((x) => `${x.trim()}:visible`).join(", "));
-
-/** Pick a resume template in the (full screen) editor. */
-async function pickTemplate(h, from, to, opts = {}) {
-  const { page } = h;
-  await tap(h, visible(page, "button, [role=combobox]").filter({ hasText: from }), { pause: opts.pause ?? 350, move: opts.move ?? 140 });
-  await tap(h, visible(page, "[role=option]").filter({ hasText: to }), { pause: opts.pickPause ?? 900, move: opts.move ?? 120 });
-}
-
-/** One still as its own clip: a full-frame screenshot with a caption, held. */
-const stillClip = (key, title, priority, still) => ({
-  key,
-  title,
-  priority,
-  async before(h) {
-    h.items = await stills(h.page, [STILLS[still]]);
-    await h.page.evaluate((label) => window.__recShow(0, label), h.items[0].label);
-  },
-  async run(h) {
-    await h.wait(h.items[0].ms);
-  },
-});
-
 const FEATURES = [
   {
-    key: "resume-editor",
-    title: "Resume editor: full screen + template switch",
-    priority: 1,
-    before: (h) => spotlight(h, { ...DOCS, caption: "Resume editor: the app's own, live" }),
-    async run(h) {
-      await openFullscreen(h);
-      await pickTemplate(h, "Classic serif", "Teal sidebar", { pickPause: 1000 });
-      // Stay in full screen on the Teal sidebar: the next clip continues from this exact state.
-    },
-  },
-  {
-    key: "resume-inline-edit",
-    title: "Resume editor: edit an entry, the page updates",
-    priority: 2,
-    async before(h) {
-      const { page } = h;
-      await spotlight(h, DOCS);
-      await openFullscreen(h);
-      await h.cursor(false);
-      await pickTemplate(h, "Classic serif", "Teal sidebar", { pause: 100, pickPause: 100, move: 20 });
-      await h.wait(500);
-      await h.waitForStill(800);
-      await h.caption("Edit an entry: the page re-renders as you type");
-      await cursorIntoFullscreen(page);
-    },
-    async run(h) {
-      const { page } = h;
-      const TYPED = " Owns the nightly reconciliation.";
-      await h.cursor(true);
-      const contentBtn = page.locator("button:visible").filter({ hasText: /content/i }).nth(1);
-      await tap(h, contentBtn, { pause: 120, move: 160 });
-      const field = page.locator("[contenteditable=true]:visible").first();
-      await field.waitFor({ state: "visible", timeout: 4000 });
-      await field.scrollIntoViewIfNeeded();
-      await tap(h, field, { pause: 40, move: 120 });
-      await page.keyboard.press("Control+End");
-      await page.keyboard.type(TYPED, { delay: 16 });
-      // Assert the payoff: the live preview (outside the editor) must contain the typed text.
-      const found = await page
-        .waitForFunction(
-          (t) => {
-            for (const e of document.querySelectorAll("p,div,span,li")) {
-              if (e.children.length || e.closest("[contenteditable]") || !e.textContent.includes(t)) continue;
-              const r = e.getBoundingClientRect();
-              if (r.width && r.height && r.bottom > 0 && r.top < innerHeight) {
-                e.scrollIntoView({ block: "center", behavior: "instant" });
-                e.style.outline = "3px solid #f59e0b";
-                e.style.outlineOffset = "3px";
-                e.style.borderRadius = "3px";
-                return true;
-              }
-            }
-            return false;
-          },
-          TYPED.trim(),
-          { timeout: 8000 }
-        )
-        .then(() => true, () => false);
-      if (!found) throw new Error("resume-inline-edit: the preview never showed the typed text");
-      await h.wait(250);
-      // The preview re-renders once more after the text lands: outline the settled line.
-      await page.evaluate((t) => {
-        for (const e of document.querySelectorAll("p,div,span,li")) {
-          if (e.children.length || e.closest("[contenteditable]") || !e.textContent.includes(t)) continue;
-          if (!e.getBoundingClientRect().width) continue;
-          e.style.outline = "3px solid #f59e0b";
-          e.style.outlineOffset = "3px";
-        }
-      }, TYPED.trim());
-      await h.beat(900);
-    },
-  },
-  {
     key: "inheritance",
-    title: "Inheritance map: one profile, many variations",
-    priority: 2,
-    before: (h) =>
-      spotlight(h, {
+    title: "Inheritance map: one profile, many job profiles/applications",
+    priority: 1,
+    before: async (h) => {
+      await spotlight(h, {
         id: "inheritance",
         widget: ".ft-flow-wrap",
         hide: ".ft-ch-no,.ft-ch-head,.ft-lede,.ft-synthetic,.ft-reh-note",
         fit: true,
-        caption: "Illustrated (landing page): one profile feeds every application",
-      }),
+      });
+      // Start from the Halden branch (off camera) so the first click visibly redraws the map.
+      const halden = h.page.locator("main").getByRole("button", { name: /^Halden Systems/ }).first();
+      const hb = await halden.boundingBox();
+      await h.page.mouse.click(hb.x + hb.width / 2, hb.y + hb.height / 2);
+      await h.page.mouse.move(640, 790);
+      await h.wait(500);
+      await say(h, "The model: profile → job profile → application → its documents", "bc");
+    },
     async run(h) {
       const main = h.page.locator("main");
-      const pick = async (re, caption, pause = 100, move = 180) => {
-        await tap(h, main.getByRole("button", { name: re }).first(), { pause, move });
-        await h.caption(caption);
-      };
       const corvid = main.getByRole("button", { name: /^Corvid Labs/ }).first();
-      const cb = await corvid.boundingBox();
-      await h.moveTo(cb.x - 120, cb.y + cb.height / 2, 16);
-      await h.cursor(true);
-      await pick(/^Corvid Labs/, "Illustrated: Profile → Platform engineering → Corvid Labs → résumé + letter");
-      await h.dwell(850);
-      await pick(/^Tenring/, "Illustrated: Profile → Founding backend → Tenring → résumé + questions", 100, 200);
-      await h.dwell(850);
+      // Hold the Halden branch (the before-state) ~0.65 s before the first redraw.
+      await h.dwell(380);
+      await cursorNear(h, corvid, -150, 0);
+      await tap(h, corvid, { pause: 100, move: 180 });
+      await park(h, corvid, 120);
+      await h.dwell(450);
+      const tenring = main.getByRole("button", { name: /^Tenring/ }).first();
+      await tap(h, tenring, { pause: 100, move: 200 });
+      await park(h, tenring, 120);
+      await h.dwell(600);
     },
   },
   {
-    key: "job-search",
-    title: "Job inbox (landing-page illustration)",
-    priority: 3,
-    before: (h) =>
-      spotlight(h, {
-        id: "agent",
-        self: true,
-        widget: ".ft-agent-grid",
-        hide: ".ft-room-no,.ft-ch-head,.ft-lede,.ft-band,.ft-ft-no",
-        hideText: ["illustration only"],
-        caption: "Illustrated (landing page): each match read against your profile",
-      }),
-    async run(h) {
-      const row = h.page.locator("#agent").getByRole("button").filter({ hasText: /corvid/i }).first();
-      const rb = await row.boundingBox();
-      await h.moveTo(rb.x + rb.width / 2, Math.min(780, rb.y + rb.height + 60), 16);
-      await h.cursor(true);
-      await tap(h, row, { pause: 100, move: 200 });
-      await h.waitForStill(500);
-      await h.dwell(1100);
-    },
-  },
-  stillClip("pipeline-still", "Signed-in app: the applications pipeline", 3, "pipeline"),
-  {
-    key: "rehearsal",
-    title: "Interview rehearsal (landing-page illustration)",
-    priority: 4,
-    before: (h) =>
-      spotlight(h, {
-        id: "rehearsal",
-        widget: ".ft-reh-wrap",
-        hide: ".ft-ch-no,.ft-ch-head,.ft-lede,.ft-synthetic,.ft-reh-note",
-        fit: true,
-        isolate: true,
-        caption: "Illustrated (landing page): answers scored against a fixed rubric",
-      }),
-    async run(h) {
-      const r = h.page.locator("main");
-      await h.cursor(true);
-      await tap(h, r.getByRole("button", { name: /bank\s*·?\s*behavioral/i }), { pause: 80, move: 180 });
-      await h.dwell(1250);
-      await tap(h, r.getByRole("button", { name: /template\s*·?\s*this application/i }), { pause: 80, move: 180 });
-      await h.dwell(1250);
-    },
-  },
-  stillClip("interview-still", "Signed-in app: practice interviews", 4, "interview"),
-  {
-    key: "app-stills",
-    title: "Signed-in app: AI chat, application detail (screenshots)",
-    priority: 5,
+    key: "base-camp",
+    title: "Base camp: every application by stage, moved in one click",
+    priority: 1,
+    url: app("/dashboard"),
     async before(h) {
-      h.items = await stills(h.page, [STILLS.chat, STILLS.application]);
-      await h.page.evaluate((label) => window.__recShow(0, label), h.items[0].label);
+      const { page } = h;
+      await appScrollTo(page, page.getByText(/open applications have nothing attached/i).first(), 100);
+      await h.wait(300); // the header collapses once scrolled: aim again
+      await appScrollTo(page, page.getByText(/open applications have nothing attached/i).first(), 100);
+      await say(h, "Base camp: every application, by stage, with what it has attached");
     },
     async run(h) {
-      for (let i = 0; i < h.items.length; i++) {
-        if (i) await h.page.evaluate(({ i, label }) => window.__recShow(i, label), { i, label: h.items[i].label });
-        await h.wait(h.items[i].ms);
-      }
+      const { page } = h;
+      const move = page.getByRole("button", { name: /move to/i }).nth(1); // Larkspur Health (Applied)
+      await cursorNear(h, move, -180, 60);
+      await h.dwell(600);
+      await tap(h, move, { pause: 220, move: 200 });
+      const opt = page.getByText("Interviewing", { exact: true }).last();
+      await tap(h, opt, { pause: 120, move: 160 });
+      await h.page.mouse.move(1000, 640);
+      await h.moveTo(1010, 650, 60);
+      await say(h, "Larkspur Health → Interviewing");
+      await h.dwell(650);
+    },
+  },
+  {
+    key: "resume-editor",
+    title: "Real resume editor: full screen + template switch",
+    priority: 1,
+    async before(h) {
+      await spotlight(h, DOCS);
+      await openFullscreen(h);
+      await h.cursor(false);
+      // Wait until the live preview's box has held still for 300 ms (fit/zoom settled).
+      await h.page.waitForFunction(() => {
+        const p = [...document.querySelectorAll("*")].find((e) => /live preview/i.test(e.textContent) && e.children.length === 0);
+        const host = document.fullscreenElement || document.body;
+        const pg = host.querySelector("[data-page], .resume-page, [class*=page]") || p;
+        const r = pg.getBoundingClientRect();
+        const sig = `${Math.round(r.left)},${Math.round(r.width)}`;
+        const now = performance.now();
+        if (window.__pvSig !== sig) { window.__pvSig = sig; window.__pvAt = now; return false; }
+        return now - window.__pvAt > 300;
+      }, null, { polling: 50, timeout: 8000 }).catch(() => {});
+      await h.wait(400);
+      await cursorIntoFullscreen(h.page);
+      await say(h, "The app's résumé editor: one click restyles the page", "bl");
+      await cursorIntoFullscreen(h.page);
+    },
+    async run(h) {
+      const { page } = h;
+      const pick = visible(page, "button, [role=combobox]").filter({ hasText: "Classic serif" });
+      await cursorNear(h, pick, 60, 70);
+      await tap(h, pick, { pause: 300, move: 140 });
+      const opt = visible(page, "[role=option]").filter({ hasText: "Teal sidebar" });
+      await tap(h, opt, { pause: 150, move: 120 });
+      await h.moveTo(395, 330, 120); // park beside the template field, off the preview text
+      await h.dwell(800);
+    },
+  },
+  {
+    key: "postings",
+    title: "Postings: the agent's matches, each score explained from the posting",
+    priority: 2,
+    url: app("/postings"),
+    async before(h) {
+      await say(h, "Postings: the agent's matches, each score backed by the posting's words", "tr");
+    },
+    async run(h) {
+      const { page } = h;
+      // Read the two matches (score + the posting's own words per dimension), then narrow by typing.
+      const chip = page.getByTestId("match-chip").first();
+      await cursorNear(h, chip, -60, 50);
+      await park(h, chip, 160);
+      await h.dwell(1100);
+      const search = page.getByPlaceholder(/search by role or company/i);
+      await tap(h, search, { pause: 60, move: 200 });
+      await page.keyboard.type("payments", { delay: 35 });
+      await park(h, search, 100);
+      await h.dwell(750);
+    },
+  },
+  {
+    key: "application-detail",
+    title: "Application detail: attachments, match reason, the posting read into fields",
+    priority: 2,
+    url: app("/application/demo-app-corvid"),
+    async before(h) {
+      await say(h, "Corvid Labs: résumé + letter attached, the match explained, the posting as fields");
+    },
+    async run(h) {
+      const { page } = h;
+      await h.dwell(900);
+      await appGlide(page, 470, 420);
+      const full = page.getByText(/^the full posting$/i).first();
+      await cursorNear(h, full, 160, 50);
+      await tap(h, full, { pause: 150, move: 180 });
+      await park(h, full, 100);
+      await appGlide(page, 260, 380);
+      await h.dwell(950);
+    },
+  },
+  {
+    key: "interview-run",
+    title: "Interview run: scored per answer against a fixed rubric",
+    priority: 3,
+    url: app("/interviews/runs/demo-res-halden"),
+    async before(h) {
+      await say(h, "A practice run for Halden Systems, scored against a rubric");
+    },
+    async run(h) {
+      const { page } = h;
+      await h.dwell(900);
+      await appGlideTo(page, page.getByText(/per-answer feedback/i), 58, 520);
+      await h.dwell(1050);
+    },
+  },
+  {
+    // Replaces the landing's rehearsal widget (v3 review): the live interview-run clip already
+    // shows the same rubric and marks, and without this clip the video never showed the AI act.
+    key: "assistant",
+    title: "Assistant: asked for a letter, drafts it with a tool, saved to the application",
+    priority: 3,
+    url: app("/assistant"),
+    async before(h) {
+      const { page } = h;
+      await mockChat(page);
+      // The chat-turn disclosure is acknowledged per session (the demo account already said yes).
+      await page.evaluate(() => {
+        for (const p of ["openai", "anthropic", "google", "local", "openrouter", "ollama"]) sessionStorage.setItem(`ai-disclosure.ack.${p}.chat`, "1");
+      });
+      // Open the seeded thread, so the turn lands in it (no conversation switch mid-stream).
+      await page.getByText(CHAT.title, { exact: true }).first().click();
+      await h.wait(900);
+      // Give the thread the page-title band's height: the whole turn then fits on screen.
+      await page.evaluate(() => {
+        const t = [...document.querySelectorAll("h1,h2")].find((e) => e.textContent.trim() === "Assistant");
+        const list = document.querySelector("[data-testid=chat-message-list]");
+        let n = t;
+        while (n && n.parentElement && !n.parentElement.contains(list)) n = n.parentElement;
+        if (n) n.style.display = "none";
+      });
+      await h.wait(300);
+      await say(h, "The assistant acts on your records: a letter for Tenring, saved to it");
+    },
+    async run(h) {
+      const { page } = h;
+      const box = page.getByPlaceholder(/ask the assistant/i);
+      await cursorNear(h, box, -120, 40);
+      await tap(h, box, { pause: 60, move: 160 });
+      await page.keyboard.type(CHAT.prompt, { delay: 22 });
+      await page.keyboard.press("Enter");
+      await page.getByTestId("chat-letter-draft-save").waitFor({ state: "visible" });
+      await h.dwell(1000);
+      const save = page.getByTestId("chat-letter-draft-save");
+      await tap(h, save, { pause: 80, move: 200 });
+      await page.getByTestId("chat-letter-draft-saved").waitFor({ state: "visible" });
+      await park(h, page.getByTestId("chat-letter-draft-saved"), 120);
+      await h.dwell(950);
     },
   },
 ];

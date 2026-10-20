@@ -6,14 +6,19 @@
 //   2 dfa             "Testar palavra": one accepted and one rejected word, verdict held
 //   3 regex           regular expression -> automaton (appears in a second box)
 //   4 determinize     NFA -> DFA appears in a second box next to the first
-//   5 state-analysis  useful states painted, then "Limpar" removes the useless ones
+//   5 state-analysis  useful states painted, then "Clean" removes the useless ones
 //   6 generate-words  all accepted words up to length 3
-//   7 dark-theme      theme switch (first to go when the total is over the band)
+//   7 dark-theme      theme switch on the same dfa_2 screen (first to go when over the band)
+// determinize is not in the v2 plan's list; it is ranked after regex (p4) because it is
+// a real computation beat, and the cosmetic beats stay last.
 // The live build fails to register the dagre layout (its CDN request for
 // cytoscape-dagre is blocked), which breaks every regex example. beforeEach loads
 // the same plugin from a working CDN so the regex models lay out; nothing else changes.
-// Split-pane clips (determinize, state-analysis, generate-words) open the second box
-// once off camera (before()), so on camera the layout never animates or goes blank.
+// determinize, state-analysis and generate-words start single-pane: the second box
+// opens on camera with its result. While the app computes and the boxes re-flow, the
+// last frame is held (screenshot overlay), so no empty or half-laid-out pane is filmed.
+// The recorder cursor is hidden during holds (rest()) so it never sits on the canvas
+// looking like an extra graph node.
 //
 // Presentation-only tweaks, none changes what the app computes:
 //  - The app lays graphs out randomly and squashed. The graph is hidden while an
@@ -22,6 +27,8 @@
 //  - Hover tooltips (CSS .tooltiptext) are hidden; they covered the controls.
 //  - With two boxes open the app's row is wider than the window; the boxes are
 //    made to share the width so both are visible.
+//  - The tape readout (#regExp) is drawn larger so the head position reads at CV size;
+//    its box grows to fit (the app gives it a fixed 6.5% height with scrollbars).
 //  - The app's own step timers (word test, ~1 s per step) run 2.5x faster.
 //  - Prompts (word, length) are answered by the dialog handler, since headless
 //    recordings never show native prompts.
@@ -43,13 +50,20 @@ const LAYOUTS = {
 const STYLE = `
   .tooltiptext, .tooltiptext3 { display: none !important; }
   body.__rec_two #cy, body.__rec_two #cy2 { height: 420px !important; }
+  /* Single pane: the finite-automaton toolbar wraps to two lines, which pushed the stats
+     line under the graph past the bottom of the pane. A shorter graph box keeps it whole
+     and above the caption pill. */
+  body:not(.__rec_two) #cy { height: 405px !important; }
+  #infoBox { height: auto !important; overflow: visible !important; }
   #buttonBox { gap: 4px !important; }
   body.__rec_two .test { width: 100% !important; min-width: 0 !important; }
   body.__rec_two .test > * { min-width: 0 !important; flex: 1 1 0 !important; }
   body.__rec_two #buttonBox button { padding: 4px 6px !important; font-size: 12px !important; min-height: 0 !important; }
   body.__rec_two #textarea { font-size: 26px !important; line-height: 1.7 !important; }
   #cy, #cy2 { transition: opacity .28s ease; }
-  body.__rec_hide2 #cy2, body.__rec_hidecy #cy, body.__rec_hidecy #cy2 { opacity: 0 !important; transition: opacity .15s ease; }
+  #regExp { font: 700 30px/1.4 ui-monospace, Menlo, Consolas, monospace !important; letter-spacing: .14em; color: #1e3a8a;
+    height: auto !important; min-height: 48px; overflow: visible !important; padding: 4px 0 6px; margin-top: 4px; white-space: nowrap; }
+  body.__rec_hidecy #cy, body.__rec_hidecy #cy2 { opacity: 0 !important; transition: opacity .15s ease; }
 `;
 
 const hideGraph = (page, hide) =>
@@ -141,6 +155,9 @@ async function preload(h, name, layout, pad) {
   await h.moveTo(150, 300, 16);
 }
 
+/** Hide the recorder cursor for a hold (it reads as a grey node on the canvas). */
+const rest = (h) => h.cursor(false);
+
 const reveal = async (page) => {
   await page.waitForTimeout(100);
   await hideGraph(page, false);
@@ -161,12 +178,12 @@ const unscroll = (page) =>
   page.evaluate(() => { for (const e of document.querySelectorAll("*")) if (e.scrollLeft) e.scrollLeft = 0; });
 
 /** Open a second box (determinize / generate) and lay both out side by side. */
-async function twoBoxes(page, layouts) {
+async function twoBoxes(page, layouts, settle = 150) {
   await page.evaluate(() => {
     document.body.classList.add("__rec_two");
     for (const e of document.querySelectorAll("#numberstates")) e.parentElement.style.fontSize = "13px";
   });
-  await page.waitForTimeout(150);
+  await page.waitForTimeout(settle);
   await unscroll(page);
   for (const [cyId, layout, pad] of layouts) await place(page, layout, pad, cyId, false);
 }
@@ -178,13 +195,13 @@ const verdict = async (page) => {
     return cy.nodes().some((n) => /rgb\((255,\s*0,\s*0|0,\s*128,\s*0)\)/.test(n.style("background-color")));
   }, null, { timeout: 6000 });
 };
-const testing = async (h, word, label) => {
+const testing = async (h, word, label, hold = 950) => {
   answer = word;
   await caption(h.page, `Test word "${word}"`);
   await h.click(h.page.locator("#testing"), { pause: 0, move: 200 });
   await verdict(h.page);
   await caption(h.page, `"${word}" ${label}`);
-  await h.beat(950);
+  await h.beat(hold);
 };
 const fwd = async (h, n, ms = 330) => {
   for (let i = 0; i < n; i++) {
@@ -207,40 +224,30 @@ const startWord = async (h, word) => {
   await h.wait(120);
 };
 
-/** Off camera: wait for a (re)generated second box, i.e. one whose nodes were not marked stale. */
-const markStale = (page) =>
-  page.evaluate(() => {
-    const cy = document.getElementById("cy2")?._cyreg?.cy;
-    cy?.nodes().forEach((n) => n.data("__old", 1));
-  });
-const waitFresh2 = (page, min) =>
-  page.waitForFunction(
-    (min) => {
-      const cy = document.getElementById("cy2")?._cyreg?.cy;
-      return cy && cy.nodes().length >= min && cy.nodes().some((n) => !n.data("__old"));
-    },
-    min,
-    { timeout: 5000 }
-  );
 const deterministicBtn = (page) =>
   page.locator("#buttonBox button", { hasText: /Make deterministic|Tornar determinista/ }).first();
 
-const hide2 = (page, on) => page.evaluate((on) => document.body.classList.toggle("__rec_hide2", on), on);
 
-/** Off camera: run the split-opening action once so on camera the layout is already settled. */
-async function preSplit(h, click, min, layouts) {
-  const { page } = h;
-  await hide2(page, true);
-  await click();
-  await waitFresh2(page, min);
-  await twoBoxes(page, layouts);
-  await page.waitForTimeout(150);
-  await markStale(page);
+/**
+ * Hold the current frame (a screenshot overlay, clicks pass through) while the app
+ * computes and the new box is laid out, so no half-built pane is ever filmed.
+ */
+async function freeze(page) {
+  const png = (await page.screenshot({ type: "png" })).toString("base64");
+  await page.evaluate((src) => {
+    const img = document.createElement("img");
+    img.id = "__rec_freeze";
+    img.src = "data:image/png;base64," + src;
+    img.style.cssText = "position:fixed;left:0;top:0;width:1280px;height:800px;z-index:2147483647;pointer-events:none";
+    document.body.appendChild(img);
+    return img.decode();
+  }, png);
 }
+const unfreeze = (page) => page.evaluate(() => document.getElementById("__rec_freeze")?.remove());
 
 export default {
   url: "https://oflat-ocamlflat-pages-d4fe77.gitlab.io/",
-  target: 30,
+  target: 25.4, // plan said 30; every planned feature (plus determinize) totals ~25.4 s at this pace
   posterFrom: { segment: "turing-machine", at: -1 },
   async beforeEach(h) {
     h.page.on("dialog", async (d) => {
@@ -263,19 +270,19 @@ export default {
       priority: 1,
       async before(h) {
         await preload(h, "tm_even_as", LAYOUTS.tm_even_as, 55);
+        await caption(h.page, "Turing machine: step through a word on the tape");
       },
       async run(h) {
         const { page } = h;
-        await h.beat(700); // the full editor with the machine loaded: the hero
+        await h.beat(800); // the full editor with the machine loaded: the hero
         await startWord(h, "aa");
-        await fwd(h, 3, 170);
-        await caption(page, '"aa" accepted');
+        await fwd(h, 3, 200);
+        await caption(page, 'Tape "aa": accepted');
         await h.beat(800);
         await startWord(h, "aaa"); // the cursor goes straight to Start
-        await fwd(h, 4, 170);
-        await caption(page, '"aaa" rejected');
-        await h.beat(1000);
-        await caption(page, "");
+        await fwd(h, 4, 200);
+        await caption(page, 'Tape "aaa": rejected');
+        await h.beat(600);
       },
     },
     {
@@ -287,8 +294,7 @@ export default {
       },
       async run(h) {
         await testing(h, "ab", "accepted");
-        await testing(h, "aa", "rejected");
-        await caption(h.page, "");
+        await testing(h, "aa", "rejected", 600);
       },
     },
     {
@@ -309,7 +315,8 @@ export default {
         const { page } = h;
         const sel = page.locator("select:has(#selectConv)");
         await h.hover(sel, 260);
-        await hide2(page, true);
+        await h.wait(60);
+        await freeze(page); // hold the regex frame while the automaton is built and laid out
         const value = await page.locator("#selectAutomaton").getAttribute("value");
         await sel.selectOption(value);
         await page.waitForFunction(() => document.getElementById("cy2")?._cyreg?.cy?.nodes().length >= 4, null, { timeout: 5000 });
@@ -317,14 +324,22 @@ export default {
           document.body.classList.add("__rec_two");
           const cy = document.getElementById("cy2")._cyreg.cy;
           cy.resize();
-          cy.layout({ name: "dagre", rankDir: "LR", nodeSep: 18, rankSep: 28 }).run();
-          cy.fit(cy.elements(), 14);
+          cy.layout({ name: "dagre", rankDir: "LR", nodeSep: 60, rankSep: 22 }).run();
+          // dagre drops the initial-state arrow's invisible source below the start node;
+          // put it straight to the left so the arrow reads as "start here".
+          const t = cy.getElementById("transparent");
+          const s0 = t.nonempty() && t.outgoers("node").first();
+          if (s0 && s0.nonempty()) {
+            const locked = t.locked(); t.unlock();
+            t.position({ x: s0.position("x") - 60, y: s0.position("y") });
+            if (locked) t.lock();
+          }
+          cy.fit(cy.elements(), 8);
         });
-        await page.waitForTimeout(100);
-        await hide2(page, false);
-        await h.moveTo(640, 640, 220);
+        await rest(h);
+        await page.waitForTimeout(60);
+        await unfreeze(page);
         await h.beat(1300);
-        await caption(page, "");
       },
     },
     {
@@ -333,25 +348,24 @@ export default {
       priority: 4,
       async before(h) {
         const { page } = h;
+        // Single pane: the click on camera opens the second box with its result.
         await preload(h, "nfa_1", LAYOUTS.nfa_1, 50);
-        const btn = deterministicBtn(page);
-        await preSplit(h, () => btn.click(), 4, [["cy", LAYOUTS.nfa_1, 25], ["cy2", LAYOUTS.nfa_1_det, 12]]);
         await caption(page, "Make deterministic");
       },
       async run(h) {
         const { page } = h;
         const btn = deterministicBtn(page);
         await h.hover(btn, 220);
-        await hide2(page, true);
+        await h.wait(80);
+        await freeze(page);
         await btn.click({ delay: 40 });
-        await waitFresh2(page, 4);
-        await twoBoxes(page, [["cy", LAYOUTS.nfa_1, 25], ["cy2", LAYOUTS.nfa_1_det, 12]]);
-        await page.waitForTimeout(60);
-        await hide2(page, false);
+        await page.waitForFunction(() => document.getElementById("cy2")?._cyreg?.cy?.nodes().length >= 4, null, { timeout: 5000 });
+        await twoBoxes(page, [["cy", LAYOUTS.nfa_1, 25], ["cy2", LAYOUTS.nfa_1_det, 12]], 60);
         await caption(page, "NFA -> deterministic");
-        await h.moveTo(900, 640, 200);
+        await rest(h);
+        await page.waitForTimeout(40);
+        await unfreeze(page);
         await h.beat(1300);
-        await caption(page, "");
       },
     },
     {
@@ -359,35 +373,30 @@ export default {
       title: "Analysis: useful states painted, useless states removed",
       priority: 5,
       async before(h) {
-        const { page } = h;
-        const kept = { transparent: [-90, 100], START: [0, 100], A: [120, 100], AB: [240, 100], SUCCESS: [360, 100] };
+        // Single box, unpainted nfa_2: the "Useful states" button is fully visible.
         await preload(h, "nfa_2", LAYOUTS.nfa_2, 40);
-        await preSplit(h, () => page.locator("#clean").click(), 4, [["cy", LAYOUTS.nfa_2, 12], ["cy2", kept, 12]]);
-        // Back to a plain, unpainted model on the left.
-        await page.evaluate(() => {
-          const cy = document.getElementById("cy")._cyreg.cy;
-          cy.nodes().removeStyle("background-color");
-        });
-        await caption(page, "Useful states");
+        await caption(h.page, "Analysis: which states are useful?");
+        const b = await h.page.locator("#useful").boundingBox();
+        await h.moveTo(b.x - 40, b.y + b.height + 50, 16); // start by the toolbar
       },
       async run(h) {
         const { page } = h;
         const kept = { transparent: [-90, 100], START: [0, 100], A: [120, 100], AB: [240, 100], SUCCESS: [360, 100] };
-        await h.click(page.locator("#useful"), { pause: 0, move: 220 });
-        await page.waitForTimeout(60);
-        await unscroll(page);
-        await place(page, LAYOUTS.nfa_2, 12, "cy", false);
-        await h.beat(900);
-        await caption(page, "Clean: useless states removed");
-        await hide2(page, true);
-        await h.click(page.locator("#clean"), { pause: 0, move: 180 });
-        await waitFresh2(page, 4);
-        await twoBoxes(page, [["cy", LAYOUTS.nfa_2, 12], ["cy2", kept, 12]]);
-        await page.waitForTimeout(60);
-        await hide2(page, false);
-        await h.moveTo(900, 640, 180);
-        await h.beat(1000);
-        await caption(page, "");
+        await h.click(page.locator("#useful"), { pause: 0, move: 120 });
+        await caption(page, "Useful states (purple): reachable and productive");
+        await h.beat(650);
+        // "Clean" paints the useless states and opens the cleaned automaton beside it.
+        await h.hover(page.locator("#clean"), 160);
+        await h.wait(30);
+        await freeze(page); // hold the purple frame while the two-box layout paints
+        await page.locator("#clean").click();
+        await page.waitForFunction(() => document.getElementById("cy2")?._cyreg?.cy?.nodes().length >= 4, null, { timeout: 5000 });
+        await twoBoxes(page, [["cy", LAYOUTS.nfa_2, 10], ["cy2", kept, 10]], 40);
+        await caption(page, "Clean: useless (purple) states removed, right");
+        await rest(h);
+        await page.waitForTimeout(40);
+        await unfreeze(page);
+        await h.beat(1400);
       },
     },
     {
@@ -395,23 +404,23 @@ export default {
       title: "Generate every accepted word up to a length",
       priority: 6,
       async before(h) {
-        const { page } = h;
         answer = "3";
         await preload(h, "dfa_2", LAYOUTS.dfa_2, 60);
-        await page.locator("#generate").click();
-        await page.waitForTimeout(300);
-        await twoBoxes(page, [["cy", LAYOUTS.dfa_2, 30]]);
-        await caption(page, "Words up to length 3");
+        await caption(h.page, "Generate accepted words up to length 3"); // from frame 0
       },
       async run(h) {
         const { page } = h;
         answer = "3";
-        await h.click(page.locator("#generate"), { pause: 0, move: 220 });
-        await page.waitForTimeout(80);
-        await twoBoxes(page, [["cy", LAYOUTS.dfa_2, 30]]);
-        await h.moveTo(900, 640, 180);
+        await h.hover(page.locator("#generate"), 200);
+        await h.wait(80);
+        await freeze(page);
+        await page.locator("#generate").click();
+        await page.waitForSelector("#generateWords", { timeout: 5000 });
+        await twoBoxes(page, [["cy", LAYOUTS.dfa_2, 20]], 40);
+        await rest(h);
+        await page.waitForTimeout(40);
+        await unfreeze(page);
         await h.beat(1300);
-        await caption(page, "");
       },
     },
     {
@@ -419,19 +428,26 @@ export default {
       title: "Dark theme",
       priority: 7,
       async before(h) {
-        await preload(h, "dfa_1", LAYOUTS.dfa_1, 70);
-        await h.page.locator("#selectTheme").evaluate((el) => el.scrollIntoView({ block: "center" }));
-        await h.page.waitForTimeout(150);
+        // The same screen generate-words ends on, so the cut is a continuation.
+        const { page } = h;
+        answer = "3";
+        await preload(h, "dfa_2", LAYOUTS.dfa_2, 60);
+        await page.locator("#generate").click();
+        await page.waitForSelector("#generateWords", { timeout: 5000 });
+        await twoBoxes(page, [["cy", LAYOUTS.dfa_2, 20]]);
+        await page.waitForTimeout(200);
+        await caption(page, "Dark theme");
+        await h.moveTo(120, 640, 16);
       },
       async run(h) {
         const { page } = h;
         const sel = page.locator("#selectTheme");
-        await h.hover(sel, 200);
-        await h.wait(100);
-        await sel.selectOption({ index: 2 });
-        await h.wait(300); // let the theme transition finish before the hold
-        await h.moveTo(700, 640, 180);
-        await h.beat(800);
+        await h.glide(sel, { offset: 560, ms: 260 });
+        await h.hover(sel, 150);
+        await sel.selectOption("dark");
+        await h.wait(250); // the theme transition
+        await rest(h);
+        await h.beat(900);
       },
     },
   ],

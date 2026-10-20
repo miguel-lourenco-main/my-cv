@@ -1,90 +1,90 @@
 {
   "id": "ui-components",
-  "composedAt": "2026-10-20T10:47:48.874Z",
-  "target": 32,
+  "composedAt": "2026-10-20T22:52:40.492Z",
+  "target": 36,
   "tolerance": 0.1,
   "bounds": [
-    28.8,
-    35.2
+    32.4,
+    39.6
   ],
   "xfade": 0,
-  "total": 29.28,
+  "total": 35.72,
   "status": "ok",
-  "marketingShare": 0.2,
+  "marketingShare": 0.18,
   "included": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 6,
+      "duration": 6.32,
       "start": 0,
-      "end": 6
+      "end": 6.32
     },
     {
       "key": "playground",
       "kind": "feature",
       "title": "Playground: edit a Button's JSX and props, copy the code",
       "priority": 1,
-      "duration": 7.04,
-      "start": 6,
-      "end": 13.04
+      "duration": 9.08,
+      "start": 6.32,
+      "end": 15.4
     },
     {
       "key": "theme",
       "kind": "feature",
       "title": "One theme (Neon) on real components, light then dark",
       "priority": 2,
-      "duration": 4.16,
-      "start": 13.04,
-      "end": 17.2
+      "duration": 4.32,
+      "start": 15.4,
+      "end": 19.72
     },
     {
       "key": "requests",
       "kind": "feature",
-      "title": "Agent request queue with validation and source review",
+      "title": "Agent request queue: a failed and a passing proposal",
       "priority": 3,
-      "duration": 5.24,
-      "start": 17.2,
-      "end": 22.44
+      "duration": 6.52,
+      "start": 19.72,
+      "end": 26.24
     },
     {
       "key": "library",
       "kind": "feature",
       "title": "Library: imported components with props contracts",
       "priority": 4,
-      "duration": 3.8,
-      "start": 22.44,
-      "end": 26.24
+      "duration": 5.48,
+      "start": 26.24,
+      "end": 31.72
     },
     {
       "key": "components",
       "kind": "feature",
       "title": "Component gallery with preview and code",
       "priority": 5,
-      "duration": 3.04,
-      "start": 26.24,
-      "end": 29.28
+      "duration": 4,
+      "start": 31.72,
+      "end": 35.72
     }
   ],
   "dropped": [],
   "missing": [],
   "clips": {
-    "marketing": 6,
-    "theme": 4.16,
-    "playground": 7.04,
-    "requests": 5.24,
-    "library": 3.8,
-    "components": 3.04
+    "marketing": 6.32,
+    "playground": 9.08,
+    "theme": 4.32,
+    "requests": 6.52,
+    "library": 5.48,
+    "components": 4
   },
   "poster": {
     "segment": "marketing",
     "at": 1
   },
   "files": {
-    "mp4": 1607352,
-    "webm": 1294274,
-    "poster": 75155,
+    "mp4": 1433573,
+    "webm": 1303598,
+    "poster": 74127,
     "mp4Crf": 23,
     "webmCrf": 38
   }

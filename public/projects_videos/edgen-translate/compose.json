@@ -1,0 +1,71 @@
+{
+  "id": "edgen-translate",
+  "composedAt": "2026-10-20T22:35:49.212Z",
+  "target": 26,
+  "tolerance": 0.1,
+  "bounds": [
+    23.4,
+    28.6
+  ],
+  "xfade": 0,
+  "total": 26.16,
+  "status": "ok",
+  "marketingShare": 0.2,
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Landing page",
+      "priority": 0,
+      "duration": 5.12,
+      "start": 0,
+      "end": 5.12
+    },
+    {
+      "key": "preview-language",
+      "kind": "feature",
+      "title": "Pick a language: side-by-side translated PDF, layout intact",
+      "priority": 1,
+      "duration": 7.04,
+      "start": 5.12,
+      "end": 12.16
+    },
+    {
+      "key": "upload-translate",
+      "kind": "feature",
+      "title": "Upload a PDF, choose German, translate -> Succeeded, meter drops",
+      "priority": 2,
+      "duration": 6.32,
+      "start": 12.16,
+      "end": 18.48
+    },
+    {
+      "key": "app-workspace",
+      "kind": "feature",
+      "title": "App workspace: New dialog run -> Italian, meter drops, sort runs",
+      "priority": 3,
+      "duration": 7.68,
+      "start": 18.48,
+      "end": 26.16
+    }
+  ],
+  "dropped": [],
+  "missing": [],
+  "clips": {
+    "marketing": 5.12,
+    "preview-language": 7.04,
+    "upload-translate": 6.32,
+    "app-workspace": 7.68
+  },
+  "poster": {
+    "segment": "preview-language",
+    "at": 8.82
+  },
+  "files": {
+    "mp4": 997231,
+    "webm": 879281,
+    "poster": 107386,
+    "mp4Crf": 23,
+    "webmCrf": 38
+  }
+}
