@@ -7,7 +7,7 @@
   },
   "projects": {
     "cash-register": {
-      "repoDir": "/home/migaloco/Desktop/personal/projects/cash_register",
+      "repoDir": "/home/migaloco/Desktop/workspace/personal/projects/cash_register",
       "devCommand": "pnpm dev",
       "port": 3000,
       "liveUrl": "https://cash-register-a85839.gitlab.io",
@@ -67,7 +67,7 @@
     },
 
     "ui-components": {
-      "repoDir": "/home/migaloco/Desktop/personal/projects/ui-components",
+      "repoDir": "/home/migaloco/Desktop/workspace/personal/projects/ui-components",
       "devCommand": "pnpm dev",
       "port": 3000,
       "liveUrl": "https://ui-components-5218c2.gitlab.io",
@@ -97,7 +97,7 @@
     },
 
     "agentic-hub": {
-      "repoDir": "/home/migaloco/Desktop/personal/projects/agentichub",
+      "repoDir": "/home/migaloco/Desktop/workspace/personal/projects/agentichub",
       "devCommand": "pnpm dev",
       "port": 3000,
       "liveUrl": "https://agentichub-64abdc.gitlab.io",
@@ -124,7 +124,7 @@
     },
 
     "job-ai-hub": {
-      "repoDir": "/home/migaloco/Desktop/personal/projects/v0-job-hunting-platform",
+      "repoDir": "/home/migaloco/Desktop/workspace/personal/projects/v0-job-hunting-platform",
       "devCommand": "pnpm dev",
       "port": 3000,
       "liveUrl": "https://v0-job-hunting-platform-two.vercel.app",
@@ -140,7 +140,7 @@
     },
 
     "sonora": {
-      "repoDir": "/home/migaloco/Desktop/personal/projects/sonora",
+      "repoDir": "/home/migaloco/Desktop/workspace/personal/projects/sonora",
       "devCommand": "pnpm dev",
       "port": 3000,
       "liveUrl": "https://sonora-d09e63.gitlab.io",
