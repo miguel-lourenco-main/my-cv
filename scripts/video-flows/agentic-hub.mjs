@@ -1,3 +1,4 @@
+// Fast-paced: short marketing slides, then invest / hire / browse / token-activity / api.
 // Live: GitLab Pages static export (no local repo). Hero -> "one agent, two
 // sides" -> category floor -> Development results -> CodeAssist Pro's page:
 // invest in it (share dialog), its agent token + live activity, the API docs
@@ -36,147 +37,244 @@ const glide = (page, top, ms) =>
 const yFor = (locator, offset) =>
   locator.first().evaluate((el, off) => Math.round(el.getBoundingClientRect().top + scrollY - off), offset);
 
+/** Wait until every element matched in `sel` (inside the page) is fully revealed. */
+const revealed = (page, sel, min) =>
+  until(page, ({ sel, min }) => {
+    const els = [...document.querySelectorAll(sel)];
+    return els.length >= min && els.every((r) => {
+      for (let n = r; n && n !== document.body; n = n.parentElement) {
+        const s = getComputedStyle(n);
+        if (Number(s.opacity) < 0.99) return false;
+      }
+      return true;
+    });
+  }, { sel, min });
+
+/**
+ * A cross-dissolve curtain for route changes: the app morphs its header and
+ * fades the new page in, and mid-morph frames read as a broken layout.
+ */
+async function installCurtain(h) {
+  await h.page.evaluate(() => {
+    const c = document.createElement("div");
+    c.id = "__rec_curtain";
+    c.style.cssText = "position:fixed;inset:0;background:#07070a;opacity:0;pointer-events:none;" +
+      "z-index:2147483646;transition:opacity .2s ease";
+    document.documentElement.appendChild(c);
+  });
+}
+const curtain = async (h, on) => {
+  await h.page.evaluate((on) => {
+    const c = document.getElementById("__rec_curtain");
+    if (c) c.style.opacity = on ? "1" : "0";
+  }, on);
+  await h.wait(220);
+};
+/** Click under the curtain (agent pages stream live activity: no networkidle). */
+async function nav(h, locator, url, ready) {
+  const { page } = h;
+  await locator.first().waitFor({ state: "visible" });
+  await h.wait(80);
+  await page.mouse.down();
+  await curtain(h, true);
+  await page.mouse.up();
+  await h.moveTo(1250, 150, 150);
+  await page.waitForURL(url, { waitUntil: "commit" });
+  await page.waitForLoadState("domcontentloaded");
+  await ready();
+  await h.wait(250);
+  await curtain(h, false);
+}
+const agentReady = (page) =>
+  page.getByRole("button", { name: "Invest", exact: true }).waitFor({ state: "visible" }).catch(() => {});
+
+const hd = (page, name) => page.getByRole("heading", { name });
+
+// Narrative order is encoded in priority (compose sorts by it): browse -> hire
+// -> invest -> token-activity -> api. Lowest-priority (api) is dropped first.
 export default {
   url: `${BASE}/`,
-  posterAt: 2,
-  async run(h) {
-    const { page } = h;
-
-    // A cross-dissolve curtain for the route changes. The app morphs its header
-    // and fades the new page in, and the mid-morph frames read as a broken
-    // layout, so the swap happens under an opaque curtain in the page's colour.
-    // It sits just under the recorder's cursor (which is at the max z-index).
-    await page.evaluate(() => {
-      const c = document.createElement("div");
-      c.id = "__rec_curtain";
-      c.style.cssText =
-        "position:fixed;inset:0;background:#07070a;opacity:0;pointer-events:none;" +
-        "z-index:2147483646;transition:opacity .28s ease";
-      document.documentElement.appendChild(c);
-    });
-    const curtain = async (on) => {
-      await page.evaluate((on) => {
-        const c = document.getElementById("__rec_curtain");
-        if (c) c.style.opacity = on ? "1" : "0";
-      }, on);
-      await h.wait(320);
-    };
-
-    // Agent pages stream a live-activity feed, so the network never goes idle:
-    // navigate by hand (URL + DOM + a ready check), under the curtain.
-    // The cursor is already on the target (h.hover). Press shows the click,
-    // the curtain closes while the button is held, and the release (= the
-    // click) fires behind it, so the app's exit morph is never on tape.
-    const nav = async (locator, url, ready) => {
-      await locator.first().waitFor({ state: "visible" });
-      await h.wait(120);
-      await page.mouse.down();
-      await curtain(true);
-      await page.mouse.up();
-      // Park the cursor in the empty gutter while the new page builds, so it
-      // never sits on top of whatever lands under the click point.
-      await h.moveTo(1250, 150, 200);
-      await page.waitForURL(url, { waitUntil: "commit" });
-      await page.waitForLoadState("domcontentloaded");
-      await ready();
-      await h.wait(350);
-      await curtain(false);
-    };
-
-    // 1) Straight from the hero to "One agent. Two sides.". The live stats
-    // strip at the foot of the hero is skipped: its "SOL settled" counter is
-    // always 0 on the demo data and read as a broken widget. One continuous,
-    // gentle move (~650 px/s) carries the strip through without stopping on it.
-    const twoSided = page.locator("#two-sided");
-    await glide(page, await yFor(twoSided, NAV_H + 10), 1700);
-    // The two cards reveal on view: hold only once both are fully in.
-    await until(page, () => {
-      const sec = document.getElementById("two-sided");
-      const cards = [...sec.querySelectorAll("*")].filter((e) =>
-        /Autonomous work, on demand|Tokenized, on-chain ownership/.test(e.textContent) && e.childElementCount === 0);
-      if (cards.length < 2) return false;
-      return cards.every((c) => {
-        for (let n = c; n && n !== sec; n = n.parentElement) {
-          const st = getComputedStyle(n);
-          if (Number(st.opacity) < 0.99 || (st.transform !== "none" && !/^matrix\(1, 0, 0, 1, 0, 0\)$/.test(st.transform))) return false;
-        }
-        return true;
+  target: 40,
+  waitUntil: "domcontentloaded",
+  pacing: { featureLead: 150 },
+  posterFrom: { segment: "marketing", at: 1 },
+  beforeEach: installCurtain,
+  marketing: {
+    async before(h) {
+      // Trigger every scroll-reveal off camera so each slide is fully legible.
+      const { page } = h;
+      const H = await page.evaluate(() => document.documentElement.scrollHeight);
+      for (let y = 0; y < H; y += 500) {
+        await page.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), y);
+        await h.wait(120);
+      }
+      await h.wait(700);
+      await page.evaluate(() => {
+        const st = document.createElement("style");
+        st.textContent = "*{scroll-behavior:auto!important}";
+        document.head.appendChild(st);
+        scrollTo({ top: 0, behavior: "instant" });
       });
-    });
-    await h.dwell(3000);
-
-    // 2) The category floor: land once with the heading ~80 px under the nav,
-    // then let the row reveal finish before holding.
-    const floorHeading = page.getByRole("heading", { name: "Browse the floor" });
-    await glide(page, await yFor(floorHeading, NAV_H + 80), 1500);
-    await until(page, () => {
-      const rows = [...document.querySelectorAll('#categories a[href^="/agents/?query="]')];
-      return rows.length >= 5 && rows.every((r) => {
-        for (let n = r; n && n.id !== "categories"; n = n.parentElement) {
-          const s = getComputedStyle(n);
-          if (Number(s.opacity) < 0.99 || (s.transform !== "none" && !/^matrix\(1, 0, 0, 1, 0, 0\)$/.test(s.transform))) return false;
-        }
-        return true;
-      });
-    });
-    await h.dwell(800);
-
-    // 3) Development -> results grid. The cursor waits in the right gutter
-    // (where nav() parked it), then glides straight to "Try agent" and clicks
-    // at once, so the card's hover market line is never held on camera.
-    const dev = page.locator('a[href="/agents/?query=Development"]');
-    await h.hover(dev, 500);
-    await nav(dev, /query=Development/, () =>
-      until(page, () => /Found \d+ results/.test(document.body.innerText)));
-    await h.dwell(1000);
-    const tryAgent = page.locator('a[href="/agents/1/"]').filter({ hasText: "Try agent" });
-    await h.hover(tryAgent, 600);
-    await nav(tryAgent, /\/agents\/1\/?$/, () =>
-      page.getByRole("button", { name: "Invest", exact: true }).waitFor({ state: "visible" }).catch(() => {}));
-
-    // 4) Agent hero, cursor parked in the right gutter above the metrics row.
-    const invest = page.getByRole("button", { name: "Invest", exact: true });
-    await h.moveTo(1240, 520, 500);
-    await h.dwell(700);
-
-    // 5) Invest: the share dialog (market cap, available shares, price).
-    await h.click(invest, { pause: 0, move: 600 });
-    const dialog = page.getByRole("dialog");
-    await dialog.waitFor({ state: "visible" });
-    await h.wait(300);
-    await h.moveTo(1240, 520, 400); // gutter, off the dialog and the metric cards
-    await h.dwell(1800);
-    const cont = dialog.getByRole("button", { name: /Continue to Investment/i });
-    if (await cont.count()) await h.hover(cont, 500);
-    await h.dwell(400);
-    await page.keyboard.press("Escape");
-    await dialog.waitFor({ state: "hidden" }).catch(() => {});
-    await h.moveTo(1240, 420, 300);
-
-    // 6) Agent token chart + live activity: one continuous move so the token
-    // card sits ~200 px down with the metrics row above it and the tab bar in
-    // view. The feed's rows stagger in on view; hold once all 8 are in.
-    const tokenCard = page.locator("h3", { hasText: /^Agent Token$/ }).locator("xpath=ancestor::div[contains(@class,'rounded-lg')][1]");
-    await glide(page, await yFor(tokenCard, 200), 1100);
-    await until(page, () => {
-      const head = [...document.querySelectorAll("h3")].find((e) => e.textContent.trim() === "Live Activity");
-      const li = [...(head?.closest(".rounded-lg")?.querySelectorAll("li") || [])];
-      return li.length >= 8 && li.every((r) => Number(getComputedStyle(r).opacity) >= 0.99);
-    }, undefined, 1500);
-    await h.dwell(2500);
-
-    // 7) API docs: click, bring the panel up under the nav in one step, hold.
-    const apiTab = page.getByRole("tab", { name: "API Documentation" });
-    await h.click(apiTab, { pause: 200, move: 500 });
-    await h.moveTo(1240, 300, 300);
-    await glide(page, await yFor(apiTab, 160), 900);
-    await h.dwell(1800);
-
-    // 8) API Playground (agent-to-agent calls) closes the clip.
-    const play = page.getByRole("tab", { name: "API Playground" });
-    await h.click(play, { pause: 200, move: 500 });
-    const pb = await play.boundingBox();
-    if (pb) await h.moveTo(pb.x + pb.width / 2, pb.y + pb.height + 44, 300);
-    await h.dwell(2700);
+      await h.wait(400);
+    },
+    async run(h) {
+      const { page } = h;
+      // Hero is held by pacing.heroDwell; type the query the browse clip opens on.
+      const box = page.getByLabel("Search agents");
+      await box.focus();
+      await box.pressSequentially("Development", { delay: 22 });
+      await h.beat(250);
+      await h.slides([
+        {
+          at: "#two-sided", offset: NAV_H + 10, hold: 150,
+          async interact() {
+            const cards = page.locator("#two-sided h3");
+            await h.hover(cards.first(), 100);
+            await h.hover(cards.nth(1), 160);
+          },
+        },
+        { at: "#categories", offset: NAV_H + 20, hold: 700 },
+        { at: "#how-it-works", offset: NAV_H + 10, hold: 650 },
+        { at: "#list-agent", offset: NAV_H + 10, hold: 700 },
+      ].map((x) => ({ ms: 260, ...x })), { settle: 150 });
+    },
   },
+  features: [
+    {
+      key: "browse",
+      title: "Search results, rating filter, sort, open an agent",
+      priority: 1,
+      url: `${BASE}/agents/?query=Development`,
+      async before(h) {
+        await until(h.page, () => /Found 9 results/.test(document.body.innerText));
+        await h.moveTo(1250, 150, 16);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(300);
+        // The grid shrink animates scale/transform (renders stretched): disable it.
+        await page.addStyleTag({ content: "main *{animation:none!important;transition-property:opacity,background-color,border-color,color!important;transform:none!important}" });
+        await h.click(page.getByText("4.7+", { exact: true }), { pause: 0 });
+        await until(page, () => /Found 2 results/.test(document.body.innerText));
+        await h.waitForStill(1200);
+        await h.beat(900);
+        await h.click(page.getByText(/clear filters/i), { pause: 0 });
+        const sort = page.locator("select").filter({ has: page.locator('option[value="rating"]') }).first();
+        await h.hover(sort, 220);
+        await h.beat(250);
+        await sort.selectOption("rating");
+        await h.beat(800);
+        const tryAgent = page.locator('a[href="/agents/1/"]').filter({ hasText: "Try agent" });
+        await h.hover(tryAgent, 280);
+        await h.wait(150);
+        await page.mouse.down();
+        await h.wait(90);
+        await page.mouse.up();
+        await h.wait(120); // clip ends on the click; the route change is never filmed
+      },
+    },
+    {
+      key: "hire",
+      title: "Hire an agent: buy credits with a live total",
+      priority: 2,
+      url: `${BASE}/agents/1/`,
+      async before(h) {
+        await agentReady(h.page);
+        const b = await h.page.getByRole("button", { name: "Hire agent" }).boundingBox();
+        await h.moveTo(b.x + b.width + 120, b.y + b.height / 2, 16);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.click(page.getByRole("button", { name: "Hire agent" }), { pause: 0 });
+        const dialog = page.getByRole("dialog");
+        await dialog.waitFor({ state: "visible" });
+        await h.beat(500);
+        const input = dialog.locator('input[type="number"]').first();
+        await input.click({ clickCount: 3 });
+        await input.pressSequentially("45", { delay: 30 });
+        await h.beat(700);
+        await h.hover(dialog.getByRole("button", { name: /^Pay /i }), 220);
+        await h.beat(350);
+      },
+    },
+    {
+      key: "invest",
+      title: "Invest in an agent: two-step share purchase",
+      priority: 3,
+      url: `${BASE}/agents/1/`,
+      async before(h) {
+        await agentReady(h.page);
+        const b = await h.page.getByRole("button", { name: "Invest", exact: true }).boundingBox();
+        await h.moveTo(b.x + b.width / 2 - 40, b.y + b.height / 2, 16);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.click(page.getByRole("button", { name: "Invest", exact: true }), { pause: 0, move: 120 });
+        const dialog = page.getByRole("dialog");
+        await dialog.waitFor({ state: "visible" });
+        await h.beat(650);
+        await h.click(dialog.getByRole("button", { name: /Continue to Investment/i }), { pause: 100 });
+        const amount = page.getByLabel(/Investment Amount/i);
+        await amount.waitFor({ state: "visible" });
+        await h.click(amount, { pause: 40 });
+        await amount.fill("");
+        await amount.pressSequentially("250", { delay: 35 });
+        await h.hover(dialog.getByRole("button", { name: /Invest Now/i }), 220);
+        await h.beat(400);
+      },
+    },
+    {
+      key: "token-activity",
+      title: "Performance metrics, agent token chart, live activity",
+      priority: 4,
+      url: `${BASE}/agents/1/`,
+      async before(h) {
+        const { page } = h;
+        await agentReady(page);
+        await h.jump(hd(page, /Performance Metrics/i), { offset: NAV_H + 10 });
+        await until(page, () => {
+          const head = [...document.querySelectorAll("h3")].find((e) => e.textContent.trim() === "Live Activity");
+          const li = [...(head?.closest(".rounded-lg")?.querySelectorAll("li") || [])];
+          return li.length >= 8 && li.every((r) => Number(getComputedStyle(r).opacity) >= 0.99);
+        }, undefined, 4000);
+        await h.moveTo(1240, 420, 16);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(450);
+        const tokenCard = page.locator("h3", { hasText: /^Agent Token$/ }).locator("xpath=ancestor::div[contains(@class,'rounded-lg')][1]");
+        await h.glide(tokenCard, { offset: 200, ms: 350 });
+        await h.moveTo(500, 400, 200);
+        await h.moveTo(700, 380, 250);
+        await h.beat(700);
+        await h.moveTo(1000, 420, 220);
+        await h.beat(400);
+      },
+    },
+    {
+      key: "api",
+      title: "API docs and playground: send a request",
+      priority: 5,
+      url: `${BASE}/agents/1/`,
+      async before(h) {
+        await agentReady(h.page);
+        await h.page.getByRole("tab", { name: "API Documentation" }).click();
+        await h.jump(h.page.getByRole("tab", { name: "API Documentation" }), { offset: 160 });
+        await h.waitForStill(800);
+        await h.moveTo(1240, 300, 16);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(700);
+        await h.click(page.getByRole("tab", { name: "API Playground" }), { pause: 60 });
+        const ta = page.locator("textarea").first();
+        await h.click(ta, { pause: 0 });
+        await ta.fill("");
+        await ta.pressSequentially('{"input":"refactor auth module"}', { delay: 18 });
+        await h.click(page.getByRole("button", { name: /Send request/i }), { pause: 0 });
+        await page.getByText(/taskId/).first().waitFor({ state: "visible", timeout: 8000 }).catch(() => {});
+        await h.beat(1100);
+      },
+    },
+  ],
 };

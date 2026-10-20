@@ -1,78 +1,82 @@
 #!/usr/bin/env node
 /**
- * Record the project walkthrough videos shown in the project dialog and the
- * Featured viewer (issue #19).
+ * Record and compose the project walkthrough videos shown in the project dialog
+ * and the Featured viewer (issue #19).
+ *
+ * The point of a video is to SHOW the app's features so the viewer does not have
+ * to explore it. So each project is recorded as separate clips — one short
+ * marketing clip (the landing page as a few quick "slides", <= 20% of runtime)
+ * and one clip per feature — and the compositor joins them in priority order,
+ * dropping the lowest-priority features until the total fits the target length.
  *
  * Usage
- *   pnpm record-videos                          # every flow in scripts/video-flows/
- *   pnpm record-videos sonora cash-register     # only these ids
- *   pnpm record-videos sonora --headed          # watch the run in a window
- *   pnpm record-videos sonora --keep-raw        # also keep the raw Playwright .webm
- *   pnpm record-videos sonora --frames <dir>    # also export review frames (see below)
- *   pnpm record-videos sonora --out <dir>       # write demo.* to <dir>/<id>/ instead of public/
- *   pnpm record-videos sonora --port-base 5100  # base for locally served apps (default 4100)
- *   pnpm record-videos sonora --frames <dir> --reframe  # frames from the existing demo.mp4, no recording
- *   pnpm record-videos --list                   # print the known ids and their ports
+ *   pnpm record-videos list                                   # ids, ports, targets, segments
+ *   pnpm record-videos record <id>                            # every clip of <id>
+ *   pnpm record-videos record <id> marketing editor kanban    # only these clips (re-record)
+ *   pnpm record-videos compose <id>                           # target = flow.target (default 45 s)
+ *   pnpm record-videos compose <id> --target 60 --tolerance 0.1 --xfade 0.15
+ *   pnpm record-videos compose <id> --frames <dir>            # + review frames, contact sheet, stats
+ *   pnpm record-videos frames <id> --frames <dir>             # frames of the existing demo.mp4 only
  *
- * Needs: ffmpeg + ffprobe on PATH (libx264, libvpx-vp9, drawtext) and a
+ *   Common options
+ *     --out <dir>        base dir instead of public/projects_videos (clips and demo
+ *                        go to <dir>/<id>/clips/ and <dir>/<id>/)
+ *     --headed           record in a visible browser window
+ *     --keep-raw         keep each raw Playwright .webm next to its clip
+ *     --port-base <n>    base for locally served apps (default 4100)
+ *
+ * Needs: ffmpeg + ffprobe on PATH (libx264, libvpx-vp9, drawtext, xfade) and a
  * Playwright Chromium in the local cache (`pnpm exec playwright-core install chromium`).
  *
- * Flows
- *   Each project's walkthrough lives in its own module, scripts/video-flows/<id>.mjs,
- *   loaded dynamically: adding a project never needs an edit here. Files whose
- *   name starts with "_" are shared code, not flows. A flow module default-exports:
+ * Flows: scripts/video-flows/<id>.mjs (files starting with "_" are shared code)
+ *   export default {
+ *     url,             string or ({ port }) => string. Where every segment starts.
+ *     target?,         seconds; default video length for `compose` (30..75, default 45)
+ *     server?,         ({ port }) => { command, args, cwd, env, url, readyTimeoutMs }
+ *                      for an app that runs locally; started once per `record`.
+ *     setup?,          async (page, { url, port }) in an UNRECORDED context (demo
+ *                      login, seeding). Its cookies + localStorage are handed to
+ *                      every recorded segment, so no login screen is ever filmed.
+ *     beforeEach?,     async (h, segment) on the recorded page before every segment
+ *                      (style tweaks etc.). Off camera: trimmed away.
+ *     marketing: {     the landing page, <= 20% of runtime. Optional for apps with
+ *       url?, before?, run(h)        no landing (cash-register, oflat).
+ *     },
+ *     features: [{     each its own clip, composed in priority order
+ *       key,           kebab-case, the clip's filename (clips/<key>.mp4)
+ *       title,         short human label (compose.json, contact sheet)
+ *       priority,      1 = most important. Lowest priority (highest number) is dropped first.
+ *       url?,          string or ({ base, port }) => string. Defaults to the flow url.
+ *       before?(h),    gets the page to the feature's opening state. Runs on the
+ *                      recorded page but is TRIMMED (off camera): use h.jump(), direct
+ *                      DOM setup, off-camera clicks, waits for spinners.
+ *       run(h),        the on-camera part.
+ *     }],
+ *     posterFrom?,     { segment: "marketing" | <feature key>, at: seconds (negative = from its end) }
+ *     pacing?, colorScheme?, locale?   overrides ("light", "en-US" by default)
+ *   }
  *
- *     url        string, or ({ port }) => string. The page the recording opens.
- *     run(h)     the scripted walkthrough; `h` is the helper set from makeHelpers().
- *     posterAt   seconds into the clip for poster.jpg (negative: from the end). Default 1.
- *     prepare(page, ctx)  optional. Runs in a separate, UNRECORDED context (e.g. a
- *                demo sign-in); its storage state (cookies + localStorage) is handed
- *                to the recorded context, so no login screen is ever on tape.
- *     server({ port })    optional, for an app that must run locally. Returns
- *                { command, args, cwd, env, url, readyTimeoutMs }; the recorder spawns
- *                it, waits until `url` answers, records, then kills the process group.
- *                `port` is unique per id (see Ports) so parallel recorders never clash.
- *     pacing     optional overrides of PACING below, for this flow only.
- *     colorScheme / locale  optional context overrides ("light", "en-US" by default).
+ *   `h` is the helper set from scripts/video-flows/_lib/helpers.mjs (fast pacing:
+ *   hero ~1.5 s, beats ~1 s, fast cursor/typing/glides; h.slides(sections) for
+ *   the marketing beats). Each clip starts when the segment's run() starts; the
+ *   page load, settle and before() are cut automatically. The marketing clip
+ *   opens on a heroDwell hold, each feature clip on a short featureLead hold.
  *
- * Pacing (the defaults every flow inherits; the reason this exists is a video that
- * scrolled past the hero before anyone could read it)
- *   - After the first load the recorder waits for the page to settle (intro
- *     animations, splash screens, typed-in text; at most `settleMax`), then holds
- *     it still for `heroDwell` (3.5 s) before the flow's run() starts, so the
- *     final hero is always readable. h.waitForStill() is available to flows too.
- *   - h.scrollTo() / h.scrollBy() never jump: each step moves at most ~0.75
- *     viewport (preferring to stop at a section or heading start), no faster than
- *     `maxScrollSpeed` px/s, and pauses `sectionPause` on every intermediate stop
- *     whose viewport shows content (text, images, canvases).
- *   - h.click() on an off-screen element brings it in with the same paced scroll.
- *   - Any click that changes the page path (a navigation, full or client-side)
- *     waits for the load and then holds `navDwell` (3 s) so the new page's hero is
- *     readable too. h.goto(url) does the same.
+ * Outputs, per id, in public/projects_videos/<id>/ (or --out <dir>/<id>/)
+ *   clips/<key>.mp4    one per segment (git-ignored, stripped from the build)
+ *   clips/clips.json   per clip: kind, title, priority, duration, recordedAt
+ *   demo.mp4           H.264 yuv420p +faststart, no audio, 1280x800, <= 3 MB
+ *   demo.webm          VP9, no audio
+ *   poster.jpg         from posterFrom
+ *   compose.json       target, tolerance, included/dropped features, durations, total
  *
- * Output, per id, in public/projects_videos/<id>/ (or --out <dir>/<id>/):
- *   demo.mp4   H.264, yuv420p, +faststart, no audio, <= 3 MB
- *   demo.webm  VP9, no audio, smaller than the mp4
- *   poster.jpg a frame `posterAt` seconds into the clip
+ * --frames <dir> (compose / frames): 2 fps PNGs, 480 px wide, named by timestamp
+ *   (t0012.5s.png), contact-sheet.png (time + segment labels) and stats.json
+ *   (duration, sizes, resolution + compose.json with segment start/end times).
  *
- * --frames <dir>  (for review / jury agents) after encoding, writes into <dir>
- *   (into <dir>/<id>/ when several ids are recorded in one run):
- *   t0000s.png, t0001s.png, ...  one frame per second of demo.mp4, 640 px wide,
- *                                named by its timestamp in seconds
- *   contact-sheet.png            all of those, tiled, each labelled with its time
- *   stats.json                   duration, mp4/webm/poster bytes, resolution, fps, url
- *
- * Ports
- *   An app that has to be run locally gets port = portBase + index of its id in
- *   PORT_ORDER (portBase 4100 by default, --port-base to change it), e.g.
- *   oflat 4100, edgen-chat 4101, ... job-ai-hub 4109. An id not in the list gets
- *   portBase + 20 + its position in the sorted flow list.
- *
- * Parallel use: one process per id is safe in a single checkout. Each run has its
- * own browser, its own temp dir, its own output folder and its own port.
- *
- * Flows use demo data only. When an app's UI changes, update its selectors in
- * its flow module and re-run.
+ * Ports: an app run locally gets portBase + index in PORT_ORDER (oflat 4100 ...
+ * job-ai-hub 4109). Parallel use: one process per id is safe in one checkout
+ * (own browser, temp dir, output folder, port). Demo data only, no login on camera.
  */
 import { chromium } from "playwright-core";
 import { execFileSync, spawn } from "node:child_process";
@@ -80,308 +84,23 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { CURSOR_SCRIPT, PACING, VIEWPORT, makeHelpers } from "./video-flows/_lib/helpers.mjs";
+
+export { PACING, makeHelpers };
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const FLOWS_DIR = path.join(ROOT, "scripts", "video-flows");
 const DEFAULT_OUT_DIR = path.join(ROOT, "public", "projects_videos");
-const VIEWPORT = { width: 1280, height: 800 };
 const MAX_MP4_BYTES = 3 * 1024 * 1024;
+const FPS = 25;
+const DEFAULT_TARGET = 45;
+const DEFAULT_TOLERANCE = 0.1;
+const MAX_MARKETING_SHARE = 0.2;
 
 export const PORT_ORDER = [
   "oflat", "edgen-chat", "edgen-code", "edgen-translate", "sonora",
   "agentic-hub", "o-guardanapo", "ui-components", "cash-register", "job-ai-hub",
 ];
-
-/** Defaults every flow inherits; a flow may override any of them via `pacing`. */
-export const PACING = {
-  heroDwell: 3500,      // ms the first screen is held still before run(), after it settles
-  settleMax: 8000,      // max ms to wait for intro animations / splash screens to finish
-  navDwell: 3000,       // ms held after any navigation, once the new page has loaded
-  maxScrollSpeed: 900,  // px/s cap for h.scrollTo()
-  scrollStep: 0.75,     // max fraction of the viewport moved per scroll step
-  minStepMs: 650,       // a scroll step never takes less than this
-  sectionPause: 1300,   // ms paused on each intermediate step that shows content
-  arrivePause: 700,     // ms paused once h.scrollTo() reaches its target
-};
-
-// ---------------------------------------------------------------------------
-// Helpers handed to every flow
-// ---------------------------------------------------------------------------
-
-/** A visible cursor: headless recordings have none, which makes clicks unreadable. */
-const CURSOR_SCRIPT = () => {
-  const install = () => {
-    if (document.getElementById("__rec_cursor")) return;
-    const c = document.createElement("div");
-    c.id = "__rec_cursor";
-    c.style.cssText =
-      "position:fixed;left:0;top:0;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;" +
-      "background:rgba(20,20,20,.35);border:2px solid rgba(255,255,255,.95);box-shadow:0 1px 6px rgba(0,0,0,.35);" +
-      "pointer-events:none;z-index:2147483647;transition:transform .12s ease,background .12s ease;" +
-      "transform:translate(-100px,-100px)";
-    document.documentElement.appendChild(c);
-    let x = -100;
-    let y = -100;
-    let down = false;
-    const paint = () => {
-      c.style.transform = `translate(${x}px,${y}px) scale(${down ? 0.7 : 1})`;
-      c.style.background = down ? "rgba(255,180,0,.75)" : "rgba(20,20,20,.35)";
-    };
-    window.addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; paint(); }, true);
-    window.addEventListener("mousedown", () => { down = true; paint(); }, true);
-    window.addEventListener("mouseup", () => { down = false; paint(); }, true);
-  };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install);
-  else install();
-};
-
-/** Path + search of a URL: a hash-only change is not a navigation. */
-const pageKey = (u) => {
-  try {
-    const x = new URL(u);
-    return x.origin + x.pathname + x.search;
-  } catch {
-    return u;
-  }
-};
-
-export function makeHelpers(page, pacing = PACING, extra = {}) {
-  let mouse = { x: VIEWPORT.width / 2, y: VIEWPORT.height / 2 };
-  const wait = (ms) => page.waitForTimeout(ms);
-
-  /** Hold the frame still (no cursor, no scroll) for `ms`. */
-  const dwell = (ms) => wait(ms);
-
-  /**
-   * Wait until the page stops changing on its own (intro animations, splash
-   * screens, typewriter text): no finite CSS/Web animation running and the
-   * visible text unchanged across two polls. Gives up after `maxMs` (pages with
-   * endless background motion never settle). Returns the ms waited.
-   */
-  async function waitForStill(maxMs = pacing.settleMax) {
-    const t0 = Date.now();
-    let prev = null;
-    let stable = 0;
-    while (Date.now() - t0 < maxMs) {
-      const sig = await page.evaluate(() => {
-        const busy = document.getAnimations().filter((a) => {
-          const t = a.effect?.getComputedTiming?.();
-          return a.playState === "running" && t && Number.isFinite(t.endTime);
-        }).length;
-        const H = window.innerHeight;
-        let text = "";
-        for (const el of document.querySelectorAll("h1, h2, h3, p, a, button, span, li")) {
-          const r = el.getBoundingClientRect();
-          if (r.bottom > 0 && r.top < H && el.childElementCount === 0) text += el.textContent;
-          if (text.length > 4000) break;
-        }
-        return { busy, text: `${text.length}:${text.slice(0, 400)}` };
-      }).catch(() => ({ busy: 1, text: "" }));
-      if (!sig.busy && sig.text === prev) {
-        if (++stable >= 2) break;
-      } else stable = 0;
-      prev = sig.text;
-      await wait(250);
-    }
-    return Date.now() - t0;
-  }
-
-  /** Wait for a freshly navigated page to settle, then hold it for navDwell. */
-  async function settleNavigation(ms = pacing.navDwell) {
-    await page.waitForLoadState("domcontentloaded").catch(() => {});
-    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
-    await waitForStill();
-    await dwell(ms);
-  }
-
-  /** Navigate the recorded page (on camera) and hold the new page's hero. */
-  async function goto(url, { dwellMs = pacing.navDwell } = {}) {
-    await page.goto(url, { waitUntil: "networkidle" });
-    await waitForStill();
-    await dwell(dwellMs);
-  }
-
-  /** Glide the cursor to (x, y) so the viewer can follow it. */
-  async function moveTo(x, y, ms = 450) {
-    const steps = Math.max(8, Math.round(ms / 16));
-    const from = { ...mouse };
-    for (let i = 1; i <= steps; i++) {
-      const t = i / steps;
-      const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      await page.mouse.move(from.x + (x - from.x) * e, from.y + (y - from.y) * e);
-      await page.waitForTimeout(ms / steps);
-    }
-    mouse = { x, y };
-  }
-
-  /**
-   * Find the element's nearest scrollable ancestor (or the window), park it on
-   * window.__recScroller and return { from, to, viewport }.
-   */
-  const resolveScroll = (locator, offset) =>
-    locator.first().evaluate((el, offset) => {
-      const scroller = (() => {
-        for (let n = el.parentElement; n; n = n.parentElement) {
-          const oy = getComputedStyle(n).overflowY;
-          if ((oy === "auto" || oy === "scroll") && n.scrollHeight > n.clientHeight + 4) return n;
-        }
-        return document.scrollingElement;
-      })();
-      window.__recScroller = scroller;
-      const isDoc = scroller === document.scrollingElement;
-      const from = scroller.scrollTop;
-      const base = isDoc ? 0 : scroller.getBoundingClientRect().top;
-      const max = scroller.scrollHeight - scroller.clientHeight;
-      const to = Math.max(0, Math.min(max, from + el.getBoundingClientRect().top - base - offset));
-      return { from, to, viewport: isDoc ? window.innerHeight : scroller.clientHeight };
-    }, offset);
-
-  /** Ease the parked scroller to `top` over `duration` ms. */
-  const animateScroll = (top, duration) =>
-    page.evaluate(
-      ({ top, duration }) =>
-        new Promise((resolve) => {
-          const s = window.__recScroller || document.scrollingElement;
-          const top0 = s.scrollTop;
-          const t0 = performance.now();
-          const step = (now) => {
-            const t = Math.min(1, (now - t0) / duration);
-            const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-            s.scrollTo({ top: top0 + (top - top0) * e, behavior: "instant" });
-            if (t < 1) requestAnimationFrame(step);
-            else resolve();
-          };
-          requestAnimationFrame(step);
-        }),
-      { top, duration }
-    );
-
-  /** Does the current viewport show something worth pausing on? */
-  const viewportHasContent = () =>
-    page.evaluate(() => {
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-      const onScreen = (r) => r.bottom > 40 && r.top < H - 40 && r.right > 0 && r.left < W && r.width > 0;
-      let chars = 0;
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      for (let n = walker.nextNode(); n && chars < 60; n = walker.nextNode()) {
-        const t = n.textContent.trim();
-        if (!t || !n.parentElement) continue;
-        const r = n.parentElement.getBoundingClientRect();
-        if (onScreen(r) && getComputedStyle(n.parentElement).visibility !== "hidden") chars += t.length;
-      }
-      if (chars >= 60) return true;
-      for (const m of document.querySelectorAll("img, svg, canvas, video, picture, iframe")) {
-        const r = m.getBoundingClientRect();
-        if (onScreen(r) && r.width * r.height > 120 * 120) return true;
-      }
-      return false;
-    });
-
-  /**
-   * Next intermediate stop between `cur` and `to`: the furthest section or
-   * heading top that is at most `maxStep` away (so a pause lands on a section's
-   * start, not mid-paragraph), else a plain `maxStep` move.
-   */
-  const nextStop = (cur, to, maxStep) =>
-    page.evaluate(({ cur, to, maxStep }) => {
-      const s = window.__recScroller || document.scrollingElement;
-      const isDoc = s === document.scrollingElement;
-      const base = isDoc ? 0 : s.getBoundingClientRect().top;
-      const dir = Math.sign(to - cur);
-      const lo = 0.35 * maxStep;
-      let best = null;
-      for (const el of document.querySelectorAll("section, [id], h1, h2, h3")) {
-        const r = el.getBoundingClientRect();
-        if (r.height < 40 && !/^H[1-3]$/.test(el.tagName)) continue;
-        const top = s.scrollTop + r.top - base - (/^H[1-3]$/.test(el.tagName) ? 90 : 0);
-        const d = (top - cur) * dir;
-        if (d >= lo && d <= maxStep && (top - to) * dir < 0 && (best === null || d > (best - cur) * dir)) best = top;
-      }
-      return best ?? cur + dir * maxStep;
-    }, { cur, to, maxStep });
-
-  /** Step the parked scroller from `from` to `to` under the pacing rules. */
-  async function stepScroll(from, to, viewport, { duration = 0, pause = pacing.arrivePause } = {}) {
-    const dist = Math.abs(to - from);
-    if (dist >= 2) {
-      const maxStep = Math.max(120, viewport * pacing.scrollStep);
-      const dir = Math.sign(to - from);
-      const floorMs = duration / Math.max(1, Math.ceil(dist / maxStep));
-      let cur = from;
-      for (let guard = 0; guard < 60; guard++) {
-        const last = Math.abs(to - cur) <= maxStep;
-        const stop = last ? to : await nextStop(cur, to, maxStep);
-        const d = Math.abs(stop - cur);
-        await animateScroll(stop, Math.max(pacing.minStepMs, (d / pacing.maxScrollSpeed) * 1000, floorMs));
-        cur = stop;
-        if (last || (to - cur) * dir <= 0) break;
-        if (await viewportHasContent()) await wait(pacing.sectionPause);
-      }
-    }
-    await wait(pause);
-  }
-
-  /**
-   * Scroll the element's scroller to it without ever jumping past a section:
-   * steps of at most `scrollStep` viewports, speed capped at `maxScrollSpeed`,
-   * a `sectionPause` on every intermediate step that shows content.
-   * `duration` is a floor for the whole move (kept for old flows), not a ceiling.
-   */
-  async function scrollTo(locator, { offset = 80, duration = 0, pause = pacing.arrivePause } = {}) {
-    const { from, to, viewport } = await resolveScroll(locator, offset);
-    await stepScroll(from, to, viewport, { duration, pause });
-  }
-
-  /** Scroll the window by `dy` px with the same step/speed/pause rules. */
-  async function scrollBy(dy, { duration = 0, pause = pacing.arrivePause } = {}) {
-    const { from, to, viewport } = await page.evaluate((dy) => {
-      const s = document.scrollingElement;
-      window.__recScroller = s;
-      const max = s.scrollHeight - s.clientHeight;
-      return { from: s.scrollTop, to: Math.max(0, Math.min(max, s.scrollTop + dy)), viewport: window.innerHeight };
-    }, dy);
-    await stepScroll(from, to, viewport, { duration, pause });
-  }
-
-  /**
-   * Move the cursor onto the element, then click it. If the click changes the
-   * page (path or query), wait for the new page and hold it for navDwell.
-   */
-  async function click(locator, { pause = 250, move = 450, navDwell = pacing.navDwell } = {}) {
-    const el = locator.first();
-    await el.waitFor({ state: "visible" });
-    let box = await el.boundingBox();
-    // Off screen: bring it in with the paced scroll, never a jump.
-    if (box && (box.y < 0 || box.y + box.height > VIEWPORT.height)) {
-      await scrollTo(el, { offset: Math.max(80, (VIEWPORT.height - box.height) / 2), pause: 300 });
-      box = await el.boundingBox();
-    }
-    if (!box) throw new Error(`no box for ${el}`);
-    await moveTo(box.x + box.width / 2, box.y + box.height / 2, move);
-    await wait(120);
-    const before = pageKey(page.url());
-    // Playwright's own click: it re-checks actionability and lands on the same point.
-    await el.click({ delay: 90 });
-    await wait(pause);
-    if (pageKey(page.url()) !== before) await settleNavigation(navDwell);
-  }
-
-  async function hover(locator, ms = 450) {
-    const box = await locator.first().boundingBox();
-    if (box) await moveTo(box.x + box.width / 2, box.y + box.height / 2, ms);
-  }
-
-  async function type(locator, text, delay = 85) {
-    await click(locator);
-    await locator.first().pressSequentially(text, { delay });
-  }
-
-  return {
-    page, pacing, viewport: VIEWPORT, ...extra,
-    wait, dwell, waitForStill, goto, settleNavigation, moveTo, scrollTo, scrollBy, click, hover, type,
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Flow discovery
@@ -398,8 +117,30 @@ function flowIds() {
 async function loadFlow(id) {
   const mod = await import(pathToFileURL(path.join(FLOWS_DIR, `${id}.mjs`)).href);
   const flow = mod.default;
-  if (!flow || typeof flow.run !== "function") throw new Error(`${id}.mjs must default-export { url, run }`);
+  const problems = [];
+  if (!flow) problems.push("no default export");
+  else {
+    if (flow.marketing && typeof flow.marketing.run !== "function") problems.push("marketing.run must be a function");
+    if (!Array.isArray(flow.features)) problems.push("features must be an array");
+    const seen = new Set(["marketing"]);
+    for (const f of flow.features || []) {
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(f.key || "")) problems.push(`bad feature key ${JSON.stringify(f.key)}`);
+      if (seen.has(f.key)) problems.push(`duplicate key ${f.key}`);
+      seen.add(f.key);
+      if (typeof f.run !== "function") problems.push(`${f.key}: run must be a function`);
+      if (!Number.isFinite(f.priority)) problems.push(`${f.key}: priority must be a number`);
+    }
+  }
+  if (problems.length) throw new Error(`${id}.mjs: ${problems.join("; ")}`);
   return flow;
+}
+
+/** Segments in declaration order: marketing first (if any), then features. */
+function segmentsOf(flow) {
+  const segs = [];
+  if (flow.marketing) segs.push({ kind: "marketing", key: "marketing", title: flow.marketing.title || "Landing page", priority: 0, ...flow.marketing });
+  (flow.features || []).forEach((f, i) => segs.push({ kind: "feature", order: i, title: f.key, ...f }));
+  return segs;
 }
 
 export function portFor(id, portBase = 4100) {
@@ -408,13 +149,15 @@ export function portFor(id, portBase = 4100) {
   return portBase + 20 + flowIds().indexOf(id);
 }
 
+const resolveUrl = (u, ctx) => (typeof u === "function" ? u(ctx) : u);
+
 // ---------------------------------------------------------------------------
 // Local app servers (flows with `server`)
 // ---------------------------------------------------------------------------
 
 async function startServer(id, spec) {
   const { command, args = [], cwd, env = {}, url, readyTimeoutMs = 180000 } = spec;
-  console.log(`${id}: starting ${command} ${args.join(" ")} in ${cwd}`);
+  console.log(`${id}: starting ${command} ${args.join(" ")}${cwd ? ` in ${cwd}` : ""}`);
   const child = spawn(command, args, {
     cwd, env: { ...process.env, ...env }, stdio: ["ignore", "pipe", "pipe"], detached: true,
   });
@@ -439,7 +182,7 @@ async function startServer(id, spec) {
 }
 
 // ---------------------------------------------------------------------------
-// Recording + encoding
+// ffmpeg
 // ---------------------------------------------------------------------------
 
 function ffmpeg(args) {
@@ -456,93 +199,102 @@ function probe(file) {
   return { width: s.width, height: s.height, fps: d ? n / d : n, codec: s.codec_name, duration: Number(j.format.duration) };
 }
 
-function encode(raw, start, duration, dir, posterAt) {
-  const mp4 = path.join(dir, "demo.mp4");
-  const webm = path.join(dir, "demo.webm");
-  const poster = path.join(dir, "poster.jpg");
-  const trim = ["-ss", start.toFixed(2), "-t", duration.toFixed(2), "-i", raw];
-  const vf = ["-vf", "scale=1280:-2:flags=lanczos,fps=25"];
+const SCALE = `scale=${VIEWPORT.width}:${VIEWPORT.height}:flags=lanczos,setsar=1,fps=${FPS}`;
+const r2 = (x) => Math.round(x * 100) / 100;
 
-  for (let crf = 23; ; crf += 2) {
-    ffmpeg([...trim, ...vf, "-an", "-c:v", "libx264", "-preset", "slow", "-crf", String(crf),
-      "-profile:v", "high", "-pix_fmt", "yuv420p", "-movflags", "+faststart", mp4]);
-    if (fs.statSync(mp4).size <= MAX_MP4_BYTES || crf >= 35) break;
-  }
-  for (let crf = 38; ; crf += 3) {
-    ffmpeg([...trim, ...vf, "-an", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", String(crf),
-      "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", "-pix_fmt", "yuv420p", webm]);
-    if (fs.statSync(webm).size < fs.statSync(mp4).size || crf >= 50) break;
-  }
-  const at = posterAt < 0 ? duration + posterAt : posterAt;
-  ffmpeg(["-ss", Math.max(0, Math.min(at, duration - 0.5)).toFixed(2), "-i", mp4,
-    "-frames:v", "1", "-q:v", "3", poster]);
-  return { mp4, webm, poster };
+/** Raw Playwright webm -> trimmed, near-lossless constant-fps clip. */
+function encodeClip(raw, start, duration, file) {
+  ffmpeg(["-ss", start.toFixed(3), "-i", raw, "-t", duration.toFixed(3), "-vf", SCALE, "-an",
+    "-c:v", "libx264", "-preset", "fast", "-crf", "14", "-pix_fmt", "yuv420p", file]);
 }
 
-/** One PNG per second (640 px wide), a labelled contact sheet and stats.json. */
-function exportFrames(id, files, framesDir, meta) {
-  fs.mkdirSync(framesDir, { recursive: true });
-  for (const f of fs.readdirSync(framesDir)) {
-    if (/^t\d+s\.png$/.test(f) || f === "contact-sheet.png" || f === "stats.json") fs.rmSync(path.join(framesDir, f));
-  }
-  const info = probe(files.mp4);
-  const tmp = fs.mkdtempSync(path.join(framesDir, ".tmp-frames-")); // same device: rename works
-  // fps=1 with round=down: output frame n is the source frame at t = n seconds.
-  ffmpeg(["-i", files.mp4, "-vf", "fps=1:round=down,scale=640:-2:flags=lanczos", "-start_number", "0",
-    path.join(tmp, "%d.png")]);
-  const shots = fs.readdirSync(tmp).map((f) => Number(f.slice(0, -4))).sort((a, b) => a - b);
-  for (const n of shots) {
-    fs.renameSync(path.join(tmp, `${n}.png`), path.join(framesDir, `t${String(n).padStart(4, "0")}s.png`));
-  }
-  fs.rmSync(tmp, { recursive: true, force: true });
+// ---------------------------------------------------------------------------
+// record
+// ---------------------------------------------------------------------------
 
-  const cols = 5;
-  const rows = Math.max(1, Math.ceil(shots.length / cols));
-  const label = (withText) =>
-    "scale=320:-2:flags=lanczos" +
-    (withText
-      ? ",drawtext=text='%{eif\\:n\\:d}s':x=6:y=6:fontsize=20:fontcolor=white:box=1:boxcolor=black@0.65:boxborderw=4"
-      : "") +
-    `,tile=${cols}x${rows}:padding=6:margin=6:color=0x202020`;
-  const sheet = path.join(framesDir, "contact-sheet.png");
-  const sheetArgs = (vf) => ["-framerate", "1", "-start_number", "0", "-i", path.join(framesDir, "t%04ds.png"),
-    "-vf", vf, "-frames:v", "1", sheet];
+const clipsDirFor = (outDir, id) => path.join(outDir, id, "clips");
+
+function readClipsJson(dir) {
   try {
-    ffmpeg(sheetArgs(label(true)));
+    return JSON.parse(fs.readFileSync(path.join(dir, "clips.json"), "utf8"));
   } catch {
-    ffmpeg(sheetArgs(label(false)));
+    return { clips: {} };
   }
-
-  const bytes = (f) => fs.statSync(f).size;
-  const stats = {
-    id,
-    url: meta.url,
-    recordedAt: new Date().toISOString(),
-    duration: Number(info.duration.toFixed(2)),
-    resolution: `${info.width}x${info.height}`,
-    width: info.width,
-    height: info.height,
-    fps: info.fps,
-    mp4Bytes: bytes(files.mp4),
-    webmBytes: bytes(files.webm),
-    posterBytes: bytes(files.poster),
-    mp4LimitBytes: MAX_MP4_BYTES,
-    frames: shots.length,
-    frameWidth: 640,
-    pacing: meta.pacing,
-    files: { mp4: files.mp4, webm: files.webm, poster: files.poster },
-  };
-  fs.writeFileSync(path.join(framesDir, "stats.json"), JSON.stringify(stats, null, 2) + "\n");
-  console.log(`${id}: ${shots.length} frames + contact-sheet.png + stats.json -> ${framesDir}`);
 }
 
-async function record(browser, id, flow, opts) {
+async function recordSegment(browser, id, flow, seg, env) {
+  const { url: baseUrl, port, storageState, pacing, rawDir, clipsDir, keepRaw } = env;
+  const url = seg.url ? resolveUrl(seg.url, { base: baseUrl, port }) : baseUrl;
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    screen: VIEWPORT, // so requestFullscreen() fills the recorded frame
+    deviceScaleFactor: 1,
+    colorScheme: flow.colorScheme || "light",
+    locale: flow.locale || "en-US",
+    timezoneId: "Europe/Lisbon",
+    storageState,
+    recordVideo: { dir: rawDir, size: VIEWPORT },
+  });
+  await ctx.addInitScript(CURSOR_SCRIPT);
+  const page = await ctx.newPage();
+  const t0 = Date.now();
+  const h = makeHelpers(page, pacing, { url, base: baseUrl, port, id, segment: seg.key });
+  let start;
+  try {
+    await page.goto(url, { waitUntil: seg.waitUntil || flow.waitUntil || "networkidle", timeout: 60000 })
+      .catch(async (e) => {
+        // networkidle can time out on pages that stream; the DOM is usually there.
+        if (!/Timeout/i.test(String(e))) throw e;
+      });
+    await h.waitForStill();
+    // Park the cursor off-frame so it does not appear mid-screen at the cut.
+    await page.mouse.move(VIEWPORT.width / 2, VIEWPORT.height / 2).catch(() => {});
+    if (flow.beforeEach) await flow.beforeEach(h, seg);
+    if (seg.before) await seg.before(h);
+    start = (Date.now() - t0) / 1000;
+    await h.dwell(seg.kind === "marketing" ? pacing.heroDwell : pacing.featureLead);
+    await seg.run(h);
+  } catch (err) {
+    const shot = path.join(clipsDir, `${seg.key}.failure.png`);
+    await page.screenshot({ path: shot }).catch(() => {});
+    await ctx.close().catch(() => {});
+    err.message = `${id}/${seg.key}: ${err.message} (at ${page.url()}, screenshot ${shot})`;
+    throw err;
+  }
+  const end = (Date.now() - t0) / 1000;
+  const video = page.video();
+  await ctx.close();
+  const raw = await video.path();
+  const file = path.join(clipsDir, `${seg.key}.mp4`);
+  encodeClip(raw, start, end - start, file);
+  if (keepRaw) fs.copyFileSync(raw, path.join(clipsDir, `${seg.key}.raw.webm`));
+  fs.rmSync(raw, { force: true });
+  fs.rmSync(path.join(clipsDir, `${seg.key}.failure.png`), { force: true });
+  const duration = r2(probe(file).duration);
+  console.log(`${id}/${seg.key}: ${duration.toFixed(2)} s (lead-in trimmed ${start.toFixed(1)} s) -> ${path.relative(ROOT, file)}`);
+  return { file: path.basename(file), duration, trimmedLeadIn: r2(start), url, recordedAt: new Date().toISOString() };
+}
+
+async function recordCmd(id, keys, opts) {
+  const flow = await loadFlow(id);
+  const segs = segmentsOf(flow);
+  const unknown = keys.filter((k) => !segs.some((s) => s.key === k));
+  if (unknown.length) throw new Error(`${id}: no segment ${unknown.join(", ")}. Known: ${segs.map((s) => s.key).join(", ")}`);
+  const todo = keys.length ? segs.filter((s) => keys.includes(s.key)) : segs;
   const port = portFor(id, opts.portBase);
   const pacing = { ...PACING, ...(flow.pacing || {}) };
+  const clipsDir = clipsDirFor(opts.outDir, id);
+  fs.mkdirSync(clipsDir, { recursive: true });
   const rawDir = fs.mkdtempSync(path.join(os.tmpdir(), `rec-${id}-`));
+
   let server;
+  const browser = await chromium.launch({
+    headless: !opts.headed,
+    args: ["--autoplay-policy=no-user-gesture-required", "--hide-scrollbars", `--window-size=${VIEWPORT.width},${VIEWPORT.height}`],
+  });
+  const failures = [];
   try {
-    let url = typeof flow.url === "function" ? flow.url({ port }) : flow.url;
+    let url = resolveUrl(flow.url, { port });
     if (flow.server) {
       const spec = flow.server({ port });
       server = await startServer(id, spec);
@@ -551,133 +303,364 @@ async function record(browser, id, flow, opts) {
     if (!url) throw new Error(`${id}: flow has no url`);
 
     let storageState;
-    if (flow.prepare) {
-      const ctx = await browser.newContext({ viewport: VIEWPORT });
-      await flow.prepare(await ctx.newPage(), { url, port });
+    const setup = flow.setup || flow.prepare;
+    if (setup) {
+      const ctx = await browser.newContext({ viewport: VIEWPORT, locale: flow.locale || "en-US", colorScheme: flow.colorScheme || "light" });
+      await setup(await ctx.newPage(), { url, port });
       storageState = await ctx.storageState();
       await ctx.close();
     }
 
-    const ctx = await browser.newContext({
-      viewport: VIEWPORT,
-      screen: VIEWPORT, // so an element's requestFullscreen() fills the recorded frame
-      deviceScaleFactor: 1,
-      colorScheme: flow.colorScheme || "light",
-      locale: flow.locale || "en-US",
-      timezoneId: "Europe/Lisbon",
-      storageState,
-      recordVideo: { dir: rawDir, size: VIEWPORT },
-    });
-    await ctx.addInitScript(CURSOR_SCRIPT);
-    const page = await ctx.newPage();
-    const t0 = Date.now();
-    await page.goto(url, { waitUntil: "networkidle" });
-    await page.waitForTimeout(400);
-    const start = (Date.now() - t0) / 1000;
-    const h = makeHelpers(page, pacing, { url, port, id });
-    try {
-      // The hero: let intro animations finish, then hold it still and readable.
-      await h.waitForStill();
-      await h.dwell(pacing.heroDwell);
-      await flow.run(h);
-    } catch (err) {
-      const shot = path.join(rawDir, "failure.png");
-      await page.screenshot({ path: shot }).catch(() => {});
-      console.error(`${id}: flow failed at ${page.url()} (screenshot: ${shot})`);
-      await ctx.close();
-      throw err;
-    }
-    const end = (Date.now() - t0) / 1000;
-    const video = page.video();
-    await ctx.close();
-    const raw = await video.path();
-
-    const dir = path.join(opts.outDir, id);
-    fs.mkdirSync(dir, { recursive: true });
-    const duration = end - start;
-    const files = encode(raw, start, duration, dir, flow.posterAt ?? 1);
-    if (opts.keepRaw) fs.copyFileSync(raw, path.join(dir, "raw.webm"));
-    fs.rmSync(rawDir, { recursive: true, force: true });
-
-    const kb = (f) => `${(fs.statSync(f).size / 1024).toFixed(0)} KB`;
-    console.log(`${id}: ${duration.toFixed(1)} s  mp4 ${kb(files.mp4)}  webm ${kb(files.webm)}  poster ${kb(files.poster)}  -> ${dir}`);
-    if (duration < 20 || duration > 40) console.warn(`  ! ${id} runs ${duration.toFixed(1)} s, outside 20–40 s`);
-    if (opts.framesDir) {
-      const fd = opts.multi ? path.join(opts.framesDir, id) : opts.framesDir;
-      exportFrames(id, files, fd, { url, pacing });
+    const env = { url, port, storageState, pacing, rawDir, clipsDir, keepRaw: opts.keepRaw };
+    for (const seg of todo) {
+      try {
+        const res = await recordSegment(browser, id, flow, seg, env);
+        // Re-read before writing so a parallel `record <id> <other-key>` is not clobbered.
+        const json = readClipsJson(clipsDir);
+        json.id = id;
+        json.viewport = VIEWPORT;
+        json.fps = FPS;
+        json.updatedAt = new Date().toISOString();
+        json.clips[seg.key] = { kind: seg.kind, title: seg.title, priority: seg.priority, ...res };
+        fs.writeFileSync(path.join(clipsDir, "clips.json"), JSON.stringify(json, null, 2) + "\n");
+      } catch (err) {
+        console.error(String(err.stack || err));
+        failures.push(seg.key);
+      }
     }
   } finally {
+    await browser.close().catch(() => {});
     server?.stop();
+    fs.rmSync(rawDir, { recursive: true, force: true });
+  }
+  if (failures.length) throw new Error(`${id}: failed segments: ${failures.join(", ")}`);
+}
+
+// ---------------------------------------------------------------------------
+// compose
+// ---------------------------------------------------------------------------
+
+/**
+ * Pick the segments: marketing (always, if recorded) + features in priority
+ * order, dropping the lowest priority until total <= hi. When dropping the
+ * lowest would fall below lo, drop instead the lowest-priority feature whose
+ * removal lands inside [lo, hi], if there is one.
+ */
+export function planComposition(segs, { target, tolerance, xfade }) {
+  const lo = target * (1 - tolerance);
+  const hi = target * (1 + tolerance);
+  const total = (list) => list.reduce((s, x) => s + x.duration, 0) - Math.max(0, list.length - 1) * xfade;
+  const marketing = segs.filter((s) => s.kind === "marketing");
+  let features = segs.filter((s) => s.kind === "feature")
+    .sort((a, b) => a.priority - b.priority || a.order - b.order);
+  const dropped = [];
+  while (features.length && total([...marketing, ...features]) > hi) {
+    const byLowest = [...features].reverse(); // lowest priority first
+    let victim = byLowest[0];
+    const t0 = total([...marketing, ...features]);
+    if (t0 - victim.duration + xfade < lo) {
+      const fit = byLowest.find((f) => {
+        const t = t0 - f.duration + xfade;
+        return t >= lo && t <= hi;
+      });
+      if (fit) victim = fit;
+    }
+    features = features.filter((f) => f !== victim);
+    dropped.push({ ...victim, reason: `over ${hi.toFixed(1)} s` });
+  }
+  const included = [...marketing, ...features];
+  const t = total(included);
+  const status = t > hi ? "over" : t < lo ? "under" : "ok";
+  return { included, dropped, total: t, lo, hi, status };
+}
+
+function timeline(included, xfade) {
+  let at = 0;
+  return included.map((s, i) => {
+    const start = i === 0 ? 0 : at - xfade;
+    const end = start + s.duration;
+    at = end;
+    return { ...s, start: r2(start), end: r2(end) };
+  });
+}
+
+function concatClips(files, durations, xfade, outFile) {
+  const inputs = files.flatMap((f) => ["-i", f]);
+  let graph;
+  if (files.length === 1) graph = `[0:v]${SCALE},format=yuv420p[v]`;
+  else if (xfade > 0) {
+    const parts = files.map((_, i) => `[${i}:v]${SCALE},format=yuv420p,settb=AVTB[s${i}]`);
+    let prev = "s0";
+    let offset = 0;
+    for (let i = 1; i < files.length; i++) {
+      offset += durations[i - 1] - xfade;
+      const out = i === files.length - 1 ? "v" : `x${i}`;
+      parts.push(`[${prev}][s${i}]xfade=transition=fade:duration=${xfade}:offset=${offset.toFixed(3)}[${out}]`);
+      prev = out;
+    }
+    graph = parts.join(";");
+  } else {
+    const parts = files.map((_, i) => `[${i}:v]${SCALE},format=yuv420p[s${i}]`);
+    graph = `${parts.join(";")};${files.map((_, i) => `[s${i}]`).join("")}concat=n=${files.length}:v=1:a=0[v]`;
+  }
+  ffmpeg([...inputs, "-filter_complex", graph, "-map", "[v]", "-an",
+    "-c:v", "libx264", "-preset", "fast", "-crf", "12", "-pix_fmt", "yuv420p", outFile]);
+}
+
+function encodeFinal(master, dir, posterAt) {
+  const mp4 = path.join(dir, "demo.mp4");
+  const webm = path.join(dir, "demo.webm");
+  const poster = path.join(dir, "poster.jpg");
+  const base = ["-i", master, "-an", "-vf", `scale=${VIEWPORT.width}:${VIEWPORT.height}:flags=lanczos,setsar=1`];
+  let crf = 23;
+  for (; ; crf += 2) {
+    ffmpeg([...base, "-c:v", "libx264", "-preset", "slow", "-crf", String(crf),
+      "-profile:v", "high", "-pix_fmt", "yuv420p", "-movflags", "+faststart", mp4]);
+    if (fs.statSync(mp4).size <= MAX_MP4_BYTES || crf >= 39) break;
+  }
+  let wcrf = 38;
+  for (; ; wcrf += 3) {
+    ffmpeg([...base, "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", String(wcrf),
+      "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", "-pix_fmt", "yuv420p", webm]);
+    if (fs.statSync(webm).size < fs.statSync(mp4).size || wcrf >= 50) break;
+  }
+  ffmpeg(["-ss", posterAt.toFixed(2), "-i", mp4, "-frames:v", "1", "-q:v", "3", poster]);
+  return { mp4, webm, poster, crf, webmCrf: wcrf };
+}
+
+async function composeCmd(id, opts) {
+  const flow = await loadFlow(id);
+  const clipsDir = clipsDirFor(opts.outDir, id);
+  const json = readClipsJson(clipsDir);
+  const target = opts.target ?? flow.target ?? DEFAULT_TARGET;
+  const tolerance = opts.tolerance ?? DEFAULT_TOLERANCE;
+  const xfade = Math.min(0.2, Math.max(0, opts.xfade ?? 0));
+  if (!(target > 0)) throw new Error("--target must be > 0");
+
+  const missing = [];
+  const segs = [];
+  for (const s of segmentsOf(flow)) {
+    const c = json.clips[s.key];
+    const file = path.join(clipsDir, `${s.key}.mp4`);
+    if (!c || !fs.existsSync(file)) {
+      missing.push(s.key);
+      continue;
+    }
+    segs.push({ key: s.key, kind: s.kind, title: s.title, priority: s.priority, order: s.order ?? -1, duration: probe(file).duration, file });
+  }
+  if (!segs.length) throw new Error(`${id}: no clips in ${clipsDir}; run \`record ${id}\` first`);
+  if (missing.length) console.warn(`${id}: no clip for ${missing.join(", ")} (skipped)`);
+
+  const plan = planComposition(segs, { target, tolerance, xfade });
+  const tl = timeline(plan.included, xfade);
+  const dir = path.join(opts.outDir, id);
+  fs.mkdirSync(dir, { recursive: true });
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `compose-${id}-`));
+  try {
+    const master = path.join(tmp, "master.mp4");
+    concatClips(tl.map((s) => s.file), tl.map((s) => s.duration), xfade, master);
+    const realTotal = probe(master).duration;
+
+    const pf = flow.posterFrom || { segment: tl[0].key, at: 1 };
+    const ps = tl.find((s) => s.key === pf.segment) || tl[0];
+    const posterAt = Math.max(0, Math.min(realTotal - 0.2, pf.at < 0 ? ps.end + pf.at : ps.start + (pf.at ?? 1)));
+    const files = encodeFinal(master, dir, posterAt);
+
+    const mk = tl.find((s) => s.kind === "marketing");
+    const marketingShare = mk ? mk.duration / realTotal : 0;
+    const bytes = (f) => fs.statSync(f).size;
+    const compose = {
+      id,
+      composedAt: new Date().toISOString(),
+      target,
+      tolerance,
+      bounds: [r2(plan.lo), r2(plan.hi)],
+      xfade,
+      total: r2(realTotal),
+      status: plan.status,
+      marketingShare: r2(marketingShare),
+      included: tl.map(({ key, kind, title, priority, duration, start, end }) =>
+        ({ key, kind, title, priority, duration: r2(duration), start, end })),
+      dropped: plan.dropped.map(({ key, title, priority, duration, reason }) => ({ key, title, priority, duration: r2(duration), reason })),
+      missing,
+      clips: Object.fromEntries(segs.map((s) => [s.key, r2(s.duration)])),
+      poster: { segment: ps.key, at: r2(posterAt) },
+      files: { mp4: bytes(files.mp4), webm: bytes(files.webm), poster: bytes(files.poster), mp4Crf: files.crf, webmCrf: files.webmCrf },
+    };
+    fs.writeFileSync(path.join(dir, "compose.json"), JSON.stringify(compose, null, 2) + "\n");
+
+    const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
+    console.log(`${id}: ${realTotal.toFixed(1)} s (target ${target} s +/-${Math.round(tolerance * 100)}%: ${plan.status})` +
+      `  mp4 ${kb(compose.files.mp4)}  webm ${kb(compose.files.webm)} -> ${path.relative(ROOT, dir) || dir}`);
+    console.log(`  included: ${tl.map((s) => `${s.key} ${s.duration.toFixed(1)}s`).join(", ")}`);
+    if (plan.dropped.length) console.log(`  dropped:  ${plan.dropped.map((s) => `${s.key} (p${s.priority}, ${s.duration.toFixed(1)}s)`).join(", ")}`);
+    if (plan.status === "under") console.warn(`  ! ${id}: ${realTotal.toFixed(1)} s is UNDER ${plan.lo.toFixed(1)} s: record more features or lower --target`);
+    if (plan.status === "over") console.warn(`  ! ${id}: ${realTotal.toFixed(1)} s is still OVER ${plan.hi.toFixed(1)} s (marketing alone too long?)`);
+    if (marketingShare > MAX_MARKETING_SHARE) console.warn(`  ! ${id}: marketing is ${(marketingShare * 100).toFixed(0)}% of the video (max ${MAX_MARKETING_SHARE * 100}%)`);
+    if (compose.files.mp4 > MAX_MP4_BYTES) console.warn(`  ! ${id}: demo.mp4 is over 3 MB even at crf ${files.crf}`);
+
+    if (opts.framesDir) exportFrames(id, dir, opts.framesDir, compose);
+    return compose;
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 }
 
+// ---------------------------------------------------------------------------
+// frames
+// ---------------------------------------------------------------------------
+
+const FRAME_FPS = 2;
+const FRAME_W = 480;
+
+/** Escape text for an ffmpeg drawtext text='...' inside a filtergraph. */
+const dtEscape = (s) => String(s).replace(/[^A-Za-z0-9 _.+-]/g, "").slice(0, 40);
+
+function exportFrames(id, dir, framesDir, compose) {
+  const mp4 = path.join(dir, "demo.mp4");
+  fs.mkdirSync(framesDir, { recursive: true });
+  for (const f of fs.readdirSync(framesDir)) {
+    if (/^t\d+(\.\d)?s\.png$/.test(f) || f === "contact-sheet.png" || f === "stats.json") fs.rmSync(path.join(framesDir, f));
+  }
+  const info = probe(mp4);
+  const tmp = fs.mkdtempSync(path.join(framesDir, ".tmp-frames-"));
+  ffmpeg(["-i", mp4, "-vf", `fps=${FRAME_FPS}:round=down,scale=${FRAME_W}:-2:flags=lanczos`, "-start_number", "0",
+    path.join(tmp, "%05d.png")]);
+  const shots = fs.readdirSync(tmp).filter((f) => f.endsWith(".png")).map((f) => Number(f.slice(0, -4))).sort((a, b) => a - b);
+  const names = [];
+  for (const n of shots) {
+    const t = n / FRAME_FPS;
+    const name = `t${String(Math.floor(t)).padStart(4, "0")}.${Math.round((t % 1) * 10)}s.png`;
+    fs.renameSync(path.join(tmp, `${String(n).padStart(5, "0")}.png`), path.join(framesDir, name));
+    names.push(name);
+  }
+
+  // Contact sheet: from a numbered copy of the sequence so pts = frame time.
+  const seq = path.join(tmp, "seq");
+  fs.mkdirSync(seq);
+  names.forEach((f, i) => fs.linkSync(path.join(framesDir, f), path.join(seq, `${String(i).padStart(5, "0")}.png`)));
+  const cols = 6;
+  const rows = Math.max(1, Math.ceil(names.length / cols));
+  const segLabels = (compose?.included || []).map((s) =>
+    `drawtext=text='${dtEscape(s.key)}':x=w-tw-6:y=6:fontsize=15:fontcolor=white:box=1:boxcolor=0x1d4ed8@0.8:boxborderw=4` +
+    `:enable='between(t\\,${s.start}\\,${Math.max(s.start, s.end - 0.01)})'`);
+  const timeLabel = "drawtext=text='%{pts\\:hms}':x=6:y=6:fontsize=15:fontcolor=white:box=1:boxcolor=black@0.7:boxborderw=4";
+  const sheet = path.join(framesDir, "contact-sheet.png");
+  const run = (labels) => ffmpeg(["-framerate", String(FRAME_FPS), "-start_number", "0", "-i", path.join(seq, "%05d.png"),
+    "-vf", ["scale=320:-2:flags=lanczos", ...labels, `tile=${cols}x${rows}:padding=6:margin=6:color=0x202020`].join(","),
+    "-frames:v", "1", sheet]);
+  try {
+    run([timeLabel, ...segLabels]);
+  } catch {
+    run([]); // ffmpeg without fontconfig/drawtext: unlabelled sheet
+  }
+  fs.rmSync(tmp, { recursive: true, force: true });
+
+  const bytes = (f) => fs.statSync(path.join(dir, f)).size;
+  const stats = {
+    id,
+    statsAt: new Date().toISOString(),
+    duration: r2(info.duration),
+    resolution: `${info.width}x${info.height}`,
+    width: info.width,
+    height: info.height,
+    fps: info.fps,
+    codec: info.codec,
+    mp4Bytes: bytes("demo.mp4"),
+    webmBytes: bytes("demo.webm"),
+    posterBytes: bytes("poster.jpg"),
+    mp4LimitBytes: MAX_MP4_BYTES,
+    frames: names.length,
+    frameFps: FRAME_FPS,
+    frameWidth: FRAME_W,
+    files: { mp4: path.join(dir, "demo.mp4"), webm: path.join(dir, "demo.webm"), poster: path.join(dir, "poster.jpg") },
+    compose,
+  };
+  fs.writeFileSync(path.join(framesDir, "stats.json"), JSON.stringify(stats, null, 2) + "\n");
+  console.log(`${id}: ${names.length} frames + contact-sheet.png + stats.json -> ${framesDir}`);
+}
+
+// ---------------------------------------------------------------------------
+// CLI
+// ---------------------------------------------------------------------------
+
 function parseArgs(argv) {
-  const valued = new Set(["--frames", "--out", "--port-base"]);
+  const valued = new Set(["--frames", "--out", "--port-base", "--target", "--tolerance", "--xfade"]);
   const flags = new Set();
   const values = {};
-  const ids = [];
+  const rest = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const [k, inline] = a.split("=", 2);
     if (valued.has(k)) {
       const v = inline ?? argv[++i];
-      if (!v || v.startsWith("--")) throw new Error(`${k} needs a value`);
+      if (v === undefined || v.startsWith("--")) throw new Error(`${k} needs a value`);
       values[k] = v;
     } else if (a.startsWith("--")) flags.add(a);
-    else ids.push(a);
+    else rest.push(a);
   }
-  return { flags, values, ids };
+  return { flags, values, rest };
 }
 
+const USAGE = `usage:
+  pnpm record-videos list
+  pnpm record-videos record <id> [segment-key...] [--headed] [--keep-raw] [--out <dir>] [--port-base <n>]
+  pnpm record-videos compose <id> [--target <s>] [--tolerance 0.1] [--xfade <=0.2] [--frames <dir>] [--out <dir>]
+  pnpm record-videos frames <id> --frames <dir> [--out <dir>]`;
+
 async function main() {
-  const { flags, values, ids } = parseArgs(process.argv.slice(2));
+  const { flags, values, rest } = parseArgs(process.argv.slice(2));
   const portBase = values["--port-base"] ? Number(values["--port-base"]) : 4100;
+  const outDir = values["--out"] ? path.resolve(values["--out"]) : DEFAULT_OUT_DIR;
+  const framesDir = values["--frames"] ? path.resolve(values["--frames"]) : null;
   const known = flowIds();
-  if (flags.has("--list")) {
-    for (const id of [...new Set([...PORT_ORDER, ...known])]) {
-      console.log(`${id.padEnd(16)} port ${portFor(id, portBase)}  ${known.includes(id) ? "flow" : "(no flow yet)"}`);
+  const [cmd, id, ...keys] = rest;
+
+  if (cmd === "list" || flags.has("--list")) {
+    for (const fid of [...new Set([...PORT_ORDER, ...known])]) {
+      if (!known.includes(fid)) {
+        console.log(`${fid.padEnd(16)} port ${portFor(fid, portBase)}  (no flow yet)`);
+        continue;
+      }
+      try {
+        const flow = await loadFlow(fid);
+        const segs = segmentsOf(flow).map((s) => (s.kind === "marketing" ? "marketing" : `${s.key}(p${s.priority})`));
+        console.log(`${fid.padEnd(16)} port ${portFor(fid, portBase)}  target ${flow.target ?? DEFAULT_TARGET}s  ${segs.join(" ")}`);
+      } catch (e) {
+        console.log(`${fid.padEnd(16)} port ${portFor(fid, portBase)}  BROKEN: ${e.message}`);
+      }
     }
     return;
   }
-  const unknown = ids.filter((id) => !known.includes(id));
-  if (unknown.length) {
-    console.error(`No flow for: ${unknown.join(", ")}. Known: ${known.join(", ")} (scripts/video-flows/<id>.mjs)`);
+  if (!["record", "compose", "frames"].includes(cmd) || !id) {
+    console.error(USAGE);
+    process.exit(2);
+  }
+  if (!known.includes(id)) {
+    console.error(`No flow for ${id}. Known: ${known.join(", ")} (scripts/video-flows/<id>.mjs)`);
     process.exit(1);
   }
-  const todo = ids.length ? ids : known;
-  const opts = {
-    keepRaw: flags.has("--keep-raw"),
-    outDir: values["--out"] ? path.resolve(values["--out"]) : DEFAULT_OUT_DIR,
-    framesDir: values["--frames"] ? path.resolve(values["--frames"]) : null,
-    multi: todo.length > 1,
-    portBase,
-  };
-  if (flags.has("--reframe")) {
-    if (!opts.framesDir) throw new Error("--reframe needs --frames <dir>");
-    for (const id of todo) {
-      const dir = path.join(opts.outDir, id);
-      const files = { mp4: path.join(dir, "demo.mp4"), webm: path.join(dir, "demo.webm"), poster: path.join(dir, "poster.jpg") };
-      const flow = await loadFlow(id);
-      const url = typeof flow.url === "function" ? flow.url({ port: portFor(id, portBase) }) : flow.url;
-      exportFrames(id, files, opts.multi ? path.join(opts.framesDir, id) : opts.framesDir, { url, pacing: { ...PACING, ...(flow.pacing || {}) } });
-    }
-    return;
-  }
-  const browser = await chromium.launch({
-    headless: !flags.has("--headed"),
-    args: ["--autoplay-policy=no-user-gesture-required", "--hide-scrollbars", `--window-size=${VIEWPORT.width},${VIEWPORT.height}`],
-  });
-  try {
-    for (const id of todo) await record(browser, id, await loadFlow(id), opts);
-  } finally {
-    await browser.close();
+  if (cmd === "record") {
+    await recordCmd(id, keys, { portBase, outDir, headed: flags.has("--headed"), keepRaw: flags.has("--keep-raw") });
+  } else if (cmd === "compose") {
+    await composeCmd(id, {
+      outDir, framesDir,
+      target: values["--target"] ? Number(values["--target"]) : undefined,
+      tolerance: values["--tolerance"] ? Number(values["--tolerance"]) : undefined,
+      xfade: values["--xfade"] ? Number(values["--xfade"]) : undefined,
+    });
+  } else {
+    if (!framesDir) throw new Error("frames needs --frames <dir>");
+    let compose = null;
+    try { compose = JSON.parse(fs.readFileSync(path.join(outDir, id, "compose.json"), "utf8")); } catch {}
+    exportFrames(id, path.join(outDir, id), framesDir, compose);
   }
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname);
 if (isMain) {
   main().catch((err) => {
-    console.error(err);
+    console.error(err?.stack || err);
     process.exit(1);
   });
 }

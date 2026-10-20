@@ -43,3 +43,6 @@ next-env.d.ts
 
 # OS
 Thumbs.db 
+# Project video segment clips (scripts/record-project-videos.mjs): inputs to the
+# compositor, never shipped. scripts/strip-video-clips.js also drops them from out/.
+/public/projects_videos/*/clips/
