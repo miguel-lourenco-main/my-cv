@@ -59,7 +59,12 @@ export function ProjectCarousel({
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-    if (selectedIndex === 0 && !reducedMotion) {
+    // The hook starts at `false` and only reads the media query after mount, so
+    // check it here too; otherwise the first render starts playback for a frame
+    // and the poster is replaced before the pause lands.
+    const prefersReduced =
+      reducedMotion || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (selectedIndex === 0 && !prefersReduced) {
       void el.play().catch(() => {
         /* autoplay blocked: the native controls still let the user start it */
       });
