@@ -1,111 +1,205 @@
 {
   "id": "cash-register",
-  "composedAt": "2026-10-20T22:33:58.540Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-21T00:19:17.716Z",
   "target": 33,
   "tolerance": 0.1,
   "bounds": [
     29.7,
     36.3
   ],
-  "xfade": 0,
-  "total": 33.2,
+  "total": 35.28,
   "status": "ok",
+  "cuts": [],
+  "cutDetails": [],
+  "longestTakeS": 35.28,
+  "longestTakeShare": 1,
+  "takes": [
+    {
+      "duration": 35.28
+    }
+  ],
   "marketingShare": 0,
-  "included": [
+  "features": [
     {
       "key": "take-order",
       "kind": "feature",
       "title": "Taking an order: drinks, search, food, quantity",
       "priority": 1,
-      "duration": 8.96,
       "start": 0,
-      "end": 8.96
+      "end": 8.12,
+      "duration": 8.12
     },
     {
       "key": "payment",
       "kind": "feature",
       "title": "Payment: cash, change due",
       "priority": 2,
-      "duration": 2.76,
-      "start": 8.96,
-      "end": 11.72
+      "start": 8.12,
+      "end": 9.97,
+      "duration": 1.85
     },
     {
       "key": "payment-done",
       "kind": "feature",
       "title": "Payment: confirmation",
       "priority": 2,
-      "duration": 1.4,
-      "start": 11.72,
-      "end": 13.12
+      "start": 9.97,
+      "end": 11.83,
+      "duration": 1.86
     },
     {
       "key": "orders-dashboard",
       "kind": "feature",
       "title": "Orders dashboard: KPIs and charts",
       "priority": 3,
-      "duration": 4.52,
-      "start": 13.12,
-      "end": 17.64
+      "start": 11.83,
+      "end": 18.39,
+      "duration": 6.56
     },
     {
       "key": "order-details",
       "kind": "feature",
       "title": "Order history: details drawer",
       "priority": 4,
-      "duration": 2.88,
-      "start": 17.64,
-      "end": 20.52
+      "start": 18.39,
+      "end": 21.3,
+      "duration": 2.91
     },
     {
       "key": "order-filters",
       "kind": "feature",
       "title": "Sort and filter the order history",
       "priority": 5,
-      "duration": 3.68,
-      "start": 20.52,
-      "end": 24.2
+      "start": 21.3,
+      "end": 23.7,
+      "duration": 2.4
     },
     {
       "key": "products-admin",
       "kind": "feature",
       "title": "Admin: edit a menu item",
       "priority": 6,
-      "duration": 6.28,
-      "start": 24.2,
-      "end": 30.48
+      "start": 23.7,
+      "end": 31.44,
+      "duration": 7.74
     },
     {
       "key": "shift-summary",
       "kind": "feature",
       "title": "End shift: shift summary",
       "priority": 7,
-      "duration": 2.72,
-      "start": 30.48,
-      "end": 33.2
+      "start": 31.44,
+      "end": 35.28,
+      "duration": 3.84
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "take-order": 8.96,
-    "payment": 2.76,
-    "payment-done": 1.4,
-    "orders-dashboard": 4.52,
-    "order-details": 2.88,
-    "order-filters": 3.68,
-    "products-admin": 6.28,
-    "shift-summary": 2.72
-  },
+  "included": [
+    {
+      "key": "take-order",
+      "kind": "feature",
+      "title": "Taking an order: drinks, search, food, quantity",
+      "priority": 1,
+      "start": 0,
+      "end": 8.12,
+      "duration": 8.12
+    },
+    {
+      "key": "payment",
+      "kind": "feature",
+      "title": "Payment: cash, change due",
+      "priority": 2,
+      "start": 8.12,
+      "end": 9.97,
+      "duration": 1.85
+    },
+    {
+      "key": "payment-done",
+      "kind": "feature",
+      "title": "Payment: confirmation",
+      "priority": 2,
+      "start": 9.97,
+      "end": 11.83,
+      "duration": 1.86
+    },
+    {
+      "key": "orders-dashboard",
+      "kind": "feature",
+      "title": "Orders dashboard: KPIs and charts",
+      "priority": 3,
+      "start": 11.83,
+      "end": 18.39,
+      "duration": 6.56
+    },
+    {
+      "key": "order-details",
+      "kind": "feature",
+      "title": "Order history: details drawer",
+      "priority": 4,
+      "start": 18.39,
+      "end": 21.3,
+      "duration": 2.91
+    },
+    {
+      "key": "order-filters",
+      "kind": "feature",
+      "title": "Sort and filter the order history",
+      "priority": 5,
+      "start": 21.3,
+      "end": 23.7,
+      "duration": 2.4
+    },
+    {
+      "key": "products-admin",
+      "kind": "feature",
+      "title": "Admin: edit a menu item",
+      "priority": 6,
+      "start": 23.7,
+      "end": 31.44,
+      "duration": 7.74
+    },
+    {
+      "key": "shift-summary",
+      "kind": "feature",
+      "title": "End shift: shift summary",
+      "priority": 7,
+      "start": 31.44,
+      "end": 35.28,
+      "duration": 3.84
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "take-order",
+    "payment",
+    "payment-done",
+    "orders-dashboard",
+    "order-details",
+    "order-filters",
+    "products-admin",
+    "shift-summary"
+  ],
+  "leadInTrimmedS": 8.7,
+  "offCameraTrimmedS": 0,
+  "rawDurationS": 44.96,
+  "videoOffsetS": -0.03,
   "poster": {
-    "segment": "take-order",
-    "at": 8.56
+    "feature": "take-order",
+    "at": 7.72
   },
   "files": {
-    "mp4": 2720429,
-    "webm": 1833450,
-    "poster": 148455,
-    "mp4Crf": 23,
+    "mp4": 3079748,
+    "webm": 2752136,
+    "poster": 147569,
+    "mp4Crf": 25,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

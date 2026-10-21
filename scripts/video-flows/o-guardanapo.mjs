@@ -32,17 +32,39 @@ const inView = async (page, sel) => {
   return all.first();
 };
 
+/**
+ * A fast cursor glide: few input round trips, paced by the wall clock, so it keeps
+ * its speed while the site re-renders its catalogue under the cursor.
+ */
+async function glideCursor(h, x, y, ms) {
+  const { page } = h;
+  const from = h.mouse;
+  const steps = 6;
+  const t0 = Date.now();
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    await page.mouse.move(from.x + (x - from.x) * e, from.y + (y - from.y) * e);
+    const lag = t0 + (ms * i) / steps - Date.now();
+    if (lag > 0) await page.waitForTimeout(lag);
+  }
+  await h.moveTo(x, y, 0); // keep h's cursor position in sync
+}
+const centre = async (h, locator) => {
+  const el = locator.first();
+  await el.waitFor({ state: "visible" });
+  const b = await el.boundingBox();
+  return b && { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+};
 /** Move the cursor to the element and press it, without waiting for navigation settling. */
 const tap = async (h, locator, moveMs = 220) => {
   const { page } = h;
-  const el = locator.first();
-  await el.waitFor({ state: "visible" });
-  await h.hover(el, moveMs);
-  const box = await el.boundingBox();
-  if (box) { await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down(); await h.wait(40); await page.mouse.up(); }
-  else await el.click({ delay: 40 });
+  const c = await centre(h, locator);
+  if (c) { await glideCursor(h, c.x, c.y, moveMs); await page.mouse.down(); await h.wait(40); await page.mouse.up(); }
+  else await locator.first().click({ delay: 40 });
   await h.wait(100);
 };
+const point = async (h, locator, ms) => { const c = await centre(h, locator); if (c) await glideCursor(h, c.x, c.y, ms); };
 
 /** Off camera: play every scroll-reveal once and pin the revealed state, then back to the top. */
 async function revealAll(page) {
@@ -84,18 +106,412 @@ html,body{margin:0;height:100%;background:#f5efe3;overflow:hidden;font-family:sy
 .top b{font:700 28px/1 Georgia,serif;color:#1d3b2a}
 .top span{font:600 14px/1 system-ui,sans-serif;color:#7a5a2e;background:#efe3cc;border:1px solid #e0cfae;border-radius:999px;padding:8px 14px}
 .s{position:fixed;inset:0;opacity:0;transition:opacity 220ms ease}
+body{transition:background-color 200ms ease}.top{transition:opacity 200ms ease}
+body.dk{background:#0b110f}body.dk .top{opacity:0}body.dk .s.on{opacity:0}
 .s.on{opacity:1}
 .s img{position:absolute;left:0;top:84px;width:1280px;height:716px;object-fit:cover;transform-origin:50% 30%;transform:scale(1);transition:transform 1400ms ease-out;box-shadow:0 0 0 1px #e4d8c2}
 .s.on img{transform:scale(1.035)}
 .cap{position:absolute;left:50%;bottom:22px;box-shadow:0 6px 24px rgba(0,0,0,.25);transform:translateX(-50%);padding:10px 20px;border-radius:999px;background:#1d3b2a;color:#fff;font:600 18px/1.2 system-ui,sans-serif;white-space:nowrap}
-</style><body><div class="top"><b>Admin back office</b><span>Screenshots &middot; sign-in required on the live site</span></div>${slides}</body>`;
+</style><body><script>if(location.hash==="#dark")document.body.className="dk"</script><div class="top"><b>Admin back office</b><span>Screenshots &middot; sign-in required on the live site</span></div>${slides}</body>`;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "og-admin-"));
   const file = path.join(tmp, "index.html");
   fs.writeFileSync(file, html);
   return pathToFileURL(file).href;
 })();
 
+// --- Continuous take (v4) ------------------------------------------------------------
+// One shot through the live site, same features and order as v3, joined by the
+// site's own header nav:
+//   home (hero -> Today's Menu -> previous day) --Products--> catalogue filters
+//   --Menus--> previous menus (calendar, sardines search) --click "Veal Rolls with
+//   Bacon" in that day's menu--> dish page --language + theme menus right there-->
+//   PT/dark --Concursos--> photo contest  |CUT|  admin back office screenshots.
+// The admin is the only cut: it is a local page of gallery screenshots (no demo
+// login on the live site), so it closes the video after the one continuous take.
+
+const OG_STYLE_IDS = ["__og_cards", "__og_header"];
+const REVEAL_CSS = "[data-reveal],.reveal,[class*=reveal]{opacity:1!important;transform:none!important;transition:none!important}";
+
+/** Products page: pin the framing (the site scrolls to the top on every filter change). */
+const lockScroll = (page) => page.evaluate(() => {
+  if (window.__ogLock) return;
+  const orig = { scrollTo: window.scrollTo, scroll: window.scroll, siv: Element.prototype.scrollIntoView };
+  const y = window.scrollY;
+  const pin = () => orig.scrollTo.call(window, { top: y, behavior: "instant" });
+  const onScroll = () => { if (Math.abs(window.scrollY - y) > 2) pin(); };
+  window.scrollTo = window.scroll = function () { pin(); };
+  Element.prototype.scrollIntoView = function () {};
+  window.addEventListener("scroll", onScroll, true);
+  window.__ogLock = () => {
+    window.scrollTo = orig.scrollTo; window.scroll = orig.scroll; Element.prototype.scrollIntoView = orig.siv;
+    window.removeEventListener("scroll", onScroll, true);
+    delete window.__ogLock;
+  };
+});
+/** Undo the products-page tweaks before leaving it (the site is a SPA: they would persist). */
+const unlockProducts = (page) => page.evaluate((ids) => {
+  window.__ogLock?.();
+  for (const id of ids) document.getElementById(id)?.remove();
+}, OG_STYLE_IDS);
+
+
+/**
+ * Privacy: the products page header's "Call: +351 ..." button shows the restaurant's
+ * phone number. CSS only (touching React's text nodes breaks hydration): the label is
+ * hidden and replaced with a generic one, so no number is ever on camera.
+ */
+const PHONE_CSS = 'a[href^="tel:"]{font-size:0!important;letter-spacing:0!important}' +
+  'a[href^="tel:"]::after{content:"Call to Order";font-size:14px;letter-spacing:.025em}' +
+  'html[lang^="pt"] a[href^="tel:"]::after{content:"Ligar para encomendar"}';
+
+/** Ease-out window scroll to a document Y (or an element at `offset` px from the top): the motion stays readable. */
+async function easeScroll(h, target, { offset = 80, ms = 550 } = {}) {
+  const { page } = h;
+  let y = target;
+  if (typeof target !== "number") {
+    const el = target.first();
+    await el.waitFor({ state: "attached" });
+    y = await el.evaluate((n, off) => n.getBoundingClientRect().top + window.scrollY - off, offset);
+  }
+  await page.evaluate(({ y, ms }) => new Promise((resolve) => {
+    const s = document.scrollingElement;
+    const prev = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = "auto";
+    const to = Math.max(0, Math.min(y, s.scrollHeight - window.innerHeight));
+    const from = s.scrollTop;
+    const t0 = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / ms);
+      const e = 1 - Math.pow(1 - t, 3);
+      s.scrollTop = from + (to - from) * e;
+      if (t < 1) requestAnimationFrame(step);
+      else { document.documentElement.style.scrollBehavior = prev; resolve(); }
+    };
+    requestAnimationFrame(step);
+  }), { y, ms });
+}
+
+const DBG = process.env.OG_DEBUG ? (...a) => console.error(`[og ${new Date().toISOString().slice(17, 23)}]`, ...a) : () => {};
+
+/** Menus page: pick a recent served day, then search "sardines" and open that day. */
+async function menusStory(h, { onCamera = true } = {}) {
+  const { page } = h;
+  const t = onCamera ? (l, ms) => tap(h, l, ms) : (l) => l.first().click();
+  const day = await page.evaluate(() => {
+    const btns = [...document.querySelectorAll("table button, [role=grid] button")].filter((b) => /^\d+$/.test(b.innerText.trim()));
+    const sel = btns.findIndex((b) => b.getAttribute("aria-selected") === "true" || b.closest("[aria-selected=true]") || /bg-mkt-primary|selected/.test(b.className + (b.parentElement?.className || "")));
+    const upto = sel > 0 ? btns.slice(0, sel) : btns;
+    const ok = upto.filter((b) => !b.disabled);
+    return ok.length ? ok[Math.max(0, ok.length - 2)].innerText.trim() : null;
+  });
+  if (day) await t(page.locator("table button, [role=grid] button").filter({ hasText: new RegExp(`^${day}$`) }));
+  await h.wait(150);
+  await h.waitForStill(400);
+  if (onCamera) await h.beat(300);
+  const search = page.getByPlaceholder(/Search by dish/).first();
+  if (onCamera) await point(h, search, 220);
+  await search.click();
+  await search.pressSequentially("sardines", { delay: onCamera ? 35 : 0 });
+  if (onCamera) await h.beat(450); else await h.wait(800);
+  await t(page.locator("aside ul li button"));
+  await h.wait(150);
+  await h.waitForStill(onCamera ? 400 : 1500);
+}
+const dishLink = async (page) => {
+  const id = DISH.split("/").pop();
+  const link = page.locator(`main a[href$="${id}"]`);
+  return (await link.count()) ? link.first() : page.locator("main a").filter({ hasText: /Veal Rolls/ }).first();
+};
+const PRODUCTS_ARRIVE = (page) => page.getByText("Labels & filters", { exact: true }).filter({ visible: true });
+const CONTESTS_ARRIVE = (page) => page.locator("main h1, main h2").filter({ hasText: /Capture|Ess[eê]ncia/i }).filter({ visible: true });
+
+/** On-camera nav: hover first (Next.js prefetches the route on hover), then click. */
+async function go(h, link, arrive, { hold = 150, move = 260, linger = 100, settle = 300, label } = {}) {
+  await point(h, link, move);
+  await h.wait(linger);
+  const t0 = Date.now();
+  await h.click(link, { pause: 0, move: 40, settle: false });
+  await h.arrived(arrive);
+  DBG(`nav ${label}: arrived in ${Date.now() - t0} ms`);
+  if (settle) await h.waitForStill(settle);
+  if (hold) await h.wait(hold);
+}
+
+/** Record the site's RSC (client navigation) answers; later serve them from memory. */
+async function rscCache(page) {
+  const store = new Map();
+  let replay = false;
+  let hits = 0, misses = 0;
+  const key = (req) => {
+    const u = new URL(req.url());
+    u.searchParams.delete("_rsc");
+    const hd = req.headers();
+    const lang = /(?:^|;\s*)lang=([^;]+)/.exec(hd.cookie || "")?.[1] || "";
+    return [req.method(), u.pathname + u.search, lang, hd["next-router-prefetch"] || "", hd["next-router-segment-prefetch"] || "", hd["next-router-state-tree"] || "", hd["next-url"] || ""].join("|");
+  };
+  await page.route((u) => u.searchParams.has("_rsc"), async (route) => {
+    const req = route.request();
+    const k = key(req);
+    if (replay && store.has(k)) { hits++; return route.fulfill(store.get(k)); }
+    if (replay) misses++;
+    const resp = await route.fetch().catch(() => null);
+    if (!resp) return route.continue().catch(() => {});
+    const body = await resp.body();
+    const v = { status: resp.status(), headers: resp.headers(), body };
+    if (!replay && resp.status() === 200) store.set(k, v);
+    return route.fulfill(v);
+  });
+  process.on("exit", () => DBG(`RSC replay: ${hits} hits, ${misses} misses`));
+  return { size: () => store.size, replay: () => { replay = true; } };
+}
+
+/** The opening state: landing page at the top, menu date pre-stepped, cursor parked. */
+async function prepHome(h) {
+  const { page } = h;
+  await page.goto(`${SITE}/`, { waitUntil: "networkidle", timeout: 30000 }).catch(() => {});
+  await h.waitForStill(2000);
+  await revealAll(page);
+  // Step the menu date back and forth once so the on-camera click is served from cache.
+  const prev = page.locator('#todays-menu button[aria-label="Previous menu"]').first();
+  const next = page.locator('#todays-menu button[aria-label="Next menu"]').first();
+  if (await prev.count()) {
+    await prev.click(); await page.waitForTimeout(3000);
+    await next.click(); await page.waitForTimeout(2500);
+  }
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(600);
+  // The hero's "Today's Menu" anchor is pressed on camera, the scroll is done by h.glide.
+  await page.evaluate(() => document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href="#todays-menu"]');
+    if (a) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true));
+  await h.moveTo(760, 470, 16);
+}
+
+export const take = {
+  target: 32,
+  posterFrom: { feature: "marketing", at: 1 },
+  async before(h) {
+    const { page } = h;
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    // Scroll-reveal sections are shown at once on every page of the take.
+    await page.addInitScript((css) => {
+      const add = () => { const s = document.createElement("style"); s.textContent = css; document.head.appendChild(s); };
+      if (document.head) add(); else document.addEventListener("DOMContentLoaded", add);
+    }, REVEAL_CSS + PHONE_CSS);
+    // Rehearsal, trimmed lead-in: play the whole route once, off the record, and
+    // keep the site's own RSC answers. The filmed run then gets each navigation and
+    // filter change answered from that warm cache instead of waiting 1-5 s on the
+    // serverless backend: the same content, without the network wait on camera.
+    const rsc = await rscCache(page);
+    await prepHome(h);
+    for (const [i, f] of take.route.entries()) {
+      if (f.kind === "marketing" || take.cutsBefore.includes(f.key)) { if (i) break; await f.run(h, {}); continue; }
+      if (f.transitionIn) await f.transitionIn(h, {});
+      await f.run(h, {});
+    }
+    DBG(`rehearsal cached ${rsc.size()} RSC answers`);
+    // Back to the opening state: EN, light, the landing page fresh.
+    await page.context().clearCookies({ name: "lang" });
+    await page.evaluate(() => localStorage.removeItem("theme"));
+    await prepHome(h);
+    rsc.replay();
+  },
+  route: [
+    {
+      key: "marketing",
+      kind: "marketing",
+      title: "Landing page",
+      priority: 0,
+      async run(h) {
+        const { page } = h;
+        await tap(h, page.locator('a[href="#todays-menu"]').first(), 240);
+        await h.glide(page.locator("#todays-menu h2").first(), { offset: 30, ms: 500 });
+        await h.wait(200);
+        const prev = page.locator('#todays-menu button[aria-label="Previous menu"]').first();
+        if (await prev.count()) {
+          await tap(h, prev, 200);
+          await h.wait(150);
+          await h.waitForStill(600);
+        }
+        await h.beat(400);
+      },
+    },
+    {
+      key: "menus-history",
+      title: "Previous menus: calendar + dish search",
+      priority: 2,
+      async transitionIn(h) {
+        const { page } = h;
+        // Down past the day's dishes to the section's own "See previous menus" link.
+        const link = page.locator('#todays-menu a[href="/menus"]');
+        await h.glide(link, { offset: 560, ms: 650 });
+        await go(h, link, page.getByPlaceholder(/Search by dish/), { label: "menus" });
+      },
+      async run(h) {
+        const { page } = h;
+        // Ask the site's router for the dish page now (data only, nothing on screen),
+        // so opening it later shows the page, not its loading skeleton.
+        await page.evaluate((href) => window.next?.router?.prefetch?.(href, { kind: "full" }), new URL(DISH).pathname).catch(() => {});
+        await menusStory(h);
+        await h.beat(200);
+        const dish = page.locator("main").getByText(/Sardines/).filter({ hasNot: page.locator("input") }).last();
+        // Frame both the found sardines and, lower down the same day, the Veal Rolls
+        // card the next feature opens (fully in view: no scroll-jump on its click).
+        const veal = await dishLink(page);
+        if (await veal.count()) await easeScroll(h, veal, { offset: 560, ms: 600 });
+        else if (await dish.count()) await easeScroll(h, dish, { offset: 330, ms: 600 });
+        // The search result: rest the cursor on the found sardines dish.
+        if (await dish.count()) await point(h, dish, 220);
+        await h.beat(550);
+      },
+    },
+    {
+      key: "dish",
+      title: "Dish page: photo, ingredients, allergens",
+      priority: 3,
+      async transitionIn(h) {
+        const { page } = h;
+        // The same day's menu also serves the Veal Rolls: open its dish page.
+        await go(h, await dishLink(page), page.locator("h3", { hasText: "Ingredients" }), { hold: 200, label: "dish" });
+      },
+      async run(h) {
+        const { page } = h;
+        const ing = page.locator("h3", { hasText: "Ingredients" });
+        if (await ing.count()) await point(h, ing, 260);
+        await h.beat(400);
+        const chip = page.getByText("Beef", { exact: true }).first();
+        if (await chip.count()) await point(h, chip, 200);
+        await h.beat(300);
+        const chip2 = page.getByText("Pork", { exact: true }).first();
+        if (await chip2.count()) await point(h, chip2, 150);
+        await h.beat(350);
+      },
+    },
+    {
+      key: "products-filter",
+      title: "Catalogue: labels, Any/All matching, search",
+      priority: 1,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.glide(0, { ms: 300 });
+        await go(h, page.locator('header a[href="/products"]').filter({ visible: true }).first(), PRODUCTS_ARRIVE(page), { hold: 0, label: "products" });
+        await page.addStyleTag({ content: ".grid > div.h-full{content-visibility:auto;contain-intrinsic-size:auto 330px;transition:none!important;animation:none!important}.grid > div.h-full *{transition:none!important}" })
+          .then((el) => el.evaluate((n) => { n.id = "__og_cards"; }));
+        await page.addStyleTag({ content: "header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgb(250,245,234)!important}" })
+          .then((el) => el.evaluate((n) => { n.id = "__og_header"; }));
+        // A short glide down to the filters panel, two rows of cards in view.
+        await h.glide(PRODUCTS_ARRIVE(page).first(), { offset: 96, ms: 380 });
+        await lockScroll(page);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(200); // For Order tab with today's menu
+        await tap(h, page.getByRole("button", { name: "Vegetarian", exact: true }), 180);
+        await h.beat(400);
+        await tap(h, page.getByRole("tab", { name: "All", exact: true }), 180);
+        await h.beat(300);
+        await tap(h, page.getByRole("button", { name: "Gluten", exact: true }), 180);
+        await h.beat(450);
+        await tap(h, page.getByRole("button", { name: "All", exact: true }), 180);
+        await h.wait(100);
+        await h.beat(400);
+        const search = page.getByPlaceholder("Search...").first();
+        await point(h, search, 200);
+        await search.focus();
+        await page.keyboard.type("cake", { delay: 35 });
+        await h.wait(250);
+        await h.beat(450);
+      },
+    },
+    {
+      // Back to the top of the catalogue: language menu (PT), then dark mode.
+      key: "i18n-theme",
+      title: "EN/PT switch + dark mode",
+      priority: 5,
+      async transitionIn(h) {
+        await unlockProducts(h.page);
+        await easeScroll(h, 0, { ms: 550 });
+      },
+      async run(h) {
+        const { page } = h;
+        await tap(h, await inView(page, 'button[aria-label="Language"]'), 240);
+        await tap(h, page.getByRole("menu").getByText(/Portugu/i), 160);
+        const t0 = Date.now();
+        await page.waitForLoadState("domcontentloaded").catch(() => {});
+        await page.getByText("Os Nossos Produtos").first().waitFor({ timeout: 8000 }).catch(() => {});
+        DBG(`lang: ${Date.now() - t0} ms`);
+        await h.waitForStill(600);
+        await h.beat(400);
+        await tap(h, await inView(page, 'button.inline-grid.place-items-center'), 220);
+        await h.wait(150);
+        const dark = page.getByRole("menuitem", { name: /dark|escuro/i });
+        if (await dark.count()) await tap(h, dark);
+        await h.beat(500);
+      },
+    },
+    {
+      key: "contests",
+      title: "Weekly photo contest",
+      priority: 6,
+      async transitionIn(h) {
+        const { page } = h;
+        await go(h, page.locator('header a[href="/contests"]').filter({ visible: true }).first(), [/\/contests/, CONTESTS_ARRIVE(page)], { hold: 150, label: "contests" });
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(200);
+        const agenda = page.locator("h2, h3", { hasText: /agenda/i }).first();
+        await h.glide(agenda, { offset: 345, ms: 420 });
+        await h.wait(150);
+        const tiles = page.getByText(/^\+\d+$/);
+        const n = await tiles.count();
+        const tile = n > 1 ? tiles.nth(1) : tiles.first();
+        if (n) {
+          await point(h, tile, 240);
+          await h.wait(250);
+          // Off to the side, so the "+N dishes" badge itself stays readable.
+          const b = await tile.boundingBox();
+          if (b) await glideCursor(h, b.x + b.width / 2 + 40, b.y + b.height + 70, 200);
+        }
+        await h.beat(650);
+      },
+    },
+    {
+      // The only cut: a local page of gallery screenshots (no demo login on the live site).
+      key: "admin-backoffice",
+      title: "Admin back office (screenshots, login required)",
+      priority: 4,
+      async before(h) {
+        const { page } = h;
+        // Opens on the contests page's dark background, then fades up to the
+        // screenshots on camera: a quick fade through the background, not a hard switch.
+        await page.goto(`${ADMIN_URL}#dark`);
+        await page.waitForFunction(() => [...document.images].every((i) => i.complete));
+        await page.mouse.move(-50, -50);
+        await h.cursor(false);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.wait(80);
+        await page.evaluate(() => document.body.classList.remove("dk"));
+        await h.wait(850);
+        for (let i = 1; i < ADMIN.length; i++) {
+          await page.evaluate((i) => {
+            const s = document.querySelectorAll(".s");
+            s[i - 1].classList.remove("on");
+            s[i].classList.add("on");
+          }, i);
+          await h.wait(i === ADMIN.length - 1 ? 1200 : 1000);
+        }
+      },
+    },
+  ],
+  cutsBefore: ["admin-backoffice"],
+};
+
 export default {
+  take,
   url: `${SITE}/`,
   target: 32, // plan 35; lowered to the real total with every planned feature in (see compose notes)
   posterFrom: { segment: "marketing", at: 1 },
@@ -191,7 +607,7 @@ export default {
         await h.wait(100); // the press returns once the site's freeze (~0.5 s) is over
         await h.beat(450);
         const search = page.getByPlaceholder("Search...").first();
-        await h.hover(search, 200);
+        await point(h, search, 200);
         await search.focus();
         await page.keyboard.type("cake", { delay: 35 });
         await h.wait(250);
@@ -226,7 +642,7 @@ export default {
         await h.beat(300);
         // Dish search: the archive answers with the dates that served it.
         const search = page.getByPlaceholder(/Search by dish/).first();
-        await h.hover(search, 220);
+        await point(h, search, 220);
         await search.click();
         await search.pressSequentially("sardines", { delay: 35 });
         await h.beat(450);
@@ -238,7 +654,7 @@ export default {
         const dish = page.locator("main").getByText(/Sardines/).filter({ hasNot: page.locator("input") }).last();
         if (await dish.count()) {
           await h.glide(dish, { offset: 330, ms: 450 });
-          await h.hover(dish, 200);
+          await point(h, dish, 200);
         }
         await h.beat(650);
       },
@@ -260,13 +676,13 @@ export default {
         const { page } = h;
         await h.beat(300);
         const ing = page.locator("h3", { hasText: "Ingredients" });
-        if (await ing.count()) await h.hover(ing, 260);
+        if (await ing.count()) await point(h, ing, 260);
         await h.beat(500);
         const chip = page.getByText("Beef", { exact: true }).first();
-        if (await chip.count()) await h.hover(chip, 200);
+        if (await chip.count()) await point(h, chip, 200);
         await h.beat(400);
         const chip2 = page.getByText("Pork", { exact: true }).first();
-        if (await chip2.count()) await h.hover(chip2, 150);
+        if (await chip2.count()) await point(h, chip2, 150);
         await h.beat(550);
       },
     },
@@ -348,7 +764,7 @@ export default {
         await h.wait(150);
         // Hover a day tile that has photos (the "+N" badge).
         const tile = page.getByText(/^\+\d+$/).first();
-        if (await tile.count()) await h.hover(tile, 240);
+        if (await tile.count()) await point(h, tile, 240);
         await h.beat(650);
       },
     },

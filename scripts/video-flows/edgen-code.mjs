@@ -47,6 +47,8 @@ const SHOTS = {
   // toolbar + input strip near the middle instead of in a thin band at the top.
   chatLeft: { x: 0, y: -30, w: 440, pad: true }, // model picker, @, tools, the typed prompt
   chatWide: { x: 0, y: -110, w: 800, pad: true }, // whole input: typed prompt + Ctrl+Enter @codebase
+  // take only: close-up on the chat toolbar (New chat, history, open in tab), readable rings
+  chatTools: { x: 352, y: -44, w: 440, pad: true },
   configTop: { x: 6, y: 70, w: 780 },
   // Help center .. both shortcut rows fully in frame; bottom (930) is the panel's own edge.
   configBottom: { x: 14, y: 455, w: 760 },
@@ -298,7 +300,7 @@ const cutTo = (page, i, shot, { mask = false, cursor = null } = {}) => {
   }, { i, t: cam(shot), mask, cursor });
 };
 
-export default {
+const FLOW = {
   url: buildPage(),
   target: PLAN_TARGET,
   colorScheme: "dark",
@@ -406,4 +408,142 @@ export default {
       },
     },
   ],
+};
+
+export default FLOW;
+
+// ---------------------------------------------------------------------------
+// CONTINUOUS take (v4): the same beats in the same order, joined on camera.
+// No cuts: every move between screenshots is a camera push plus, where the
+// extension itself changes view, a cursor click and a short cross-fade.
+// ---------------------------------------------------------------------------
+const feat = (key) => FLOW.features.find((f) => f.key === key);
+/** Cross-fade to screenshot i (on camera), optional mask fade, in parallel with a camera move. */
+const fadeTo = (page, i, { mask, ms = 300 } = {}) =>
+  page.evaluate(({ i, mask, ms }) => {
+    document.querySelectorAll("#cam > .pg").forEach((im, k) => {
+      im.style.transition = `opacity ${ms}ms ease`;
+      im.classList.toggle("on", k === i);
+    });
+    document.querySelectorAll(".tx,.demo").forEach((e) => {
+      e.style.transition = `opacity ${ms}ms ease`;
+      e.style.opacity = "0";
+      setTimeout(() => e.remove(), ms + 20);
+    });
+    const m = document.getElementById("mask");
+    m.style.transition = `opacity ${ms}ms ease`;
+    if (mask != null) m.classList.toggle("on", mask);
+    m.classList.toggle("dlg", i === 2);
+  }, { i, mask: mask ?? null, ms });
+
+/** Settings-click swap: the outgoing view fades out fast, the incoming one fades in just after,
+ *  so no frame shows both layouts at full legibility. */
+const swapTo = (page, i, { out = 150, inMs = 260, delay = 90 } = {}) =>
+  page.evaluate(({ i, out, inMs, delay }) => {
+    document.querySelectorAll("#cam > .pg").forEach((im, k) => {
+      const on = k === i;
+      im.style.transition = on ? `opacity ${inMs}ms ease ${delay}ms` : `opacity ${out}ms ease`;
+      im.classList.toggle("on", on);
+    });
+    document.querySelectorAll(".tx,.demo").forEach((e) => {
+      e.style.transition = `opacity ${out}ms ease`;
+      e.style.opacity = "0";
+      setTimeout(() => e.remove(), out + 20);
+    });
+  }, { i, out, inMs, delay });
+
+/** The Add click: Add flashes, "Currently Indexing: None" becomes the demo entry, ringed. */
+async function addClick(h) {
+  const { page } = h;
+  await cursorTo(page, { x: 560, y: 720 }, 1);
+  await cursorTo(page, { x: 662, y: 672 }, 260);
+  await h.wait(140);
+  await pulse(page);
+  await ring(page, { x: 618, y: 652, w: 84, h: 38 }, "", "below", 380);
+  await h.wait(200);
+  await page.evaluate(() => {
+    const d = document.createElement("div");
+    d.className = "tx";
+    Object.assign(d.style, { left: "98px", top: "752px", width: "600px", height: "30px", background: "#141414", opacity: "0", transition: "opacity 180ms ease",
+      font: '16px/30px "Noto Sans",system-ui,sans-serif', color: "#cccccc", paddingLeft: "3px", boxSizing: "border-box" });
+    d.innerHTML = 'React <span style="color:#8a8a8a">&middot; https://react.dev</span>' +
+      '<span style="display:inline-block;width:150px;height:4px;margin-left:16px;vertical-align:middle;border-radius:2px;background:#2a2a2a;overflow:hidden">' +
+      '<span style="display:block;width:38%;height:100%;background:#38bdf8"></span></span>';
+    document.getElementById("cam").appendChild(d);
+    void d.offsetWidth;
+    d.style.opacity = "1";
+  });
+  await cursorTo(page, { x: 748, y: 640 }, 240);
+  await beat(h, { x: 92, y: 726, w: 610, h: 58 }, "Indexing React for @docs", { pos: "above", dur: 1000, hold: 1040 });
+}
+
+export const take = {
+  target: PLAN_TARGET,
+  async before(h) {
+    await ready(h.page);
+    await cutTo(h.page, 0, SHOTS.hero);
+  },
+  route: [
+    { key: "marketing", kind: "marketing", title: FLOW.marketing.title, priority: 0, run: (h) => FLOW.marketing.run(h) },
+    {
+      ...feat("chat-panel"),
+      before: undefined,
+      // the listing page sits right of the chat sidebar: one eased pan left that ends pushed in
+      // on the chat toolbar, while the listing page fades under the panel-colour mask, so only
+      // one surface is in frame as the camera moves
+      async transitionIn(h) {
+        await h.page.evaluate(() => {
+          const m = document.getElementById("mask");
+          m.style.transition = "opacity 300ms ease";
+          m.classList.add("on");
+        });
+        // matrix target: the pan interpolates linearly in screen space, so the toolbar strip
+        // enters frame early instead of the camera swinging through the empty panel area
+        SHOT = SHOTS.chatTools;
+        await ringOff(h.page);
+        await h.page.evaluate(({ s, x, y }) => {
+          const c = document.getElementById("cam");
+          c.style.transition = "transform 700ms cubic-bezier(.45,0,.25,1)";
+          c.style.transform = `matrix(${s},0,0,${s},${-s * x},${-s * y})`;
+        }, { s: VW / SHOTS.chatTools.w, x: SHOTS.chatTools.x, y: SHOTS.chatTools.y });
+        await h.wait(720);
+      },
+    },
+    {
+      ...feat("codebase-config"),
+      before: undefined,
+      // chat-panel ends with the Settings icon ringed: click it, the cursor stays on the icon while
+      // the settings page comes in, and only then does the camera reframe
+      async transitionIn(h) {
+        const { page } = h;
+        await cursorTo(page, { x: 640, y: 120 }, 1);
+        await cursorTo(page, { x: 629, y: 57 }, 260);
+        await h.wait(160);
+        await pulse(page);
+        await h.wait(120);
+        await swapTo(page, 1);
+        await h.wait(380);
+        await cursorHide(page);
+        await move(page, SHOTS.configTop, 500);
+        await h.wait(520);
+      },
+    },
+    {
+      ...feat("add-docs"),
+      before: undefined,
+      // back up the settings page to the @docs section (Add Docs button), extension page masked
+      async transitionIn(h) {
+        const { page } = h;
+        await fadeTo(page, 1, { mask: true, ms: 450 });
+        await move(page, SHOTS.addDoc, 550);
+        await h.wait(420);
+      },
+      async run(h, ctx) {
+        await feat("add-docs").run(h, ctx);
+        await addClick(h);
+      },
+    },
+  ],
+  // the final beat: full dialog, title + X in frame, React indexing ringed (camera settled)
+  posterFrom: { feature: "add-docs", at: -0.45 },
 };

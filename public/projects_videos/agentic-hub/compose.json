@@ -1,91 +1,167 @@
 {
   "id": "agentic-hub",
-  "composedAt": "2026-10-20T22:41:29.408Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-21T00:08:26.586Z",
   "target": 26,
   "tolerance": 0.1,
   "bounds": [
     23.4,
     28.6
   ],
-  "xfade": 0,
-  "total": 26.08,
+  "total": 25.84,
   "status": "ok",
-  "marketingShare": 0.2,
-  "included": [
+  "cuts": [],
+  "cutDetails": [],
+  "longestTakeS": 25.83,
+  "longestTakeShare": 1,
+  "takes": [
+    {
+      "duration": 25.83
+    }
+  ],
+  "marketingShare": 0.19,
+  "features": [
     {
       "key": "marketing",
       "kind": "marketing",
-      "title": "Landing page",
+      "title": "Landing: hero, two-sided market, category floor",
       "priority": 0,
-      "duration": 5.16,
       "start": 0,
-      "end": 5.16
+      "end": 4.9,
+      "duration": 4.9
     },
     {
       "key": "browse",
       "kind": "feature",
       "title": "Search results, rating filter, sort, open an agent",
       "priority": 1,
-      "duration": 4.72,
-      "start": 5.16,
-      "end": 9.88
+      "start": 4.9,
+      "end": 9.05,
+      "duration": 4.15
     },
     {
       "key": "hire",
       "kind": "feature",
       "title": "Hire an agent: buy credits with a live total",
       "priority": 2,
-      "duration": 3.72,
-      "start": 9.88,
-      "end": 13.6
+      "start": 9.05,
+      "end": 13.21,
+      "duration": 4.16
     },
     {
       "key": "invest",
       "kind": "feature",
       "title": "Invest in an agent: two-step share purchase",
       "priority": 3,
-      "duration": 3.32,
-      "start": 13.6,
-      "end": 16.92
+      "start": 13.21,
+      "end": 17.12,
+      "duration": 3.91
     },
     {
       "key": "token-activity",
       "kind": "feature",
       "title": "Performance metrics, agent token chart, live activity",
       "priority": 4,
-      "duration": 4.8,
-      "start": 16.92,
-      "end": 21.72
+      "start": 17.12,
+      "end": 21.08,
+      "duration": 3.96
     },
     {
       "key": "api",
       "kind": "feature",
       "title": "API docs and playground: send a request",
       "priority": 5,
-      "duration": 4.36,
-      "start": 21.72,
-      "end": 26.08
+      "start": 21.08,
+      "end": 25.83,
+      "duration": 4.75
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "marketing": 5.16,
-    "browse": 4.72,
-    "hire": 3.72,
-    "invest": 3.32,
-    "token-activity": 4.8,
-    "api": 4.36
-  },
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Landing: hero, two-sided market, category floor",
+      "priority": 0,
+      "start": 0,
+      "end": 4.9,
+      "duration": 4.9
+    },
+    {
+      "key": "browse",
+      "kind": "feature",
+      "title": "Search results, rating filter, sort, open an agent",
+      "priority": 1,
+      "start": 4.9,
+      "end": 9.05,
+      "duration": 4.15
+    },
+    {
+      "key": "hire",
+      "kind": "feature",
+      "title": "Hire an agent: buy credits with a live total",
+      "priority": 2,
+      "start": 9.05,
+      "end": 13.21,
+      "duration": 4.16
+    },
+    {
+      "key": "invest",
+      "kind": "feature",
+      "title": "Invest in an agent: two-step share purchase",
+      "priority": 3,
+      "start": 13.21,
+      "end": 17.12,
+      "duration": 3.91
+    },
+    {
+      "key": "token-activity",
+      "kind": "feature",
+      "title": "Performance metrics, agent token chart, live activity",
+      "priority": 4,
+      "start": 17.12,
+      "end": 21.08,
+      "duration": 3.96
+    },
+    {
+      "key": "api",
+      "kind": "feature",
+      "title": "API docs and playground: send a request",
+      "priority": 5,
+      "start": 21.08,
+      "end": 25.83,
+      "duration": 4.75
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "marketing",
+    "browse",
+    "hire",
+    "invest",
+    "token-activity",
+    "api"
+  ],
+  "leadInTrimmedS": 18.15,
+  "offCameraTrimmedS": 0,
+  "rawDurationS": 44.96,
+  "videoOffsetS": -0.03,
   "poster": {
-    "segment": "marketing",
-    "at": 1
+    "feature": "marketing",
+    "at": 0.9
   },
   "files": {
-    "mp4": 2038626,
-    "webm": 1285558,
-    "poster": 80808,
+    "mp4": 2979048,
+    "webm": 1926266,
+    "poster": 84261,
     "mp4Crf": 23,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

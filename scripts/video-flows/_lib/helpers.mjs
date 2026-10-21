@@ -18,6 +18,8 @@ export const PACING = {
   slideHold: 1100,      // ms each marketing slide is held by h.slides()
   settleMax: 2500,      // max ms to wait for intro animations / splash screens (off camera where possible)
   navDwell: 1000,       // ms held after an on-camera navigation, once the new page has loaded
+  navHold: 500,         // ms held after h.nav()/h.navLink() (continuous takes: the next feature's run() reads on)
+  navSettleMax: 700,    // max ms h.nav() waits for the destination to stop moving after it is visible
   maxScrollSpeed: 2400, // px/s for paced scrolls and glides
   glideMinMs: 280,      // a glide never takes less than this...
   glideMaxMs: 750,      // ...nor more than this, however far it goes
@@ -328,7 +330,7 @@ export function makeHelpers(page, pacing = PACING, extra = {}) {
    * Move the cursor onto the element, then click it. If the click changes the
    * page (path or query), wait for the new page and hold it for navDwell.
    */
-  async function click(locator, { pause = pacing.clickPause, move = pacing.moveMs, navDwell = pacing.navDwell } = {}) {
+  async function click(locator, { pause = pacing.clickPause, move = pacing.moveMs, navDwell = pacing.navDwell, settle = true } = {}) {
     const el = loc(locator).first();
     await el.waitFor({ state: "visible" });
     let box = await el.boundingBox();
@@ -342,7 +344,55 @@ export function makeHelpers(page, pacing = PACING, extra = {}) {
     const before = pageKey(page.url());
     await el.click({ delay: 60 });
     if (pause) await wait(pause);
-    if (pageKey(page.url()) !== before) await settleNavigation(navDwell);
+    if (settle && pageKey(page.url()) !== before) await settleNavigation(navDwell);
+  }
+
+  /**
+   * Wait until the destination of an on-camera navigation is there. `arrive` is a
+   * CSS selector, a Locator, a RegExp for the URL, a function (page) => Promise,
+   * or an array of these (all must hold).
+   */
+  async function arrived(arrive, timeout = 15000) {
+    if (!arrive) return page.waitForLoadState("domcontentloaded").catch(() => {});
+    if (Array.isArray(arrive)) {
+      for (const a of arrive) await arrived(a, timeout);
+      return;
+    }
+    if (arrive instanceof RegExp) return page.waitForURL(arrive, { timeout, waitUntil: "commit" });
+    if (typeof arrive === "function") return arrive(page);
+    return loc(arrive).first().waitFor({ state: "visible", timeout });
+  }
+
+  /**
+   * Quick ON-CAMERA navigation for continuous takes: glide to `target`, click
+   * it, wait only until `arrive` is visible (never for networkidle), let the new
+   * view settle for at most navSettleMax ms, then hold navHold ms. The click and
+   * the arrival are filmed, like a person using the app; nothing is trimmed.
+   */
+  async function nav(target, { arrive, hold = pacing.navHold, move = pacing.moveMs, timeout = 15000, settleMax = pacing.navSettleMax } = {}) {
+    await click(target, { pause: 0, move, settle: false });
+    await arrived(arrive, timeout);
+    if (settleMax) await waitForStill(settleMax);
+    if (hold) await dwell(hold);
+  }
+
+  /**
+   * h.nav() on the app's own navigation: the first link (or button) named `name`
+   * (string = substring, case-insensitive; or RegExp) inside nav/header/aside,
+   * falling back to anywhere on the page. `within` narrows the search (selector).
+   */
+  async function navLink(name, { within, ...opts } = {}) {
+    const rx = name instanceof RegExp ? name : new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    const scopes = within ? [page.locator(within)] : [page.locator("nav, header, aside, [role=navigation]"), page.locator("body")];
+    for (const scope of scopes) {
+      const cand = scope.getByRole("link", { name: rx }).or(scope.getByRole("button", { name: rx }).or(scope.getByRole("tab", { name: rx })));
+      const n = await cand.count();
+      for (let i = 0; i < n; i++) {
+        const el = cand.nth(i);
+        if (await el.isVisible()) return nav(el, opts);
+      }
+    }
+    throw new Error(`navLink: nothing visible named ${rx}`);
   }
 
   async function hover(locator, ms = pacing.moveMs) {
@@ -380,9 +430,13 @@ export function makeHelpers(page, pacing = PACING, extra = {}) {
     }, { text, bottom }).catch(() => {});
 
   const api = {
-    page, pacing, viewport: VIEWPORT, ...extra,
+    page, pacing, viewport: VIEWPORT,
+    // Continuous takes replace this with a version that trims fn's span out of the
+    // video (a counted cut). In clip mode it simply runs fn.
+    offCamera: async (fn) => fn?.(),
+    ...extra,
     wait, dwell, beat, waitForStill, goto, settleNavigation, moveTo, scrollTo, scrollBy, glide, jump, slides,
-    click, hover, type, cursor, caption,
+    click, hover, type, cursor, caption, arrived, nav, navLink,
     get mouse() { return { ...mouse }; },
   };
   return api;

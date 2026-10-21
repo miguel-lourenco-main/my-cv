@@ -1,101 +1,197 @@
 {
   "id": "sonora",
-  "composedAt": "2026-10-20T22:27:08.018Z",
-  "target": 40,
+  "mode": "continuous",
+  "composedAt": "2026-10-21T00:30:17.250Z",
+  "target": 31,
   "tolerance": 0.1,
   "bounds": [
-    36,
-    44
+    27.9,
+    34.1
   ],
-  "xfade": 0,
-  "total": 41.8,
+  "total": 30.04,
   "status": "ok",
-  "marketingShare": 0.17,
-  "included": [
+  "cuts": [
+    25.36
+  ],
+  "cutDetails": [
+    {
+      "at": 25.36,
+      "skippedS": 4.3,
+      "label": "before chapter-3"
+    }
+  ],
+  "longestTakeS": 25.36,
+  "longestTakeShare": 0.84,
+  "takes": [
+    {
+      "duration": 25.36
+    },
+    {
+      "duration": 4.67
+    }
+  ],
+  "marketingShare": 0.16,
+  "features": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 6.96,
       "start": 0,
-      "end": 6.96
-    },
-    {
-      "key": "player",
-      "kind": "feature",
-      "title": "Narrated player with word-by-word highlighting",
-      "priority": 1,
-      "duration": 7.92,
-      "start": 6.96,
-      "end": 14.88
-    },
-    {
-      "key": "choices",
-      "kind": "feature",
-      "title": "In-player branching choice",
-      "priority": 2,
-      "duration": 3.04,
-      "start": 14.88,
-      "end": 17.92
-    },
-    {
-      "key": "chapter-3",
-      "kind": "feature",
-      "title": "The chosen path: chapter 3 narration",
-      "priority": 3,
-      "duration": 3.8,
-      "start": 17.92,
-      "end": 21.72
+      "end": 4.95,
+      "duration": 4.95
     },
     {
       "key": "library",
       "kind": "feature",
       "title": "Library: genre filter, search, open a story",
       "priority": 4,
-      "duration": 6.84,
-      "start": 21.72,
-      "end": 28.56
+      "start": 4.95,
+      "end": 10.07,
+      "duration": 5.12
     },
     {
       "key": "story-detail",
       "kind": "feature",
       "title": "Story page with the branching-paths map",
       "priority": 5,
-      "duration": 6.92,
-      "start": 28.56,
-      "end": 35.48
+      "start": 10.07,
+      "end": 14.77,
+      "duration": 4.7
+    },
+    {
+      "key": "player",
+      "kind": "feature",
+      "title": "Narrated player with word-by-word highlighting",
+      "priority": 1,
+      "start": 14.77,
+      "end": 19.16,
+      "duration": 4.39
+    },
+    {
+      "key": "choices",
+      "kind": "feature",
+      "title": "In-player branching choice",
+      "priority": 2,
+      "start": 19.16,
+      "end": 25.36,
+      "duration": 6.2
+    },
+    {
+      "key": "chapter-3",
+      "kind": "feature",
+      "title": "The chosen path: chapter 3 narration",
+      "priority": 3,
+      "start": 25.36,
+      "end": 26.24,
+      "duration": 0.88
     },
     {
       "key": "voices",
       "kind": "feature",
       "title": "Voice Studio: bring your own narrator",
       "priority": 6,
-      "duration": 6.32,
-      "start": 35.48,
-      "end": 41.8
+      "start": 26.24,
+      "end": 30.03,
+      "duration": 3.79
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "marketing": 6.96,
-    "player": 7.92,
-    "choices": 3.04,
-    "chapter-3": 3.8,
-    "library": 6.84,
-    "story-detail": 6.92,
-    "voices": 6.32
-  },
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Landing page",
+      "priority": 0,
+      "start": 0,
+      "end": 4.95,
+      "duration": 4.95
+    },
+    {
+      "key": "library",
+      "kind": "feature",
+      "title": "Library: genre filter, search, open a story",
+      "priority": 4,
+      "start": 4.95,
+      "end": 10.07,
+      "duration": 5.12
+    },
+    {
+      "key": "story-detail",
+      "kind": "feature",
+      "title": "Story page with the branching-paths map",
+      "priority": 5,
+      "start": 10.07,
+      "end": 14.77,
+      "duration": 4.7
+    },
+    {
+      "key": "player",
+      "kind": "feature",
+      "title": "Narrated player with word-by-word highlighting",
+      "priority": 1,
+      "start": 14.77,
+      "end": 19.16,
+      "duration": 4.39
+    },
+    {
+      "key": "choices",
+      "kind": "feature",
+      "title": "In-player branching choice",
+      "priority": 2,
+      "start": 19.16,
+      "end": 25.36,
+      "duration": 6.2
+    },
+    {
+      "key": "chapter-3",
+      "kind": "feature",
+      "title": "The chosen path: chapter 3 narration",
+      "priority": 3,
+      "start": 25.36,
+      "end": 26.24,
+      "duration": 0.88
+    },
+    {
+      "key": "voices",
+      "kind": "feature",
+      "title": "Voice Studio: bring your own narrator",
+      "priority": 6,
+      "start": 26.24,
+      "end": 30.03,
+      "duration": 3.79
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "marketing",
+    "library",
+    "story-detail",
+    "player",
+    "choices",
+    "chapter-3",
+    "voices"
+  ],
+  "leadInTrimmedS": 18.27,
+  "offCameraTrimmedS": 4.3,
+  "rawDurationS": 53.04,
+  "videoOffsetS": -0.06,
   "poster": {
-    "segment": "marketing",
+    "feature": "marketing",
     "at": 1
   },
   "files": {
-    "mp4": 2746190,
-    "webm": 2126282,
-    "poster": 129898,
-    "mp4Crf": 25,
+    "mp4": 2779526,
+    "webm": 2469826,
+    "poster": 130751,
+    "mp4Crf": 27,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

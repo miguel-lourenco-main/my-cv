@@ -1,101 +1,197 @@
 {
   "id": "o-guardanapo",
-  "composedAt": "2026-10-20T22:43:14.364Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-21T00:05:18.572Z",
   "target": 32,
   "tolerance": 0.1,
   "bounds": [
     28.8,
     35.2
   ],
-  "xfade": 0,
-  "total": 31.56,
+  "total": 33.04,
   "status": "ok",
-  "marketingShare": 0.13,
-  "included": [
+  "cuts": [
+    28.65
+  ],
+  "cutDetails": [
+    {
+      "at": 28.65,
+      "skippedS": 0.07,
+      "label": "before admin-backoffice"
+    }
+  ],
+  "longestTakeS": 28.65,
+  "longestTakeShare": 0.87,
+  "takes": [
+    {
+      "duration": 28.65
+    },
+    {
+      "duration": 4.39
+    }
+  ],
+  "marketingShare": 0.11,
+  "features": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 4.16,
       "start": 0,
-      "end": 4.16
-    },
-    {
-      "key": "products-filter",
-      "kind": "feature",
-      "title": "Catalogue: labels, Any/All matching, search",
-      "priority": 1,
-      "duration": 7.04,
-      "start": 4.16,
-      "end": 11.2
+      "end": 3.63,
+      "duration": 3.63
     },
     {
       "key": "menus-history",
       "kind": "feature",
       "title": "Previous menus: calendar + dish search",
       "priority": 2,
-      "duration": 5.6,
-      "start": 11.2,
-      "end": 16.8
+      "start": 3.63,
+      "end": 10.69,
+      "duration": 7.06
     },
     {
       "key": "dish",
       "kind": "feature",
       "title": "Dish page: photo, ingredients, allergens",
       "priority": 3,
-      "duration": 3.16,
-      "start": 16.8,
-      "end": 19.96
+      "start": 10.69,
+      "end": 13.76,
+      "duration": 3.07
     },
     {
-      "key": "admin-backoffice",
+      "key": "products-filter",
       "kind": "feature",
-      "title": "Admin back office (screenshots, login required)",
-      "priority": 4,
-      "duration": 5.16,
-      "start": 19.96,
-      "end": 25.12
+      "title": "Catalogue: labels, Any/All matching, search",
+      "priority": 1,
+      "start": 13.76,
+      "end": 21.63,
+      "duration": 7.87
     },
     {
       "key": "i18n-theme",
       "kind": "feature",
       "title": "EN/PT switch + dark mode",
       "priority": 5,
-      "duration": 3.8,
-      "start": 25.12,
-      "end": 28.92
+      "start": 21.63,
+      "end": 25.12,
+      "duration": 3.49
     },
     {
       "key": "contests",
       "kind": "feature",
       "title": "Weekly photo contest",
       "priority": 6,
-      "duration": 2.64,
-      "start": 28.92,
-      "end": 31.56
+      "start": 25.12,
+      "end": 28.65,
+      "duration": 3.53
+    },
+    {
+      "key": "admin-backoffice",
+      "kind": "feature",
+      "title": "Admin back office (screenshots, login required)",
+      "priority": 4,
+      "start": 28.65,
+      "end": 33.04,
+      "duration": 4.39
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "marketing": 4.16,
-    "products-filter": 7.04,
-    "menus-history": 5.6,
-    "dish": 3.16,
-    "admin-backoffice": 5.16,
-    "i18n-theme": 3.8,
-    "contests": 2.64
-  },
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Landing page",
+      "priority": 0,
+      "start": 0,
+      "end": 3.63,
+      "duration": 3.63
+    },
+    {
+      "key": "menus-history",
+      "kind": "feature",
+      "title": "Previous menus: calendar + dish search",
+      "priority": 2,
+      "start": 3.63,
+      "end": 10.69,
+      "duration": 7.06
+    },
+    {
+      "key": "dish",
+      "kind": "feature",
+      "title": "Dish page: photo, ingredients, allergens",
+      "priority": 3,
+      "start": 10.69,
+      "end": 13.76,
+      "duration": 3.07
+    },
+    {
+      "key": "products-filter",
+      "kind": "feature",
+      "title": "Catalogue: labels, Any/All matching, search",
+      "priority": 1,
+      "start": 13.76,
+      "end": 21.63,
+      "duration": 7.87
+    },
+    {
+      "key": "i18n-theme",
+      "kind": "feature",
+      "title": "EN/PT switch + dark mode",
+      "priority": 5,
+      "start": 21.63,
+      "end": 25.12,
+      "duration": 3.49
+    },
+    {
+      "key": "contests",
+      "kind": "feature",
+      "title": "Weekly photo contest",
+      "priority": 6,
+      "start": 25.12,
+      "end": 28.65,
+      "duration": 3.53
+    },
+    {
+      "key": "admin-backoffice",
+      "kind": "feature",
+      "title": "Admin back office (screenshots, login required)",
+      "priority": 4,
+      "start": 28.65,
+      "end": 33.04,
+      "duration": 4.39
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "marketing",
+    "menus-history",
+    "dish",
+    "products-filter",
+    "i18n-theme",
+    "contests",
+    "admin-backoffice"
+  ],
+  "leadInTrimmedS": 62.3,
+  "offCameraTrimmedS": 0.07,
+  "rawDurationS": 96.4,
+  "videoOffsetS": -0.06,
   "poster": {
-    "segment": "marketing",
+    "feature": "marketing",
     "at": 1
   },
   "files": {
-    "mp4": 2715218,
-    "webm": 1906167,
-    "poster": 139224,
+    "mp4": 3069740,
+    "webm": 1982074,
+    "poster": 148733,
     "mp4Crf": 23,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

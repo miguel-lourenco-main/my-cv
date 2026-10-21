@@ -510,7 +510,7 @@ async function appScrollTo(page, locator, y) {
   const el = locator.first();
   await el.waitFor({ state: "visible", timeout: 15000 });
   await el.evaluate((e, y) => {
-    const s = document.getElementById("__app_sc") || document.scrollingElement;
+    const s = document.getElementById("__app_sc")?.isConnected ? document.getElementById("__app_sc") : ([...document.querySelectorAll("div")].find((n) => { const o = getComputedStyle(n).overflowY; return (o === "auto" || o === "scroll") && n.scrollHeight > n.clientHeight + 40 && n.clientHeight > 400; }) || document.scrollingElement);
     s.scrollTop += e.getBoundingClientRect().top - y;
   }, y);
 }
@@ -518,7 +518,7 @@ async function appScrollTo(page, locator, y) {
 /** Fast eased scroll of the app container by `dy` (on camera). */
 const appGlide = (page, dy, ms = 450) =>
   page.evaluate(({ dy, ms }) => new Promise((res) => {
-    const s = document.getElementById("__app_sc") || document.scrollingElement;
+    const s = document.getElementById("__app_sc")?.isConnected ? document.getElementById("__app_sc") : ([...document.querySelectorAll("div")].find((n) => { const o = getComputedStyle(n).overflowY; return (o === "auto" || o === "scroll") && n.scrollHeight > n.clientHeight + 40 && n.clientHeight > 400; }) || document.scrollingElement);
     const a = s.scrollTop, b = Math.max(0, Math.min(s.scrollHeight - s.clientHeight, a + dy)), t0 = performance.now();
     const step = (now) => {
       const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -532,7 +532,7 @@ const appGlide = (page, dy, ms = 450) =>
  *  frame, because the app's tall header collapses into a 42 px bar once the page scrolls). */
 const appGlideTo = (page, locator, y, ms = 500) =>
   locator.first().evaluate((el, { y, ms }) => new Promise((res) => {
-    const s = document.getElementById("__app_sc") || document.scrollingElement;
+    const s = document.getElementById("__app_sc")?.isConnected ? document.getElementById("__app_sc") : ([...document.querySelectorAll("div")].find((n) => { const o = getComputedStyle(n).overflowY; return (o === "auto" || o === "scroll") && n.scrollHeight > n.clientHeight + 40 && n.clientHeight > 400; }) || document.scrollingElement);
     const a = s.scrollTop, t0 = performance.now();
     const step = (now) => {
       const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -572,10 +572,14 @@ export default {
   server({ port }) {
     APP = `http://localhost:${port}`;
     const sb = localSupabaseEnv();
+    // JOB_AI_HUB_BUILD=<dir>: serve a production build (`next build` of a copy of the hub, made
+    // with the same NEXT_PUBLIC_* values) with `next start`. No dev compile, prefetched routes:
+    // the on-camera navigations then draw without their loading skeletons. Default: next dev.
+    const built = process.env.JOB_AI_HUB_BUILD;
     return {
       command: path.join(HUB, "node_modules/.bin/next"),
-      args: ["dev", "--port", String(port)],
-      cwd: HUB,
+      args: [built ? "start" : "dev", "--port", String(port)],
+      cwd: built || HUB,
       env: {
         NEXT_PUBLIC_SUPABASE_URL: sb.url,
         NEXT_PUBLIC_SUPABASE_ANON_KEY: sb.anon,
@@ -588,6 +592,9 @@ export default {
         UPSTASH_REDIS_REST_URL: "",
         UPSTASH_REDIS_REST_TOKEN: "",
         NEXT_TELEMETRY_DISABLED: "1",
+        // A production build without DEPLOYMENT_MODE reads as hosted and fails the chat routes
+        // closed (no rate limiter here). A local demo server is self-hosted.
+        ...(built ? { DEPLOYMENT_MODE: "self-hosted" } : {}),
       },
       url: `${APP}/sign-in`,
       readyTimeoutMs: 180000,
@@ -863,3 +870,372 @@ const FEATURES = [
     },
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Continuous take (v4): ONE shot, no cuts. The local server renders the same Field Table
+// landing at "/" and, for a signed-in visitor, its nav ends in "Open the app →". So the take
+// starts on the landing (hero, the claim), uses the landing's own nav to reach the inheritance
+// map and the résumé editor widget (filmed in place, no spotlight), then "Open the app" walks
+// into base camp and the signed-in app is driven through its own links and tabs:
+//   landing hero -> claim --nav "How it works"--> inheritance map --nav "Documents"--> editor
+//   (Full screen, template switch, exit) --"Open the app"--> base camp (move Larkspur)
+//   --"Corvid Labs"--> application detail --tab "Postings"--> postings (search)
+//   --tab "Interviews" + the Halden run--> interview run --tab "Assistant" + thread--> assistant.
+// Order vs v3: base camp moves after the editor (both landing widgets come first), and the
+// application detail before postings (it is reached from base camp's Corvid row).
+// ---------------------------------------------------------------------------
+
+/** The landing nav's anchors: an eased scroll of <main> to the section (the page's own
+ *  scrollTo is frozen by freezeSnap). `extra` px past the section top, per anchor. */
+const ANCHOR_EXTRA = { "#inheritance": 300, "#documents": 0 };
+
+async function prepLanding(page) {
+  await page.evaluate((extra) => {
+    // Freeze the landing's snap-to-section (its own scrollTo calls on <main>); looked up per
+    // call, so a re-rendered <main> stays frozen too.
+    for (const k of ["scrollTo", "scroll", "scrollBy"]) {
+      const orig = Element.prototype[k];
+      Element.prototype[k] = function (...a) {
+        if (this.tagName === "MAIN") return;
+        return orig.apply(this, a);
+      };
+    }
+    const st = document.createElement("style");
+    st.textContent =
+      "nextjs-portal{display:none!important}" +
+      "[data-ft-part],.ft-line,[data-ft-room],[data-ft-group]{opacity:1!important;transform:none!important;transition:none!important;animation:none!important;clip-path:none!important;filter:none!important}";
+    document.head.append(st);
+    window.__smoothTo = (sel, add = 0, ms = 650) => new Promise((res) => {
+      window.__navAt = performance.now();
+      const m = document.querySelector("main");
+      m.style.scrollBehavior = "auto";
+      const el = document.querySelector(sel);
+      const a = m.scrollTop, b = a + el.getBoundingClientRect().top - 56 + add, t0 = performance.now();
+      const step = (now) => {
+        const t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        m.scrollTop = a + (b - a) * e;
+        t < 1 ? requestAnimationFrame(step) : res();
+      };
+      requestAnimationFrame(step);
+    });
+    document.addEventListener("click", (ev) => {
+      const a = ev.target.closest?.("header a[href^='#'], nav a[href^='#']");
+      if (!a || !(a.getAttribute("href") in extra)) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      window.__smoothTo(a.getAttribute("href"), extra[a.getAttribute("href")]);
+    }, true);
+  }, ANCHOR_EXTRA);
+}
+
+/** Every document of the take: hide the dev badge and the "agent is not running here" note. */
+const APP_INIT = () => {
+  // No "Restore unsaved changes?" dialog: the landing's editor widget keeps a local draft
+  // backup once touched, and a reload would offer it back (a modal over the whole page).
+  try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith("pjhh:draft-backup:")) localStorage.removeItem(k);
+  } catch {}
+  const hide = () => {
+    if (!document.getElementById("__jah_st") && document.head) {
+      const st = document.createElement("style");
+      st.id = "__jah_st";
+      st.textContent = "nextjs-portal{display:none!important}";
+      document.head.append(st);
+    }
+    for (const p of document.querySelectorAll("p, div, span"))
+      if (p.children.length === 0 && /agent is not running here/i.test(p.textContent)) p.style.display = "none";
+  };
+  new MutationObserver(hide).observe(document, { childList: true, subtree: true });
+};
+
+/** Put the cursor + caption back on <html> (after the editor leaves full screen). */
+const cursorOutOfFullscreen = (page) =>
+  page.evaluate(() => {
+    for (const id of ["__rec_caption", "__rec_cursor"]) {
+      const c = document.getElementById(id);
+      if (c && c.parentElement !== document.documentElement) document.documentElement.appendChild(c);
+    }
+  });
+
+/** Click the landing nav's anchor on camera. The pinned sections sometimes swallow the
+ *  click; then the same eased scroll is started directly (identical on screen). */
+async function landingNav(h, href) {
+  const { page } = h;
+  const link = page.locator(`header nav.ft-contents a[href='${href}']`).first();
+  await tap(h, link, { pause: 0, move: 220 });
+  await page.evaluate(({ href, add }) => {
+    if (!(window.__navAt && performance.now() - window.__navAt < 300)) return window.__smoothTo(href, add);
+  }, { href, add: ANCHOR_EXTRA[href] });
+  await page.waitForTimeout(700); // the eased scroll
+}
+
+/**
+ * The app reads its records client-side from Supabase on every mount (no client cache), so each
+ * page drew a ~0.5 s skeleton on camera. Off camera, the warm-up visits record each Supabase GET
+ * (REST rows + the auth user); on camera the FIRST request for the same URL is answered from that
+ * recording at once (the same seeded rows), later ones go to the database (so a refetch after the
+ * Larkspur move reads the real, moved row). Writes always go through.
+ */
+async function supabaseReplay(page) {
+  const base = localSupabaseEnv().url.replace(/\/$/, "");
+  const cache = new Map();
+  const state = { recording: true };
+  await page.route((u) => u.href.startsWith(base + "/rest/v1/") || u.href.startsWith(base + "/auth/v1/user"), async (route) => {
+    const req = route.request();
+    if (req.method() !== "GET") return route.fallback();
+    const key = req.url();
+    const auth = key.startsWith(base + "/auth/v1/user");
+    const hit = cache.get(key);
+    if (!state.recording && hit && (auth || !hit.used)) {
+      hit.used = true;
+      return route.fulfill({ status: hit.status, headers: hit.headers, body: hit.body });
+    }
+    const res = await route.fetch();
+    const body = await res.body();
+    if (state.recording && res.ok()) cache.set(key, { status: res.status(), headers: res.headers(), body, used: false });
+    return route.fulfill({ response: res, body });
+  });
+  return state;
+}
+
+const tab = (h, rx, arrive) => h.navLink(rx, { within: "header, nav", arrive, hold: 150, move: 220, settleMax: 300 });
+
+export const take = {
+  target: 30,
+  pacing: { heroDwell: 900 }, // the wordmark frame; the headline then builds in on the glide
+  url: ({ port }) => `http://localhost:${port}/`,
+  waitUntil: "networkidle",
+  posterFrom: { feature: "resume-editor", at: -0.3 },
+  async setup(page, ctx) {
+    APP = `http://localhost:${ctx.port}`;
+    seedDemo();
+    await page.goto(`${APP}/sign-in`, { waitUntil: "networkidle", timeout: 180000 });
+    await page.getByLabel(/email/i).first().fill(DEMO.email);
+    await page.getByLabel(/password/i).first().fill(DEMO.password);
+    await page.getByRole("button", { name: /sign in/i }).first().click();
+    await page.waitForURL((u) => !u.pathname.startsWith("/sign-in"), { timeout: 90000 });
+    // Compile every route the take opens (dev server), then reset the data.
+    for (const p of ["/", "/dashboard", "/application/demo-app-corvid", "/postings", "/interviews", "/interviews/runs/demo-res-halden", "/assistant"])
+      await page.goto(APP + p, { waitUntil: "networkidle", timeout: 180000 }).catch(() => {});
+    seedDemo();
+  },
+  async before(h) {
+    const { page } = h;
+    await page.context().addInitScript(APP_INIT);
+    await mockChat(page);
+    const replay = await supabaseReplay(page);
+    // Warm this browser's cache for every page the take opens (route chunks, fonts, data),
+    // so the on-camera navigations draw at once instead of through their loading skeletons.
+    for (const p of ["/dashboard", "/application/demo-app-corvid", "/postings", "/interviews", "/interviews/runs/demo-res-halden", "/assistant"])
+      await page.goto(APP + p, { waitUntil: "networkidle", timeout: 60000 }).catch(() => {});
+    replay.recording = false;
+    await page.goto(APP + "/", { waitUntil: "networkidle", timeout: 60000 });
+    await page.evaluate(() => {
+      for (const p of ["openai", "anthropic", "google", "local", "openrouter", "ollama"]) sessionStorage.setItem(`ai-disclosure.ack.${p}.chat`, "1");
+    });
+    await page.reload({ waitUntil: "networkidle" });
+    await h.waitForStill(1500);
+    await h.wait(800); // hydration done before the landing is prepped
+    await prepLanding(page);
+    await h.cursor(false);
+    await h.moveTo(900, 560, 16);
+    await h.waitForStill(1500);
+  },
+  route: [
+    {
+      key: "marketing",
+      kind: "marketing",
+      title: "Landing page",
+      priority: 0,
+      async run(h) {
+        const { page } = h;
+        // Wordmark -> the headline builds in (scroll-driven) -> the complete hero.
+        await h.glide(1000, { ms: 600 });
+        await page.locator("a[href='/sign-up']:visible").first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
+        await h.dwell(800);
+        await h.glide(page.getByText(/is what\s*every product says/i).first(), { offset: NAV + 90, ms: 500 });
+        await h.dwell(800);
+      },
+    },
+    {
+      key: "inheritance",
+      title: "Inheritance map: one profile, many job profiles/applications",
+      priority: 1,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.cursor(true);
+        await landingNav(h, "#inheritance");
+        await say(h, "The model: profile → job profile → application → its documents", "bc");
+      },
+      async run(h) {
+        const main = h.page.locator("main");
+        const corvid = main.getByRole("button", { name: /^Corvid Labs/ }).first();
+        await tap(h, corvid, { pause: 100, move: 220 });
+        await park(h, corvid, 120);
+        await h.dwell(700);
+      },
+    },
+    {
+      key: "resume-editor",
+      title: "Real resume editor: full screen + template switch",
+      priority: 1,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.caption("");
+        await landingNav(h, "#documents");
+        const btn = page.getByRole("button", { name: /full screen/i }).first();
+        const b = await btn.boundingBox();
+        await h.moveTo(b.x + b.width / 2, b.y + b.height / 2, 200);
+        await btn.click({ delay: 40 });
+        await cursorIntoFullscreen(page);
+        await page.waitForFunction(() => !!document.fullscreenElement, null, { timeout: 5000 });
+        await cursorIntoFullscreen(page);
+        await h.wait(200);
+        await say(h, "The app's résumé editor: one click restyles the page", "bl");
+        await cursorIntoFullscreen(page);
+      },
+      async run(h) {
+        const { page } = h;
+        const pick = visible(page, "button, [role=combobox]").filter({ hasText: "Classic serif" });
+        await tap(h, pick, { pause: 250, move: 180 });
+        const opt = visible(page, "[role=option]").filter({ hasText: "Teal sidebar" });
+        await tap(h, opt, { pause: 100, move: 120 });
+        await h.moveTo(395, 330, 100);
+        await h.dwell(750);
+      },
+    },
+    {
+      key: "base-camp",
+      title: "Base camp: every application by stage, moved in one click",
+      priority: 1,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.caption("");
+        // Leave full screen (the editor's own toggle when it has one), then into the app.
+        const exit = page.getByRole("button", { name: /exit full ?screen/i }).first();
+        if (await exit.isVisible().catch(() => false)) await tap(h, exit, { pause: 0, move: 160 });
+        else await page.evaluate(() => document.fullscreenElement && document.exitFullscreen());
+        await page.waitForFunction(() => !document.fullscreenElement, null, { timeout: 5000 });
+        await cursorOutOfFullscreen(page);
+        // Straight on to "Open the app" (no landing re-read); the hover lets Link prefetch.
+        const open = page.getByRole("link", { name: /open the app/i }).first();
+        await tap(h, open, { pause: 0, move: 240 });
+        await page.getByText(/open applications have nothing attached/i).first().waitFor({ state: "visible", timeout: 15000 });
+        await page.getByRole("button", { name: /move to another stage: Larkspur/i }).waitFor({ state: "visible", timeout: 15000 });
+        await h.waitForStill(250);
+        await say(h, "Base camp: every application, by stage, with what it has attached");
+      },
+      async run(h) {
+        const { page } = h;
+        const move = page.getByRole("button", { name: /move to another stage: Larkspur/i });
+        await h.dwell(250);
+        await tap(h, move, { pause: 220, move: 240 });
+        const opt = page.getByText("Interviewing", { exact: true }).last();
+        await tap(h, opt, { pause: 120, move: 160 });
+        await h.moveTo(1010, 650, 120);
+        await say(h, "Larkspur Health → Interviewing");
+        await h.dwell(650);
+      },
+    },
+    {
+      key: "application-detail",
+      title: "Application detail: attachments, match reason, the posting read into fields",
+      priority: 2,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.caption("");
+        // The "Moved to Interviewing" toast has done its job: fade it out as the cursor leaves.
+        await page.evaluate(() => {
+          for (const t of document.querySelectorAll("[data-sonner-toast]")) {
+            t.style.transition = "opacity 180ms"; t.style.opacity = "0";
+            setTimeout(() => t.remove(), 200);
+          }
+        });
+        await tap(h, page.getByRole("link", { name: /^Corvid Labs/ }).first(), { pause: 0, move: 240 });
+        await page.getByRole("link", { name: /open the resume/i }).first().waitFor({ state: "visible", timeout: 15000 });
+        await h.waitForStill(250);
+        await say(h, "Corvid Labs: résumé + letter attached, the match explained, the posting as fields");
+      },
+      async run(h) {
+        const { page } = h;
+        await h.dwell(700);
+        await appGlide(page, 470, 420);
+        await h.dwell(900);
+      },
+    },
+    {
+      key: "postings",
+      title: "Postings: the agent's matches, each score explained from the posting",
+      priority: 2,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.caption("");
+        await tab(h, /^Postings(\s*Saved.*)?$/i, page.getByTestId("match-chip").first());
+        await say(h, "Postings: the agent's matches, each score backed by the posting's words", "tr");
+      },
+      async run(h) {
+        const { page } = h;
+        const chip = page.getByTestId("match-chip").first();
+        await park(h, chip, 200);
+        await h.dwell(750);
+        const search = page.getByPlaceholder(/search by role or company/i);
+        await tap(h, search, { pause: 60, move: 200 });
+        await page.keyboard.type("payments", { delay: 30 });
+        await park(h, search, 100);
+        await h.dwell(650);
+      },
+    },
+    {
+      key: "interview-run",
+      title: "Interview run: scored per answer against a fixed rubric",
+      priority: 3,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.caption("");
+        await tab(h, /^Interviews(\s*Practice.*)?$/i, page.getByText("Halden Systems · platform loop").first());
+        // The run link sits under the card's Start button: click its visible top edge.
+        const run = page.getByRole("link", { name: /Halden Systems · platform loop · 78/ }).first();
+        const b = await run.boundingBox();
+        await h.moveTo(b.x + 60, b.y + 4, 220);
+        await page.mouse.down(); await h.wait(40); await page.mouse.up();
+        await page.getByText(/per-answer feedback/i).first().waitFor({ state: "visible", timeout: 15000 });
+        await h.waitForStill(250);
+        await say(h, "A practice run for Halden Systems, scored against a rubric");
+      },
+      async run(h) {
+        const { page } = h;
+        await h.dwell(550);
+        await appGlideTo(page, page.getByText(/per-answer feedback/i), 58, 480);
+        await h.dwell(700);
+      },
+    },
+    {
+      key: "assistant",
+      title: "Assistant: asked for a letter, drafts it with a tool, saved to the application",
+      priority: 3,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.caption("");
+        await tab(h, /^Assistant(\s*Ask.*)?$/i, page.getByPlaceholder(/ask the assistant/i));
+        // One click: the app's chat provider opens the latest thread (the seeded "Letter for
+        // Tenring") by itself, so the turn lands in it without a second click on the thread.
+        await page.getByText(CHAT.title, { exact: true }).first().waitFor({ state: "visible", timeout: 10000 });
+        await say(h, "The assistant acts on your records: a letter for Tenring, saved to it");
+      },
+      async run(h) {
+        const { page } = h;
+        const box = page.getByPlaceholder(/ask the assistant/i);
+        await tap(h, box, { pause: 60, move: 200 });
+        await page.keyboard.type(CHAT.prompt, { delay: 16 });
+        await page.keyboard.press("Enter");
+        await page.getByTestId("chat-letter-draft-save").waitFor({ state: "visible" });
+        await h.dwell(700);
+        const save = page.getByTestId("chat-letter-draft-save");
+        await tap(h, save, { pause: 80, move: 180 });
+        await page.getByTestId("chat-letter-draft-saved").waitFor({ state: "visible" });
+        await park(h, page.getByTestId("chat-letter-draft-saved"), 120);
+        await h.dwell(650);
+      },
+    },
+  ],
+};

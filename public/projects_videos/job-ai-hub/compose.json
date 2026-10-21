@@ -1,111 +1,205 @@
 {
   "id": "job-ai-hub",
-  "composedAt": "2026-10-20T22:44:22.322Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-21T00:14:00.182Z",
   "target": 30,
   "tolerance": 0.1,
   "bounds": [
     27,
     33
   ],
-  "xfade": 0,
-  "total": 28.76,
+  "total": 29.36,
   "status": "ok",
-  "marketingShare": 0.19,
-  "included": [
+  "cuts": [],
+  "cutDetails": [],
+  "longestTakeS": 29.36,
+  "longestTakeShare": 1,
+  "takes": [
+    {
+      "duration": 29.38
+    }
+  ],
+  "marketingShare": 0.13,
+  "features": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 5.44,
       "start": 0,
-      "end": 5.44
+      "end": 3.73,
+      "duration": 3.73
     },
     {
       "key": "inheritance",
       "kind": "feature",
       "title": "Inheritance map: one profile, many job profiles/applications",
       "priority": 1,
-      "duration": 3.36,
-      "start": 5.44,
-      "end": 8.8
-    },
-    {
-      "key": "base-camp",
-      "kind": "feature",
-      "title": "Base camp: every application by stage, moved in one click",
-      "priority": 1,
-      "duration": 2.76,
-      "start": 8.8,
-      "end": 11.56
+      "start": 3.73,
+      "end": 6.28,
+      "duration": 2.55
     },
     {
       "key": "resume-editor",
       "kind": "feature",
       "title": "Real resume editor: full screen + template switch",
       "priority": 1,
-      "duration": 2.72,
-      "start": 11.56,
-      "end": 14.28
+      "start": 6.28,
+      "end": 10.46,
+      "duration": 4.18
     },
     {
-      "key": "postings",
+      "key": "base-camp",
       "kind": "feature",
-      "title": "Postings: the agent's matches, each score explained from the posting",
-      "priority": 2,
-      "duration": 3.6,
-      "start": 14.28,
-      "end": 17.88
+      "title": "Base camp: every application by stage, moved in one click",
+      "priority": 1,
+      "start": 10.46,
+      "end": 14.55,
+      "duration": 4.09
     },
     {
       "key": "application-detail",
       "kind": "feature",
       "title": "Application detail: attachments, match reason, the posting read into fields",
       "priority": 2,
-      "duration": 3.68,
-      "start": 17.88,
-      "end": 21.56
+      "start": 14.55,
+      "end": 17.63,
+      "duration": 3.08
+    },
+    {
+      "key": "postings",
+      "kind": "feature",
+      "title": "Postings: the agent's matches, each score explained from the posting",
+      "priority": 2,
+      "start": 17.63,
+      "end": 21.29,
+      "duration": 3.66
     },
     {
       "key": "interview-run",
       "kind": "feature",
       "title": "Interview run: scored per answer against a fixed rubric",
       "priority": 3,
-      "duration": 2.52,
-      "start": 21.56,
-      "end": 24.08
+      "start": 21.29,
+      "end": 25.01,
+      "duration": 3.72
     },
     {
       "key": "assistant",
       "kind": "feature",
       "title": "Assistant: asked for a letter, drafts it with a tool, saved to the application",
       "priority": 3,
-      "duration": 4.68,
-      "start": 24.08,
-      "end": 28.76
+      "start": 25.01,
+      "end": 29.36,
+      "duration": 4.35
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "marketing": 5.44,
-    "inheritance": 3.36,
-    "base-camp": 2.76,
-    "resume-editor": 2.72,
-    "postings": 3.6,
-    "application-detail": 3.68,
-    "interview-run": 2.52,
-    "assistant": 4.68
-  },
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Landing page",
+      "priority": 0,
+      "start": 0,
+      "end": 3.73,
+      "duration": 3.73
+    },
+    {
+      "key": "inheritance",
+      "kind": "feature",
+      "title": "Inheritance map: one profile, many job profiles/applications",
+      "priority": 1,
+      "start": 3.73,
+      "end": 6.28,
+      "duration": 2.55
+    },
+    {
+      "key": "resume-editor",
+      "kind": "feature",
+      "title": "Real resume editor: full screen + template switch",
+      "priority": 1,
+      "start": 6.28,
+      "end": 10.46,
+      "duration": 4.18
+    },
+    {
+      "key": "base-camp",
+      "kind": "feature",
+      "title": "Base camp: every application by stage, moved in one click",
+      "priority": 1,
+      "start": 10.46,
+      "end": 14.55,
+      "duration": 4.09
+    },
+    {
+      "key": "application-detail",
+      "kind": "feature",
+      "title": "Application detail: attachments, match reason, the posting read into fields",
+      "priority": 2,
+      "start": 14.55,
+      "end": 17.63,
+      "duration": 3.08
+    },
+    {
+      "key": "postings",
+      "kind": "feature",
+      "title": "Postings: the agent's matches, each score explained from the posting",
+      "priority": 2,
+      "start": 17.63,
+      "end": 21.29,
+      "duration": 3.66
+    },
+    {
+      "key": "interview-run",
+      "kind": "feature",
+      "title": "Interview run: scored per answer against a fixed rubric",
+      "priority": 3,
+      "start": 21.29,
+      "end": 25.01,
+      "duration": 3.72
+    },
+    {
+      "key": "assistant",
+      "kind": "feature",
+      "title": "Assistant: asked for a letter, drafts it with a tool, saved to the application",
+      "priority": 3,
+      "start": 25.01,
+      "end": 29.36,
+      "duration": 4.35
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "marketing",
+    "inheritance",
+    "resume-editor",
+    "base-camp",
+    "application-detail",
+    "postings",
+    "interview-run",
+    "assistant"
+  ],
+  "leadInTrimmedS": 14.46,
+  "offCameraTrimmedS": 0,
+  "rawDurationS": 44.36,
+  "videoOffsetS": -0.05,
   "poster": {
-    "segment": "resume-editor",
-    "at": 13.98
+    "feature": "resume-editor",
+    "at": 10.16
   },
   "files": {
-    "mp4": 2269323,
-    "webm": 1654665,
-    "poster": 145828,
-    "mp4Crf": 23,
+    "mp4": 2751199,
+    "webm": 2333895,
+    "poster": 143845,
+    "mp4Crf": 25,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

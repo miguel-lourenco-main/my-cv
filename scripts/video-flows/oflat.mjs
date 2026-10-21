@@ -1,7 +1,8 @@
 // Live: GitLab Pages build of OFLAT (OCamlFlat via js_of_ocaml), no local repo.
 // No landing page (the app opens on the editor), so there is no marketing segment;
 // the first ~0.7 s of the first clip is the "hero" (editor + machine loaded).
-// Fast cut: every feature is its own clip, composed by priority.
+// Clip mode: every feature is its own clip, composed by priority. Continuous mode (`take`,
+// the default since v4): the same features in one shot, joined by on-camera example switches.
 //   1 turing-machine  step-by-step: "aa" accepted, "aaa" rejected
 //   2 dfa             "Testar palavra": one accepted and one rejected word, verdict held
 //   3 regex           regular expression -> automaton (appears in a second box)
@@ -245,25 +246,8 @@ async function freeze(page) {
 }
 const unfreeze = (page) => page.evaluate(() => document.getElementById("__rec_freeze")?.remove());
 
-export default {
-  url: "https://oflat-ocamlflat-pages-d4fe77.gitlab.io/",
-  target: 25.4, // plan said 30; every planned feature (plus determinize) totals ~25.4 s at this pace
-  posterFrom: { segment: "turing-machine", at: -1 },
-  async beforeEach(h) {
-    h.page.on("dialog", async (d) => {
-      if (d.type() === "prompt") await d.accept(answer);
-      else await d.accept();
-    });
-    await h.page.addStyleTag({ content: STYLE });
-    // Register the dagre layout (its CDN copy is blocked in the live build).
-    await h.page.addScriptTag({ content: await getDagre() });
-    await h.page.evaluate(() => {
-      try { window.cytoscape.use(window.cytoscapeDagre); } catch {}
-      const st = window.setTimeout.bind(window);
-      window.setTimeout = (f, t, ...a) => st(f, t >= 400 ? t / 2.5 : t, ...a);
-    });
-  },
-  features: [
+const features = [
+
     {
       key: "turing-machine",
       title: "Turing machine: step-by-step acceptance and rejection on the tape",
@@ -311,7 +295,7 @@ export default {
         await caption(page, "Regex to automaton");
         await h.moveTo(120, 420, 16);
       },
-      async run(h) {
+      async run(h, o = {}) {
         const { page } = h;
         const sel = page.locator("select:has(#selectConv)");
         await h.hover(sel, 260);
@@ -339,7 +323,7 @@ export default {
         await rest(h);
         await page.waitForTimeout(60);
         await unfreeze(page);
-        await h.beat(1300);
+        await h.beat(o.end ?? 1300);
       },
     },
     {
@@ -352,7 +336,7 @@ export default {
         await preload(h, "nfa_1", LAYOUTS.nfa_1, 50);
         await caption(page, "Make deterministic");
       },
-      async run(h) {
+      async run(h, o = {}) {
         const { page } = h;
         const btn = deterministicBtn(page);
         await h.hover(btn, 220);
@@ -365,7 +349,7 @@ export default {
         await rest(h);
         await page.waitForTimeout(40);
         await unfreeze(page);
-        await h.beat(1300);
+        await h.beat(o.end ?? 1300);
       },
     },
     {
@@ -379,7 +363,7 @@ export default {
         const b = await h.page.locator("#useful").boundingBox();
         await h.moveTo(b.x - 40, b.y + b.height + 50, 16); // start by the toolbar
       },
-      async run(h) {
+      async run(h, o = {}) {
         const { page } = h;
         const kept = { transparent: [-90, 100], START: [0, 100], A: [120, 100], AB: [240, 100], SUCCESS: [360, 100] };
         await h.click(page.locator("#useful"), { pause: 0, move: 120 });
@@ -396,7 +380,7 @@ export default {
         await rest(h);
         await page.waitForTimeout(40);
         await unfreeze(page);
-        await h.beat(1400);
+        await h.beat(o.end ?? 1400);
       },
     },
     {
@@ -408,7 +392,7 @@ export default {
         await preload(h, "dfa_2", LAYOUTS.dfa_2, 60);
         await caption(h.page, "Generate accepted words up to length 3"); // from frame 0
       },
-      async run(h) {
+      async run(h, o = {}) {
         const { page } = h;
         answer = "3";
         await h.hover(page.locator("#generate"), 200);
@@ -420,7 +404,7 @@ export default {
         await rest(h);
         await page.waitForTimeout(40);
         await unfreeze(page);
-        await h.beat(1300);
+        await h.beat(o.end ?? 1300);
       },
     },
     {
@@ -450,5 +434,167 @@ export default {
         await h.beat(900);
       },
     },
+];
+
+/** The recorded-page tweaks every clip (beforeEach) and the take (take.before) start from. */
+async function prepare(h) {
+  h.page.on("dialog", async (d) => {
+    if (d.type() === "prompt") await d.accept(answer);
+    else await d.accept();
+  });
+  await h.page.addStyleTag({ content: STYLE });
+  // Register the dagre layout (its CDN copy is blocked in the live build).
+  await h.page.addScriptTag({ content: await getDagre() });
+  await h.page.evaluate(() => {
+    try { window.cytoscape.use(window.cytoscapeDagre); } catch {}
+    const st = window.setTimeout.bind(window);
+    window.setTimeout = (f, t, ...a) => st(f, t >= 400 ? t / 2.5 : t, ...a);
+  });
+}
+
+/**
+ * ON CAMERA (continuous take): open another predefined example from the sidebar like a
+ * user would: cursor onto the examples list, scroll it to the example, click it. The
+ * app swaps the model in place (and closes any second box); the graph is hidden for
+ * the ~0.4 s it reloads and fades in laid out.
+ */
+async function openExample(h, name, { layout, pad, text } = {}) {
+  const { page } = h;
+  await h.cursor(true);
+  await caption(page, "");
+  const t0 = Date.now();
+  const list = await page.locator("#examplesServer").boundingBox();
+  // The cursor heads for the list while it scrolls (one gesture), then onto the example.
+  // Short move durations: every cursor step is a browser round trip, so fewer steps = faster.
+  await Promise.all([
+    h.moveTo(list.x + list.width / 2, list.y + list.height / 2, 96),
+    scrollExamples(page, name, 300),
+  ]);
+  await h.hover(example(page, name), 64);
+  await hideGraph(page, true);
+  await page.waitForTimeout(80);
+  const t1 = Date.now();
+  await example(page, name).first().click({ delay: 40 });
+  const t2 = Date.now();
+  await page.evaluate(() => document.body.classList.remove("__rec_two"));
+  if (layout) await place(page, layout, pad);
+  else await reveal(page);
+  if (text) await caption(page, text);
+  if (process.env.OFLAT_DEBUG) console.log(`  openExample ${name}: before click ${t1 - t0} ms, click ${t2 - t1} ms, load ${Date.now() - t2} ms`);
+}
+
+/**
+ * The continuous take: v3's seven features in v3's order, one shot. Each feature's
+ * off-camera preload became an on-camera example switch in the sidebar (openExample);
+ * dark-theme needs no transition, it runs on the screen generate-words ends on.
+ */
+export const take = {
+  target: 25.4,
+  async before(h) {
+    await prepare(h);
+  },
+  posterFrom: { feature: "turing-machine", at: -1 },
+  route: [
+    {
+      key: "turing-machine",
+      title: "Turing machine: step-by-step acceptance and rejection on the tape",
+      priority: 1,
+      async before(h) {
+        await preload(h, "tm_even_as", LAYOUTS.tm_even_as, 55);
+        await caption(h.page, "Turing machine: step through a word on the tape");
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(800); // the full editor with the machine loaded: the hero
+        await startWord(h, "aa");
+        await fwd(h, 3, 200);
+        await caption(page, 'Tape "aa": accepted');
+        await h.beat(800);
+        await startWord(h, "aaa");
+        await fwd(h, 4, 200);
+        await caption(page, 'Tape "aaa": rejected');
+        await h.beat(250); // the verdict stays on screen while the cursor heads for the examples
+      },
+    },
+    {
+      key: "dfa",
+      title: "Finite automaton: test a word, accepted and rejected",
+      priority: 2,
+      async transitionIn(h) {
+        await openExample(h, "dfa_1", { layout: LAYOUTS.dfa_1, pad: 70 });
+      },
+      async run(h) {
+        await testing(h, "ab", "accepted", 800);
+        await testing(h, "aa", "rejected", 300);
+      },
+    },
+    {
+      key: "regex",
+      title: "Regular expression converted into an automaton",
+      priority: 3,
+      async transitionIn(h) {
+        await openExample(h, "re_abc", { text: "Regex to automaton" });
+        await h.page.waitForTimeout(150);
+      },
+      async run(h) {
+        await features.find((f) => f.key === "regex").run(h, { end: 800 });
+      },
+    },
+    {
+      key: "determinize",
+      title: "Make a non-deterministic automaton deterministic",
+      priority: 4,
+      async transitionIn(h) {
+        await openExample(h, "nfa_1", { layout: LAYOUTS.nfa_1, pad: 50, text: "Make deterministic" });
+      },
+      async run(h) {
+        await features.find((f) => f.key === "determinize").run(h, { end: 800 });
+      },
+    },
+    {
+      key: "state-analysis",
+      title: "Analysis: useful states painted, useless states removed",
+      priority: 5,
+      async transitionIn(h) {
+        await openExample(h, "nfa_2", { layout: LAYOUTS.nfa_2, pad: 40, text: "Analysis: which states are useful?" });
+      },
+      async run(h) {
+        await features.find((f) => f.key === "state-analysis").run(h, { end: 900 });
+      },
+    },
+    {
+      key: "generate-words",
+      title: "Generate every accepted word up to a length",
+      priority: 6,
+      async transitionIn(h) {
+        answer = "3";
+        await openExample(h, "dfa_2", { layout: LAYOUTS.dfa_2, pad: 60, text: "Generate accepted words up to length 3" });
+        await h.cursor(true);
+      },
+      async run(h) {
+        await features.find((f) => f.key === "generate-words").run(h, { end: 900 });
+      },
+    },
+    {
+      key: "dark-theme",
+      title: "Dark theme",
+      priority: 7,
+      async run(h) {
+        await h.cursor(true);
+        await caption(h.page, "Dark theme");
+        await features.find((f) => f.key === "dark-theme").run(h);
+      },
+    },
   ],
+};
+
+export default {
+  take,
+  url: "https://oflat-ocamlflat-pages-d4fe77.gitlab.io/",
+  target: 25.4, // plan said 30; every planned feature (plus determinize) totals ~25.4 s at this pace
+  posterFrom: { segment: "turing-machine", at: -1 },
+  async beforeEach(h) {
+    await prepare(h);
+  },
+  features,
 };

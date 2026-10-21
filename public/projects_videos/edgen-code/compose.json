@@ -1,71 +1,129 @@
 {
   "id": "edgen-code",
-  "composedAt": "2026-10-20T22:29:47.199Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-20T23:32:16.201Z",
   "target": 30,
   "tolerance": 0.1,
   "bounds": [
     27,
     33
   ],
-  "xfade": 0,
-  "total": 27.28,
+  "total": 29.8,
   "status": "ok",
-  "marketingShare": 0.16,
-  "included": [
+  "cuts": [],
+  "cutDetails": [],
+  "longestTakeS": 29.8,
+  "longestTakeShare": 1,
+  "takes": [
+    {
+      "duration": 29.83
+    }
+  ],
+  "marketingShare": 0.15,
+  "features": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Extension overview",
       "priority": 0,
-      "duration": 4.32,
       "start": 0,
-      "end": 4.32
+      "end": 4.36,
+      "duration": 4.36
     },
     {
       "key": "chat-panel",
       "kind": "feature",
       "title": "Chat panel: model picker, @-context, @codebase send",
       "priority": 1,
-      "duration": 8,
-      "start": 4.32,
-      "end": 12.32
+      "start": 4.36,
+      "end": 12.79,
+      "duration": 8.43
     },
     {
       "key": "codebase-config",
       "kind": "feature",
       "title": "@codebase index, @docs, help center, shortcuts",
       "priority": 1,
-      "duration": 7.44,
-      "start": 12.32,
-      "end": 19.76
+      "start": 12.79,
+      "end": 21.08,
+      "duration": 8.29
     },
     {
       "key": "add-docs",
       "kind": "feature",
       "title": "Add documentation dialog (@docs provider)",
       "priority": 2,
-      "duration": 7.52,
-      "start": 19.76,
-      "end": 27.28
+      "start": 21.08,
+      "end": 29.8,
+      "duration": 8.72
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "marketing": 4.32,
-    "chat-panel": 8,
-    "codebase-config": 7.44,
-    "add-docs": 7.52
-  },
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Extension overview",
+      "priority": 0,
+      "start": 0,
+      "end": 4.36,
+      "duration": 4.36
+    },
+    {
+      "key": "chat-panel",
+      "kind": "feature",
+      "title": "Chat panel: model picker, @-context, @codebase send",
+      "priority": 1,
+      "start": 4.36,
+      "end": 12.79,
+      "duration": 8.43
+    },
+    {
+      "key": "codebase-config",
+      "kind": "feature",
+      "title": "@codebase index, @docs, help center, shortcuts",
+      "priority": 1,
+      "start": 12.79,
+      "end": 21.08,
+      "duration": 8.29
+    },
+    {
+      "key": "add-docs",
+      "kind": "feature",
+      "title": "Add documentation dialog (@docs provider)",
+      "priority": 2,
+      "start": 21.08,
+      "end": 29.8,
+      "duration": 8.72
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "marketing",
+    "chat-panel",
+    "codebase-config",
+    "add-docs"
+  ],
+  "leadInTrimmedS": 1.41,
+  "offCameraTrimmedS": 0,
+  "rawDurationS": 32.88,
+  "videoOffsetS": -0.22,
   "poster": {
-    "segment": "add-docs",
-    "at": 22.36
+    "feature": "add-docs",
+    "at": 29.35
   },
   "files": {
-    "mp4": 1456749,
-    "webm": 926429,
-    "poster": 74762,
+    "mp4": 1690291,
+    "webm": 1020852,
+    "poster": 74419,
     "mp4Crf": 23,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

@@ -1,91 +1,167 @@
 {
   "id": "ui-components",
-  "composedAt": "2026-10-20T22:52:40.492Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-20T23:36:18.355Z",
   "target": 36,
   "tolerance": 0.1,
   "bounds": [
     32.4,
     39.6
   ],
-  "xfade": 0,
-  "total": 35.72,
+  "total": 34.52,
   "status": "ok",
-  "marketingShare": 0.18,
-  "included": [
+  "cuts": [],
+  "cutDetails": [],
+  "longestTakeS": 34.52,
+  "longestTakeShare": 1,
+  "takes": [
+    {
+      "duration": 34.52
+    }
+  ],
+  "marketingShare": 0.14,
+  "features": [
     {
       "key": "marketing",
       "kind": "marketing",
       "title": "Landing page",
       "priority": 0,
-      "duration": 6.32,
       "start": 0,
-      "end": 6.32
-    },
-    {
-      "key": "playground",
-      "kind": "feature",
-      "title": "Playground: edit a Button's JSX and props, copy the code",
-      "priority": 1,
-      "duration": 9.08,
-      "start": 6.32,
-      "end": 15.4
+      "end": 4.85,
+      "duration": 4.85
     },
     {
       "key": "theme",
       "kind": "feature",
       "title": "One theme (Neon) on real components, light then dark",
       "priority": 2,
-      "duration": 4.32,
-      "start": 15.4,
-      "end": 19.72
+      "start": 4.85,
+      "end": 9.23,
+      "duration": 4.38
+    },
+    {
+      "key": "playground",
+      "kind": "feature",
+      "title": "Playground: edit a Button's JSX and props, copy the code",
+      "priority": 1,
+      "start": 9.23,
+      "end": 17.32,
+      "duration": 8.09
     },
     {
       "key": "requests",
       "kind": "feature",
       "title": "Agent request queue: a failed and a passing proposal",
       "priority": 3,
-      "duration": 6.52,
-      "start": 19.72,
-      "end": 26.24
+      "start": 17.32,
+      "end": 24.62,
+      "duration": 7.3
     },
     {
       "key": "library",
       "kind": "feature",
       "title": "Library: imported components with props contracts",
       "priority": 4,
-      "duration": 5.48,
-      "start": 26.24,
-      "end": 31.72
+      "start": 24.62,
+      "end": 29.36,
+      "duration": 4.74
     },
     {
       "key": "components",
       "kind": "feature",
       "title": "Component gallery with preview and code",
       "priority": 5,
-      "duration": 4,
-      "start": 31.72,
-      "end": 35.72
+      "start": 29.36,
+      "end": 34.52,
+      "duration": 5.16
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "marketing": 6.32,
-    "playground": 9.08,
-    "theme": 4.32,
-    "requests": 6.52,
-    "library": 5.48,
-    "components": 4
-  },
+  "included": [
+    {
+      "key": "marketing",
+      "kind": "marketing",
+      "title": "Landing page",
+      "priority": 0,
+      "start": 0,
+      "end": 4.85,
+      "duration": 4.85
+    },
+    {
+      "key": "theme",
+      "kind": "feature",
+      "title": "One theme (Neon) on real components, light then dark",
+      "priority": 2,
+      "start": 4.85,
+      "end": 9.23,
+      "duration": 4.38
+    },
+    {
+      "key": "playground",
+      "kind": "feature",
+      "title": "Playground: edit a Button's JSX and props, copy the code",
+      "priority": 1,
+      "start": 9.23,
+      "end": 17.32,
+      "duration": 8.09
+    },
+    {
+      "key": "requests",
+      "kind": "feature",
+      "title": "Agent request queue: a failed and a passing proposal",
+      "priority": 3,
+      "start": 17.32,
+      "end": 24.62,
+      "duration": 7.3
+    },
+    {
+      "key": "library",
+      "kind": "feature",
+      "title": "Library: imported components with props contracts",
+      "priority": 4,
+      "start": 24.62,
+      "end": 29.36,
+      "duration": 4.74
+    },
+    {
+      "key": "components",
+      "kind": "feature",
+      "title": "Component gallery with preview and code",
+      "priority": 5,
+      "start": 29.36,
+      "end": 34.52,
+      "duration": 5.16
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "marketing",
+    "theme",
+    "playground",
+    "requests",
+    "library",
+    "components"
+  ],
+  "leadInTrimmedS": 16.73,
+  "offCameraTrimmedS": 0,
+  "rawDurationS": 51.8,
+  "videoOffsetS": -0.08,
   "poster": {
-    "segment": "marketing",
-    "at": 1
+    "feature": "playground",
+    "at": 16.72
   },
   "files": {
-    "mp4": 1433573,
-    "webm": 1303598,
-    "poster": 74127,
+    "mp4": 2602095,
+    "webm": 1866338,
+    "poster": 112172,
     "mp4Crf": 23,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }

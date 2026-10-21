@@ -33,6 +33,8 @@ const STYLE = `
   table .w-\\[12rem\\] { width:11.25rem!important; min-width:11.25rem!important; }
 `;
 
+/** The uploader's target-language picker (2nd combobox; its label changes once picked). */
+const uploaderPicker = (page) => page.locator("button[role=combobox]").nth(1);
 const option = (page, name) => page.locator("[role=option]:visible").filter({ hasText: name }).first();
 const previewsReady = (page) =>
   page.waitForFunction(() => {
@@ -150,8 +152,8 @@ async function seedGermanRun(h) {
   await fastTimers(page);
   await hideToasts(page);
   await installDemoState(page);
-  await h.jump(page.locator("button").filter({ hasText: "English" }).nth(1), { offset: 100 });
-  await page.locator("button").filter({ hasText: "English" }).nth(1).click();
+  await h.jump(uploaderPicker(page), { offset: 100 });
+  await uploaderPicker(page).click();
   await option(page, /German/).click();
   await blur(page);
   const chooser = page.waitForEvent("filechooser");
@@ -268,7 +270,35 @@ async function pickPreview(page, from, to) {
   await blur(page);
 }
 
-export default {
+/** The pricing slider: a quick drag to ~60% (cursor shows up just for it). */
+async function dragPriceSlider(h) {
+  const { page } = h;
+  const sl = priceSlider(page);
+  const b = await sl.boundingBox();
+  if (!b) return;
+  const tb = await sl.evaluate((el) => {
+    let n = el.parentElement;
+    while (n && n.getBoundingClientRect().width < 120) n = n.parentElement;
+    const r = n.getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height };
+  });
+  const y = b.y + b.height / 2;
+  await h.moveTo(b.x + b.width / 2, y + 60, 0);
+  await h.cursor(true);
+  await h.moveTo(b.x + b.width / 2, y, 120);
+  await page.mouse.down();
+  const x0 = b.x + b.width / 2;
+  const x1 = tb.x + tb.w * 0.6;
+  for (let i = 1; i <= 5; i++) {
+    await page.mouse.move(x0 + ((x1 - x0) * i) / 5, y);
+    await page.waitForTimeout(45);
+  }
+  await page.mouse.up();
+  await h.moveTo(x1, y, 0); // keep h's cursor position in sync
+  await h.beat(380);
+}
+
+const flow = {
   url: "https://edgentranslate-41c1b4.gitlab.io/",
   target: 26,
   pacing: { featureLead: 250 },
@@ -292,30 +322,7 @@ export default {
           hold: 250,
           settle: 150,
           cut: true,
-          async interact(h2) {
-            const sl = priceSlider(page);
-            const b = await sl.boundingBox();
-            if (!b) return;
-            const tb = await sl.evaluate((el) => {
-              let n = el.parentElement;
-              while (n && n.getBoundingClientRect().width < 120) n = n.parentElement;
-              const r = n.getBoundingClientRect();
-              return { x: r.x, y: r.y, w: r.width, h: r.height };
-            });
-            const y = b.y + b.height / 2;
-            await h2.moveTo(b.x + b.width / 2, y + 60, 0);
-            await h2.cursor(true);
-            await h2.moveTo(b.x + b.width / 2, y, 120);
-            await page.mouse.down();
-            const x0 = b.x + b.width / 2;
-            const x1 = tb.x + tb.w * 0.6;
-            for (let i = 1; i <= 5; i++) {
-              await page.mouse.move(x0 + ((x1 - x0) * i) / 5, y);
-              await page.waitForTimeout(45);
-            }
-            await page.mouse.up();
-            await h2.beat(380);
-          },
+          interact: (h2) => dragPriceSlider(h2),
         },
       ]);
     },
@@ -407,14 +414,14 @@ export default {
           while (n.parentElement && n.parentElement !== document.body && getComputedStyle(n).backgroundColor === "rgba(0, 0, 0, 0)") n = n.parentElement;
           n.style.visibility = "hidden";
         });
-        await h.jump(page.locator("button").filter({ hasText: "English" }).nth(1), { offset: 110 });
+        await h.jump(uploaderPicker(page), { offset: 110 });
         await h.waitForStill(600);
         await page.mouse.move(900, 300);
       },
       async run(h) {
         const { page } = h;
         // Language first (its popover is gone before the file lands), then the file.
-        await h.click(page.locator("button").filter({ hasText: "English" }).nth(1), { pause: 0, move: 150 });
+        await h.click(uploaderPicker(page), { pause: 0, move: 150 });
         await page.locator("[role=option]:visible").first().waitFor();
         await page.keyboard.type("Ger", { delay: 45 });
         await page.waitForTimeout(150);
@@ -494,6 +501,150 @@ export default {
         await h.moveTo(820, 330, 160);
         await h.beat(1000);
       },
+    },
+  ],
+};
+
+export default flow;
+
+const feature = (key) => flow.features.find((f) => f.key === key);
+/**
+ * Scrolling back UP the landing page brings its floating nav pill (Pricing /
+ * Contact, y 15-55) back over the preview picker, so the take frames the picker
+ * just below it (v3 used 16 px, but only ever scrolled down to it).
+ */
+const PICKER_OFFSET = 66;
+const pickerTop = (page) => page.locator("button").filter({ hasText: "English" }).first();
+
+/** The landing band right under the uploader (hidden off screen, as in v3). */
+const hideFormatsBand = (page) =>
+  page.locator("h1", { hasText: "Supported Formats and Languages" }).first().evaluate((el) => {
+    let n = el;
+    while (n.parentElement && n.parentElement !== document.body && getComputedStyle(n).backgroundColor === "rgba(0, 0, 0, 0)") n = n.parentElement;
+    n.style.visibility = "hidden";
+  });
+
+/**
+ * The language picker (cmdk) calls scrollIntoView on its first group heading
+ * when it opens. Once the landing page has been scrolled past the preview, that
+ * scrolls the DOCUMENT back to the top (the popover is not placed yet). Keep the
+ * scroll inside the picker's own list: the page stays where the viewer is.
+ */
+const keepPageStillOnPickerOpen = (page) =>
+  page.evaluate(() => {
+    if (window.__sivGuard) return;
+    window.__sivGuard = true;
+    const orig = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function (...a) {
+      if (!this.closest?.("[cmdk-root]")) return orig.apply(this, a);
+      let box = this.parentElement;
+      while (box && !/(auto|scroll)/.test(getComputedStyle(box).overflowY)) box = box.parentElement;
+      if (!box || box === document.body || box === document.documentElement) return;
+      const r = this.getBoundingClientRect();
+      const b = box.getBoundingClientRect();
+      if (r.top < b.top) box.scrollTop -= b.top - r.top;
+      else if (r.bottom > b.bottom) box.scrollTop += r.bottom - b.bottom;
+    };
+  });
+
+/**
+ * Continuous take (v4): the v3 content and order in ONE shot, no cuts.
+ *
+ * hero --glide--> formats --glide--> languages --glide--> pricing (slider drag)
+ * --glide back up--> preview picker (English -> Spanish -> French) --glide down
+ * --> uploader (German + file + Translate Files) --> /app (Succeeded, meter)
+ * --> "+ New" dialog (Italian run) --> sort by Target language.
+ *
+ * The landing -> /app hand-off is the app's own client-side navigation, so the
+ * demo state (fast timers, fixed clock/ids, meter override) lives on through it.
+ */
+export const take = {
+  target: 26,
+  posterFrom: { feature: "preview-language", at: 4.6 },
+  async before(h) {
+    const { page } = h;
+    await page.addStyleTag({ content: STYLE });
+    await keepPageStillOnPickerOpen(page);
+    await fastTimers(page);
+    await hideToasts(page);
+    await installDemoState(page);
+    // Load /app's route code now so the hand-off renders without its loader.
+    await page.evaluate(() => window.next?.router?.prefetch?.("/app/")).catch(() => {});
+    await page.waitForLoadState("networkidle").catch(() => {});
+    await previewsReady(page);
+    // Pre-render Spanish and French at the exact framing the take films them in
+    // (picker 16 px from the top) and keep a pixel copy of each pane.
+    await h.jump(pickerTop(page), { offset: PICKER_OFFSET });
+    await h.waitForStill(800);
+    let prev = await rightSig(page);
+    for (const [from, to, key] of [["English", /Spanish/, "es"], ["Spanish", /French/, "fr"]]) {
+      await pickPreview(page, from, to);
+      prev = await paneChangedFrom(page, prev);
+      await captureSnap(page, key);
+    }
+    await pickPreview(page, "French", /English/);
+    await paneChangedFrom(page, prev);
+    await armSnaps(page);
+    // Warm the lower landing sections (reveal animations, flag images).
+    for (const sel of ["#supported-languages", "text=Fair pricing for all types of businesses"]) {
+      await h.jump(sel, { offset: 40 });
+      await h.waitForStill(600);
+    }
+    await h.jump(0);
+    await previewsReady(page);
+    await h.cursor(false); // marketing glides only: no cursor until the slider drag
+    await page.mouse.move(1180, 22);
+    await h.moveTo(1180, 22, 0);
+    await h.waitForStill(800);
+  },
+  route: [
+    {
+      key: "marketing",
+      kind: "marketing",
+      title: "Landing page: formats, languages, pricing slider",
+      priority: 0,
+      async run(h) {
+        const { page } = h;
+        await h.glide(page.locator("h1", { hasText: "Supported Formats and Languages" }), { offset: 40, ms: 480 });
+        await h.dwell(600);
+        await h.glide("#supported-languages", { offset: 20, ms: 320 });
+        await h.dwell(480);
+        await h.glide("text=Fair pricing for all types of businesses", { offset: 95, ms: 400 });
+        await h.dwell(150);
+        await dragPriceSlider(h);
+      },
+    },
+    {
+      key: "preview-language",
+      title: "Pick a language: side-by-side translated PDF, layout intact",
+      priority: 1,
+      async transitionIn(h) {
+        // Back up to the live preview in one fast glide (same framing as the snaps).
+        await h.moveTo(1180, 22, 140);
+        await h.glide(pickerTop(h.page), { offset: PICKER_OFFSET, ms: 650 });
+        await h.wait(150);
+      },
+      run: (h) => feature("preview-language").run(h),
+    },
+    {
+      key: "upload-translate",
+      title: "Upload a PDF, choose German, translate -> Succeeded, meter drops",
+      priority: 2,
+      async transitionIn(h) {
+        const { page } = h;
+        await hideFormatsBand(page); // well below the fold here
+        await h.moveTo(900, 300, 160);
+        await h.glide(uploaderPicker(page), { offset: 110, ms: 380 });
+        await h.wait(120);
+      },
+      run: (h) => feature("upload-translate").run(h),
+    },
+    {
+      key: "app-workspace",
+      title: "App workspace: New dialog run -> Italian, meter drops, sort runs",
+      priority: 3,
+      // upload-translate ends with the cursor resting on '+ New': run presses it.
+      run: (h) => feature("app-workspace").run(h),
     },
   ],
 };

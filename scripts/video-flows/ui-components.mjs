@@ -145,7 +145,8 @@ const followPointer = () => {
 async function specimens(h) {
   const { page } = h;
   const input = page.getByPlaceholder("Type to typeset");
-  await h.type(input, "Hi", 40);
+  await fast(h, input, 240);
+  await page.keyboard.type("Hi", { delay: 40 });
   const thumb = page.locator("main [role=slider]").first();
   const tb = await thumb.boundingBox();
   const track = await thumb.evaluate((el) => {
@@ -239,7 +240,262 @@ async function cutTo(h, act, ready) {
 /** Features: no entrance/cross-fade animations, so no half-faded frames on camera. */
 const calm = (h) => h.page.emulateMedia({ reducedMotion: "reduce" }).catch(() => {});
 
+/** Same as quietDarkMonaco/hideOwnerName/followPointer + CURSOR_CSS, as one init script (every full load of the take). */
+const TAKE_INIT = `(() => {
+  const css = ${JSON.stringify(CURSOR_CSS)};
+  const boot = () => {
+    if (!document.getElementById("__rec_css")) {
+      const st = document.createElement("style");
+      st.id = "__rec_css";
+      st.textContent = css;
+      document.head.appendChild(st);
+    }
+    (${hideOwnerName.toString()})();
+    (${quietDarkMonaco.toString()})();
+    (${followPointer.toString()})();
+    // Monaco's mount placeholder reads as a spinner: hide it (the panel is empty for a moment instead).
+    if (!window.__recInit) window.__recInit = setInterval(() => {
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        if (!/^\\s*(Initializing|Loading) editor/i.test(n.nodeValue)) continue;
+        let el = n.parentElement;
+        if (el?.parentElement && el.parentElement.textContent.trim().length < 40) el = el.parentElement;
+        if (el && el.style.visibility !== "hidden") el.style.visibility = "hidden";
+      }
+    }, 30);
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();`;
+
+/** Lock the playground framing (opening the code panel reflows the page); release() before leaving. */
+const lockScroll = (h) => h.page.evaluate(() => {
+  window.__lockY = window.scrollY;
+  const fix = () => { if (Math.abs(window.scrollY - window.__lockY) > 1) window.scrollTo(0, window.__lockY); };
+  window.addEventListener("scroll", fix, true);
+  const t = setInterval(fix, 16);
+  window.__unlock = () => { window.removeEventListener("scroll", fix, true); clearInterval(t); };
+});
+const unlockScroll = (h) => h.page.evaluate(() => window.__unlock?.()).catch(() => {});
+const NAV_SETTLE = 250;
+const recursor = (h) => h.page.evaluate(CURSOR_SCRIPT).catch(() => {});
+const headerLink = (page, name) => page.locator("header a").filter({ hasText: new RegExp(`^\\s*${name}\\s*$`) }).first();
+
+/** The playground's edit sequence (shared by clip mode and the take). */
+async function playgroundEdit(h) {
+  const { page } = h;
+  const edit = page.locator(".monaco-editor .view-line", { hasText: "Primary" }).first();
+  await edit.waitFor({ state: "visible" });
+  const wb = await edit.boundingBox();
+  const wordBox = await edit.locator("span", { hasText: "Primary" }).last().boundingBox().catch(() => null);
+  const tx = wordBox ? wordBox.x + wordBox.width / 2 : wb.x + 30;
+  await h.moveTo(tx, wb.y + wb.height / 2, 200);
+  await page.mouse.dblclick(tx, wb.y + wb.height / 2);
+  await page.keyboard.type("Get started", { delay: 45 });
+  await page.keyboard.press("Escape");
+  await h.beat(550);
+  const variant = page.locator("main select").first();
+  const size = page.locator("main select").nth(1);
+  await h.hover(variant, 200);
+  await variant.selectOption("secondary");
+  await h.wait(600);
+  await h.hover(size, 180);
+  await size.selectOption("lg");
+  await h.wait(600);
+  await fast(h, page.getByRole("button", { name: "Code", exact: true }), 200);
+  const code = page.locator(".monaco-editor").filter({ has: page.locator(".view-line", { hasText: "export default" }) }).first();
+  await code.waitFor({ timeout: 6000 }).catch(() => {});
+  const dy = await page.evaluate(() => {
+    const e = window.monaco?.editor.getEditors().find((x) => /export default function/.test(x.getValue()));
+    if (!e) return 0;
+    const lines = e.getValue().split("\n");
+    const first = lines.findIndex((l) => /export default function/.test(l)) + 1;
+    return Math.max(0, e.getTopForLineNumber(first) - 4 - e.getScrollTop());
+  });
+  const cb = await code.boundingBox();
+  if (cb && dy > 0) {
+    await h.moveTo(cb.x + cb.width / 2, Math.min(cb.y + 60, 760), 180);
+    await page.mouse.wheel(0, dy);
+  }
+  await h.beat(900);
+  await fast(h, page.getByRole("button", { name: "Copy", exact: true }), 200);
+  await page.getByText("Code copied to clipboard").first().waitFor({ timeout: 4000 }).catch(() => {});
+  await h.beat(600);
+}
+
+/**
+ * Continuous take (v4): one shot, the v3 content joined by the site's own
+ * navigation. The order swaps theme and playground (v3: playground, theme) so the
+ * landing page hands over with one natural click: its "6 themes" list -> Neon.
+ *
+ * landing (hero, specimens operated, the 6 themes) --click "Neon"--> Neon theme
+ * (light -> dark -> CSS) --header Playground--> playground (Button: JSX, props,
+ * code, copy) --header Requests--> failed proposal -> back -> passing proposal ->
+ * history --header Library--> search, BaseButton, code --header Components-->
+ * Slider: drag, code.
+ */
+const take = {
+  target: 36,
+  posterFrom: { feature: "playground", at: -0.6 },
+  async before(h) {
+    const { page } = h;
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"], { origin: BASE }).catch(() => {});
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.addInitScript(TAKE_INIT);
+    // Lead-in (trimmed, not a cut): visit every page the take uses so routes,
+    // chunks, Monaco and its TS worker are in the HTTP cache.
+    await page.goto(`${BASE}/playground/`, { waitUntil: "domcontentloaded" });
+    await page.locator("main button", { hasText: /^Button$/ }).first().click({ timeout: 15000 });
+    await page.getByRole("button", { name: "Properties", exact: true }).click();
+    await page.locator(".monaco-editor .view-line", { hasText: "Primary" }).first().waitFor({ timeout: 20000 });
+    await page.getByRole("button", { name: "Code", exact: true }).click().catch(() => {});
+    await h.wait(1200);
+    for (const p of ["/themes/?theme=neon", "/requests/?request=req-3ee6bec0c5af", "/requests/?request=req-80f75c51b822", "/library/?id=my-cv--basebutton", "/components/?component=slider", "/components/", "/library/", "/requests/"]) {
+      await page.goto(`${BASE}${p}`, { waitUntil: "networkidle" }).catch(() => {});
+    }
+    await page.goto(`${BASE}/`, { waitUntil: "networkidle" }).catch(() => {});
+    await h.waitForStill(2000);
+    await page.evaluate(() => document.querySelector("main input")?.closest(".grid")?.setAttribute("data-rec-shown", ""));
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await h.wait(300);
+    await h.moveTo(1180, 760, 16);
+  },
+  route: [
+    {
+      key: "marketing",
+      kind: "marketing",
+      title: "Landing page",
+      priority: 0,
+      async run(h) {
+        const { page } = h;
+        const input = page.getByPlaceholder("Type to typeset");
+        await h.glide(input.locator("xpath=ancestor::div[contains(@class,'grid')][1]"), { offset: 185, ms: 420 });
+        await specimens(h);
+        await h.glide(page.getByRole("heading", { name: "6 themes, one source." }), { offset: 110, ms: 450 });
+        await h.beat(600);
+      },
+    },
+    {
+      key: "theme",
+      title: "One theme (Neon) on real components, light then dark",
+      priority: 2,
+      async transitionIn(h) {
+        const { page } = h;
+        const neon = page.locator("main a[href='/themes/?theme=neon']").first();
+        await h.glide(neon, { offset: 430, ms: 380 });
+        await h.nav(neon, { arrive: page.getByText("Dark Mode", { exact: true }), hold: 0, move: 240, settleMax: NAV_SETTLE });
+        await recursor(h);
+      },
+      async run(h) {
+        const { page } = h;
+        await h.beat(500);
+        await fast(h, page.getByText("Dark Mode", { exact: true }).first(), 240);
+        await h.beat(900);
+        await fast(h, page.getByText("CSS", { exact: true }), 220);
+        await h.beat(800);
+      },
+    },
+    {
+      key: "playground",
+      title: "Playground: edit a Button's JSX and props, copy the code",
+      priority: 1,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.nav(headerLink(page, "Playground"), { arrive: page.locator("main button", { hasText: /^Button$/ }), hold: 0, move: 240, settleMax: NAV_SETTLE });
+        await recursor(h);
+      },
+      async run(h) {
+        const { page } = h;
+        await fast(h, page.locator("main button", { hasText: /^Button$/ }), 240);
+        await fast(h, page.getByRole("button", { name: "Properties", exact: true }), 220);
+        // The glide runs while Monaco mounts (its "Initializing editor..." placeholder is hidden by TAKE_INIT).
+        await h.glide(400, { ms: 380 });
+        await page.locator(".monaco-editor .view-line", { hasText: "Primary" }).first().waitFor({ timeout: 10000 });
+        await lockScroll(h);
+        await playgroundEdit(h);
+        await unlockScroll(h);
+      },
+    },
+    {
+      key: "requests",
+      title: "Agent request queue: a failed and a passing proposal",
+      priority: 3,
+      async transitionIn(h) {
+        const { page } = h;
+        await page.addStyleTag({ content: `a[href*="request="]:has(.text-danger) .h-28{display:none!important}` });
+        await h.nav(headerLink(page, "Requests"), { arrive: page.getByText(/^Validation failed \(/), hold: 150, move: 260, settleMax: NAV_SETTLE });
+      },
+      async run(h) {
+        const { page } = h;
+        await fast(h, page.getByText(/^Validation failed \(/), 240);
+        await page.getByText("Add loading state to Button").first().waitFor({ state: "visible" });
+        await h.beat(250);
+        await h.nav(page.getByText("Add loading state to Button").first(), { arrive: page.getByText(/\d+ error\(s\)/), hold: 1000, move: 200, settleMax: NAV_SETTLE });
+        await h.nav(page.getByText("All requests").first(), { arrive: page.getByText("Add ThemeToggle"), hold: 0, move: 200, settleMax: NAV_SETTLE });
+        await h.nav(page.getByText("Add ThemeToggle").first(), { arrive: page.getByText(/Validation passed/), hold: 700, move: 200, settleMax: NAV_SETTLE });
+        await fast(h, page.getByRole("tab", { name: /History/ }).or(page.getByText(/^History \(/)).first(), 200);
+        await h.beat(700);
+      },
+    },
+    {
+      key: "library",
+      title: "Library: imported components with props contracts",
+      priority: 4,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.nav(headerLink(page, "Library"), { arrive: page.getByPlaceholder(/Search name, prop/), hold: 100, move: 260, settleMax: NAV_SETTLE });
+      },
+      async run(h) {
+        const { page } = h;
+        await fast(h, page.getByPlaceholder(/Search name, prop/), 220);
+        await page.keyboard.type("button", { delay: 30 });
+        await h.beat(450);
+        await h.nav(page.getByText("BaseButton", { exact: true }).first(), { arrive: page.getByText(/^Props \(/), hold: 800, move: 220, settleMax: NAV_SETTLE });
+        await fast(h, page.getByRole("tab", { name: "Code" }).or(page.getByRole("button", { name: "Code", exact: true })).first(), 200);
+        await h.waitForStill(500);
+        await h.beat(700);
+      },
+    },
+    {
+      key: "components",
+      title: "Component gallery with preview and code",
+      priority: 5,
+      async transitionIn(h) {
+        const { page } = h;
+        await h.nav(page.locator("header a[href='/components/']").first(), { arrive: page.locator("main a[href='/components/?component=slider']"), hold: 0, move: 260, settleMax: NAV_SETTLE });
+        await h.nav(page.locator("main a[href='/components/?component=slider']").first(), { arrive: page.getByText("Open in Playground"), hold: 150, move: 220, settleMax: NAV_SETTLE });
+      },
+      async run(h) {
+        const { page } = h;
+        const thumb = page.locator("main [role=slider]").nth(1);
+        const tb = await thumb.boundingBox();
+        const track = await thumb.evaluate((el) => {
+          for (let n = el.parentElement; n; n = n.parentElement) {
+            const r = n.getBoundingClientRect();
+            if (r.width > 150) return { x: r.x, width: r.width };
+          }
+          return null;
+        });
+        if (tb && track) {
+          const y = tb.y + tb.height / 2;
+          await h.moveTo(tb.x + tb.width / 2, y, 220);
+          await page.mouse.down();
+          await h.moveTo(track.x + tb.width / 2 + 0.8 * (track.width - tb.width), y, 300);
+          await page.mouse.up();
+        }
+        await h.beat(350);
+        await fast(h, page.getByRole("tab", { name: "Code" }).or(page.getByRole("button", { name: "Code", exact: true })).first(), 200);
+        await h.waitForStill(400);
+        await h.beat(400);
+        await h.hover(page.getByText("Open in Playground").first(), 220);
+        await h.beat(600);
+      },
+    },
+  ],
+};
+
 export default {
+  take,
   url: `${BASE}/`,
   target: 36, // plan 40; every planned feature is in and the cut runs ~36 s (round 3)
   colorScheme: "dark",

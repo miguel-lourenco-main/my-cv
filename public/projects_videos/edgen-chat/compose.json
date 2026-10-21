@@ -1,91 +1,178 @@
 {
   "id": "edgen-chat",
-  "composedAt": "2026-10-20T22:17:49.236Z",
+  "mode": "continuous",
+  "composedAt": "2026-10-20T23:53:03.420Z",
   "target": 35,
   "tolerance": 0.1,
   "bounds": [
     31.5,
     38.5
   ],
-  "xfade": 0,
-  "total": 33.52,
+  "total": 33.96,
   "status": "ok",
+  "cuts": [
+    31.04
+  ],
+  "cutDetails": [
+    {
+      "at": 31.04,
+      "skippedS": 1.4,
+      "label": "before command-center"
+    }
+  ],
+  "longestTakeS": 31.04,
+  "longestTakeShare": 0.91,
+  "takes": [
+    {
+      "duration": 31.04
+    },
+    {
+      "duration": 2.93
+    }
+  ],
   "marketingShare": 0,
-  "included": [
+  "features": [
     {
       "key": "chat",
       "kind": "feature",
       "title": "New chat, streamed answer",
       "priority": 1,
-      "duration": 6.36,
       "start": 0,
-      "end": 6.36
+      "end": 6.27,
+      "duration": 6.27
     },
     {
       "key": "model-switch",
       "kind": "feature",
       "title": "Switch model mid-conversation, context-aware follow-up",
       "priority": 2,
-      "duration": 7,
-      "start": 6.36,
-      "end": 13.36
+      "start": 6.27,
+      "end": 12.99,
+      "duration": 6.72
     },
     {
       "key": "settings",
       "kind": "feature",
       "title": "Settings: provider status, proxy vs local, model and key",
       "priority": 3,
-      "duration": 8.72,
-      "start": 13.36,
-      "end": 22.08
+      "start": 12.99,
+      "end": 19.82,
+      "duration": 6.83
     },
     {
       "key": "history",
       "kind": "feature",
-      "title": "Local chat history and search",
+      "title": "Local chat history: rename, open, search",
       "priority": 4,
-      "duration": 4.44,
-      "start": 22.08,
-      "end": 26.52
+      "start": 19.82,
+      "end": 27.71,
+      "duration": 7.89
     },
     {
       "key": "theme",
       "kind": "feature",
       "title": "Light / dark theme toggle",
       "priority": 5,
-      "duration": 3.8,
-      "start": 26.52,
-      "end": 30.32
+      "start": 27.71,
+      "end": 31.04,
+      "duration": 3.33
     },
     {
       "key": "command-center",
       "kind": "feature",
       "title": "Command-center layout",
       "priority": 6,
-      "duration": 3.2,
-      "start": 30.32,
-      "end": 33.52
+      "start": 31.04,
+      "end": 33.96,
+      "duration": 2.92
     }
   ],
-  "dropped": [],
-  "missing": [],
-  "clips": {
-    "chat": 6.36,
-    "model-switch": 7,
-    "settings": 8.72,
-    "history": 4.44,
-    "theme": 3.8,
-    "command-center": 3.2
-  },
+  "included": [
+    {
+      "key": "chat",
+      "kind": "feature",
+      "title": "New chat, streamed answer",
+      "priority": 1,
+      "start": 0,
+      "end": 6.27,
+      "duration": 6.27
+    },
+    {
+      "key": "model-switch",
+      "kind": "feature",
+      "title": "Switch model mid-conversation, context-aware follow-up",
+      "priority": 2,
+      "start": 6.27,
+      "end": 12.99,
+      "duration": 6.72
+    },
+    {
+      "key": "settings",
+      "kind": "feature",
+      "title": "Settings: provider status, proxy vs local, model and key",
+      "priority": 3,
+      "start": 12.99,
+      "end": 19.82,
+      "duration": 6.83
+    },
+    {
+      "key": "history",
+      "kind": "feature",
+      "title": "Local chat history: rename, open, search",
+      "priority": 4,
+      "start": 19.82,
+      "end": 27.71,
+      "duration": 7.89
+    },
+    {
+      "key": "theme",
+      "kind": "feature",
+      "title": "Light / dark theme toggle",
+      "priority": 5,
+      "start": 27.71,
+      "end": 31.04,
+      "duration": 3.33
+    },
+    {
+      "key": "command-center",
+      "kind": "feature",
+      "title": "Command-center layout",
+      "priority": 6,
+      "start": 31.04,
+      "end": 33.96,
+      "duration": 2.92
+    }
+  ],
+  "skipped": [],
+  "route": [
+    "chat",
+    "model-switch",
+    "settings",
+    "history",
+    "theme",
+    "command-center"
+  ],
+  "leadInTrimmedS": 9.85,
+  "offCameraTrimmedS": 1.4,
+  "rawDurationS": 45.44,
+  "videoOffsetS": -0.07,
   "poster": {
-    "segment": "chat",
-    "at": 6.06
+    "feature": "chat",
+    "at": 5.97
   },
   "files": {
-    "mp4": 1804066,
-    "webm": 1213414,
-    "poster": 83968,
+    "mp4": 2169483,
+    "webm": 1475617,
+    "poster": 84195,
     "mp4Crf": 23,
     "webmCrf": 38
-  }
+  },
+  "checks": {
+    "length": true,
+    "cuts": true,
+    "longestTake": true,
+    "marketing": true,
+    "mp4Size": true
+  },
+  "ok": true
 }
